@@ -134,7 +134,7 @@ public class RegUser_Activity extends AppCompatActivity implements View.OnClickL
                     //get the reference to admin collection,
                     final CollectionReference cR_ifRegistered = FirebaseFirestore.getInstance().collection("admins_offices");
 
-                    //check array of field "employee_this_admin", if contain User phone number
+                    //check array of field "employee_this_admin", if contain UserCheckIn phone number
                     Query query_ifRegistered = cR_ifRegistered.whereArrayContains("employee_this_admin",user.getPhoneNumber());
 
                     query_ifRegistered.get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
@@ -155,7 +155,7 @@ public class RegUser_Activity extends AppCompatActivity implements View.OnClickL
 
                             }else {
 
-                                //return as User is not verified by any admin,
+                                //return as UserCheckIn is not verified by any admin,
                                 //sign him out from firebase authentication page.
 
                                 logOutNow();
@@ -170,7 +170,7 @@ public class RegUser_Activity extends AppCompatActivity implements View.OnClickL
                         @Override
                         public void onFailure(@NonNull Exception e) {
 
-                            //failure to retrieve data, ask User to try again, log in.
+                            //failure to retrieve data, ask UserCheckIn to try again, log in.
 
                                 logOutNow();
 
@@ -179,7 +179,7 @@ public class RegUser_Activity extends AppCompatActivity implements View.OnClickL
                         @Override
                         public void onCanceled() {
 
-                            //canceled to retrieve data, ask User to enter again if consent.
+                            //canceled to retrieve data, ask UserCheckIn to enter again if consent.
 
                                 logOutNow();
 

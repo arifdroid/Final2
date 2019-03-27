@@ -6,13 +6,17 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.afinal.R;
 import com.example.afinal.fingerPrint_Login.Presenter_FingerPrint;
+import com.example.afinal.fingerPrint_Login.main_activity_fragment.Main_BottomNav_Activity;
 
 import java.util.Observable;
 import java.util.Observer;
@@ -80,6 +84,35 @@ public class FingerPrint_LogIn_Final_Activity extends AppCompatActivity implemen
                         textView.setText("admin detected, fingerprint checkin now with server..");
 
                         presenter.checkSupportedDevice();
+
+                        textView.addTextChangedListener(new TextWatcher() {
+                            @Override
+                            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+                            }
+
+                            @Override
+                            public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+                            }
+
+                            @Override
+                            public void afterTextChanged(Editable s) {
+
+                                if(s.toString().equals("success verified")) {
+
+                                    Intent intent = new Intent(FingerPrint_LogIn_Final_Activity.this, Main_BottomNav_Activity.class);
+                                    startActivity(intent);
+
+                                    //intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+                                    finish();
+
+                                }else {
+                                    Toast.makeText(FingerPrint_LogIn_Final_Activity.this,"please try fingerprint again" ,Toast.LENGTH_SHORT).show();
+                                }
+
+                            }
+                        });
                     }
                 }else {
                     textView.setText("waiting");
@@ -89,6 +122,7 @@ public class FingerPrint_LogIn_Final_Activity extends AppCompatActivity implemen
 
             }
         });
+
 
 
 

@@ -24,7 +24,7 @@ public class Test_Presenter implements ILogInPresenter {
     @Override
     public void doLogIn(String name, String pwd) {
         Boolean isLogInSuccess = true;
-        //final int code = User.
+        //final int code = UserCheckIn.
         final int code = user.checkUserValidity(name,pwd);
         //thisView.onLogInResult();
 

@@ -13,6 +13,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.example.afinal.R;
+import com.example.afinal.fingerPrint_Login.main_activity_fragment.Main_BottomNav_Activity;
 import com.example.afinal.fingerPrint_Login.register.register_as_admin.register_as_admin_regAdmin.RegAdmin_AsAdmin_Activity;
 import com.example.afinal.fingerPrint_Login.register.register_with_activity.RegAdmin_Activity;
 
@@ -53,7 +54,7 @@ public class Login_Select_Action_Fragment extends Fragment implements View.OnCli
         //then set text
 
         textView_RegAdmin.setText("Register As Admin");
-        textView_RegUser.setText("Register As User");
+        textView_RegUser.setText("Register As UserCheckIn");
         textViewAdmin_1.setText("Log in to Admin 1");
         textViewAdmin_2.setText("Log in to Admin 2");
         textView_Note.setText("MC or Outstation?");
@@ -133,6 +134,8 @@ public class Login_Select_Action_Fragment extends Fragment implements View.OnCli
                 break;
 
             case R.id.select_fragment_FloatButton_addNoteMCiD:
+
+
 
 
 

@@ -5,33 +5,32 @@
     android:id="@+id/container"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".fingerPrint_Login.register.Register_Activity">
+    tools:context=".fingerPrint_Login.main_activity_fragment.Main_BottomNav_Activity">
 
     <android.support.design.widget.BottomNavigationView
-        android:id="@+id/registration_navigationiD"
+        android:id="@+id/bottomNav_view_pager_menuOptionsiD"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="1dp"
+        android:layout_marginStart="0dp"
+        android:layout_marginEnd="0dp"
         android:background="?android:attr/windowBackground"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:menu="@menu/navigation" />
 
-    <FrameLayout
-        android:id="@+id/registration_frameiD"
+    <android.support.v4.view.ViewPager
+        android:id="@+id/bottomNav_view_pager_frameID"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:layout_marginStart="3dp"
-        android:layout_marginTop="3dp"
-        android:layout_marginEnd="3dp"
-        android:layout_marginBottom="3dp"
-        app:layout_constraintBottom_toTopOf="@+id/registration_navigationiD"
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="8dp"
+        app:layout_constraintBottom_toTopOf="@+id/bottomNav_view_pager_menuOptionsiD"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
-    </FrameLayout>
+
+    </android.support.v4.view.ViewPager>
 
 </android.support.constraint.ConstraintLayout>

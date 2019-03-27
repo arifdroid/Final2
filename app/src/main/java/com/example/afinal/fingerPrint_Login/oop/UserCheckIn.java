@@ -1,6 +1,6 @@
 package com.example.afinal.fingerPrint_Login.oop;
 
-public class User {
+public class UserCheckIn {
 
     private String name;
     private String phone;
@@ -9,11 +9,11 @@ public class User {
     private String uid;
     private float rating;
 
-    public User(){
+    public UserCheckIn(){
 
     }
 
-    public User(String name, String phone, String image_url, String uid, float rating) {
+    public UserCheckIn(String name, String phone, String image_url, String uid, float rating) {
         this.name = name;
         this.phone = phone;
         this.image_url = image_url;
