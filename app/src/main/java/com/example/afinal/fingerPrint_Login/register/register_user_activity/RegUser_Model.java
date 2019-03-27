@@ -1,6 +1,6 @@
 package com.example.afinal.fingerPrint_Login.register.register_user_activity;
 
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 import android.util.Log;
 
 import com.google.android.gms.tasks.OnCompleteListener;

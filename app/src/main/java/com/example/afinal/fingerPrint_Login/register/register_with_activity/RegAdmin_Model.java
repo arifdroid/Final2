@@ -1,8 +1,7 @@
 package com.example.afinal.fingerPrint_Login.register.register_with_activity;
 
 import android.os.Handler;
-import android.support.annotation.NonNull;
-import android.widget.TableRow;
+import androidx.annotation.NonNull;
 
 import com.google.android.gms.tasks.OnCanceledListener;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -15,7 +14,6 @@ import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.Map;
 import java.util.Observable;
-import java.util.Observer;
 
 public class RegAdmin_Model extends Observable implements RegAdminModel_Interface{
 

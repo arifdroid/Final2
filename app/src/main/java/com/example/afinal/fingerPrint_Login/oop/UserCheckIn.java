@@ -9,8 +9,14 @@ public class UserCheckIn {
     private String uid;
     private float rating;
 
+    private int priority;
+
     public UserCheckIn(){
 
+    }
+
+    public void setPriority(int priority) {
+        this.priority = priority;
     }
 
     public UserCheckIn(String name, String phone, String image_url, String uid, float rating) {

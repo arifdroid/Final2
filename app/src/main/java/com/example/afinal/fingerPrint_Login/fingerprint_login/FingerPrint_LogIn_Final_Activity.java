@@ -1,10 +1,17 @@
 package com.example.afinal.fingerPrint_Login.fingerprint_login;
 
 import android.content.Intent;
-import android.support.constraint.ConstraintLayout;
-import android.support.design.widget.FloatingActionButton;
-import android.support.v4.app.FragmentManager;
-import android.support.v7.app.AppCompatActivity;
+
+import androidx.annotation.NonNull;
+import androidx.constraintlayout.widget.ConstraintLayout;
+
+
+import com.example.afinal.fingerPrint_Login.oop.OnServerTime_Interface;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import androidx.fragment.app.FragmentManager;
+import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -15,8 +22,13 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.afinal.R;
-import com.example.afinal.fingerPrint_Login.Presenter_FingerPrint;
 import com.example.afinal.fingerPrint_Login.main_activity_fragment.Main_BottomNav_Activity;
+import com.google.firebase.FirebaseApp;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.functions.FirebaseFunctions;
+import com.google.firebase.functions.HttpsCallableResult;
 
 import java.util.Observable;
 import java.util.Observer;
@@ -26,7 +38,7 @@ import java.util.Observer;
 //first instantiate to null
 //update text view as well.
 
-public class FingerPrint_LogIn_Final_Activity extends AppCompatActivity implements FingerPrintFinal_View_Interface, View.OnClickListener, Observer {
+public class FingerPrint_LogIn_Final_Activity extends AppCompatActivity implements FingerPrintFinal_View_Interface, View.OnClickListener, Observer, OnServerTime_Interface {
 
     private FloatingActionButton floatButtonGetAction;
     private TextView textView;
@@ -43,14 +55,43 @@ public class FingerPrint_LogIn_Final_Activity extends AppCompatActivity implemen
 
     ConstraintLayout backColor;
 
+    //after log in register user data timestamp directly.
+
+    private String globalAdminNameHere = "ariff";
+    private String globalAdminPhoneHere= "+60190";
+
+    private FirebaseFirestore instance = FirebaseFirestore.getInstance();
+
+    private CollectionReference collectionReferenceRating
+            = instance.collection("all_admin_doc_collections")
+            .document(globalAdminNameHere+globalAdminPhoneHere+"_doc").collection("all_employee_thisAdmin_collection");
+
+
+
+    // >> testing value
+
+    //cloud function with time value
+
+    private long timeStampthis;
+
+    private OnServerTime_Interface onServerTime_interface;
+
+    ///
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_finger_print__log_in__final_);
 
         //initially false, add observer to this.
+
+        FirebaseApp.initializeApp(this);
+
         dataPulled = false;
 
+
+
+        timeStampthis= 0;
 
         nameUser = "";
         phoneUser = "";
@@ -63,6 +104,8 @@ public class FingerPrint_LogIn_Final_Activity extends AppCompatActivity implemen
         imageView = findViewById(R.id.login_final_imageViewID);
         textView.setText("click button below to log in");
         backColor = findViewById(R.id.backLayoutColourID);
+
+
 
         presenter = new FingerPrintFinal_Presenter(this);
 
@@ -101,6 +144,18 @@ public class FingerPrint_LogIn_Final_Activity extends AppCompatActivity implemen
 
                                 if(s.toString().equals("success verified")) {
 
+                                    //check in with time stamp.
+                                    //getServerTimeNow(this);
+
+                                    Log.i("checkkTime : ", " 00 ");
+
+
+                                    getServerTimeNow(onServerTime_interface);
+
+                                    if(timeStampthis!=0){
+                                        Toast.makeText(FingerPrint_LogIn_Final_Activity.this,"time now is: "+ timeStampthis, Toast.LENGTH_SHORT).show();
+                                    }
+
                                     Intent intent = new Intent(FingerPrint_LogIn_Final_Activity.this, Main_BottomNav_Activity.class);
                                     startActivity(intent);
 
@@ -127,6 +182,41 @@ public class FingerPrint_LogIn_Final_Activity extends AppCompatActivity implemen
 
 
     }
+
+    public void getServerTimeNow(final OnServerTime_Interface onServerTime_interface){
+
+        FirebaseFunctions.getInstance().getHttpsCallable("getTime")
+                .call()
+                .addOnCompleteListener(new OnCompleteListener<HttpsCallableResult>() {
+                    @Override
+                    public void onComplete(@NonNull Task<HttpsCallableResult> task) {
+
+                        Log.i("checkkTime : ", " 22 before task" );
+
+                        if(task.isSuccessful()){
+
+                        long timm = (long) task.getResult().getData();
+
+                        Log.i("checkkTime : ", " 1 "+ timm);
+                        if(onServerTime_interface!=null) {
+                            onServerTime_interface.onSuccess(timm);
+                        }else {
+                            onServerTime_interface.onFailed();
+                        }
+
+
+                    }else {
+
+                        Log.i("checkkTime : ", " 11 task failed?" );
+                    }
+
+                    }
+                });
+
+        return;
+
+    }
+
 
     @Override
     public void onClick(View v) {
@@ -162,5 +252,19 @@ public class FingerPrint_LogIn_Final_Activity extends AppCompatActivity implemen
         super.onDestroy();
 
         presenter.deleteObserver(this);
+    }
+
+
+    @Override
+    public void onSuccess(long timeStampHere) {
+
+        Log.i("checkkTime : ", " 2 "+ timeStampHere);
+        this.timeStampthis =timeStampHere;
+        return;
+    }
+
+    @Override
+    public void onFailed() {
+ 
     }
 }

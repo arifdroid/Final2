@@ -3,7 +3,6 @@ package com.example.afinal.fingerPrint_Login.fingerprint_login;
 import android.content.Context;
 import android.hardware.fingerprint.FingerprintManager;
 import android.os.CancellationSignal;
-import android.support.v4.hardware.fingerprint.FingerprintManagerCompat;
 import android.util.Log;
 
 import com.example.afinal.fingerPrint_Login.PassResult;

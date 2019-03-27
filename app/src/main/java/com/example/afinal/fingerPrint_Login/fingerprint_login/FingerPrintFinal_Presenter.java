@@ -1,12 +1,11 @@
 package com.example.afinal.fingerPrint_Login.fingerprint_login;
 
-import android.app.Activity;
 import android.content.Context;
 import android.hardware.fingerprint.FingerprintManager;
 import android.os.Build;
+import androidx.appcompat.app.AppCompatActivity;
 import android.util.Log;
 
-import com.example.afinal.fingerPrint_Login.Model_fingerPrint;
 import com.example.afinal.fingerPrint_Login.PassResult;
 
 import java.util.Observable;
@@ -28,7 +27,7 @@ class FingerPrintFinal_Presenter extends Observable {
     public FingerPrintFinal_Presenter(FingerPrintFinal_View_Interface view_interface) {
 
         this.view_interface = view_interface;
-        mContext = ((Activity)view_interface).getApplicationContext();
+        mContext = ((AppCompatActivity)view_interface).getApplicationContext();
         resultFinal = "";
     }
 

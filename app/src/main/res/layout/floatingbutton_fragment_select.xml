@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout
+<androidx.constraintlayout.widget.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
@@ -24,7 +24,7 @@
         app:layout_constraintVertical_bias="0.0"/>
 
 
-    <android.support.design.widget.FloatingActionButton
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/select_fragment_FloatButton_backiD"
         app:backgroundTint="@android:color/holo_red_light"
         android:layout_width="50dp"
@@ -41,7 +41,7 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.987" />
 
-    <android.support.design.widget.FloatingActionButton
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/select_fragment_FloatButton_admin1id"
         android:layout_width="40dp"
         android:layout_height="wrap_content"
@@ -102,7 +102,7 @@
         app:layout_constraintEnd_toStartOf="@+id/select_fragment_FloatButton_addNoteMCiD"
         app:layout_constraintTop_toTopOf="@+id/select_fragment_FloatButton_addNoteMCiD" />
 
-    <android.support.design.widget.FloatingActionButton
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/select_fragment_FloatButton_admin2"
         android:layout_width="40dp"
         android:layout_height="wrap_content"
@@ -113,7 +113,7 @@
         app:layout_constraintEnd_toEndOf="@+id/select_fragment_FloatButton_backiD"
         app:layout_constraintStart_toStartOf="@+id/select_fragment_FloatButton_backiD" />
 
-    <android.support.design.widget.FloatingActionButton
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/select_fragment_FloatButton_RegisterUseriD"
         android:layout_width="40dp"
         android:layout_height="wrap_content"
@@ -124,7 +124,7 @@
         app:layout_constraintEnd_toEndOf="@+id/select_fragment_FloatButton_backiD"
         app:layout_constraintStart_toStartOf="@+id/select_fragment_FloatButton_backiD" />
 
-    <android.support.design.widget.FloatingActionButton
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/select_fragment_FloatButton_RegisterAdminiD"
         android:layout_width="40dp"
         android:layout_height="wrap_content"
@@ -135,7 +135,7 @@
         app:layout_constraintEnd_toEndOf="@+id/select_fragment_FloatButton_backiD"
         app:layout_constraintStart_toStartOf="@+id/select_fragment_FloatButton_backiD" />
 
-    <android.support.design.widget.FloatingActionButton
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/select_fragment_FloatButton_addNoteMCiD"
         android:layout_width="40dp"
         android:layout_height="wrap_content"
@@ -147,4 +147,4 @@
         app:layout_constraintStart_toStartOf="@+id/select_fragment_FloatButton_backiD" />
 
 
-</android.support.constraint.ConstraintLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>
