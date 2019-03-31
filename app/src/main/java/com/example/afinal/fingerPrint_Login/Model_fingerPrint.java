@@ -63,4 +63,7 @@ public class Model_fingerPrint extends FingerprintManager.AuthenticationCallback
             passResult.passingResult("auth failed");
         }
     }
+
+    public void stopListening() {
+    }
 }

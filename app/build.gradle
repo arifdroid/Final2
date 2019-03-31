@@ -30,15 +30,11 @@ dependencies {
     implementation 'com.google.firebase:firebase-functions:16.3.0'
 
     //firebase admin
-   // implementation 'com.google.firebase:firebase-admin:6.8.0'
-
-
+    // implementation 'com.google.firebase:firebase-admin:6.8.0'
 
     //chart android
     implementation 'com.github.PhilJay:MPAndroidChart:v3.1.0'
     implementation 'com.github.PhilJay:MPAndroidChart:v3.1.0'
-
-
 
     //request location permission
     implementation 'pub.devrel:easypermissions:2.0.1'

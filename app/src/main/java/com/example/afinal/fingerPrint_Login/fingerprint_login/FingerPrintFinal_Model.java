@@ -17,20 +17,30 @@ public class FingerPrintFinal_Model extends FingerprintManager.AuthenticationCal
         this.passResult = passResult;
     }
 
+    //telling the same object to stop listening
+
+    private FingerprintManager fingerprintManager;
+
+    private   CancellationSignal cancellationSignal;
+
 
 
     public FingerPrintFinal_Model(Context mContext) {
 
-        Log.i("checkFinal : ", " flow 10 ,model, constructtor(), ");
+        Log.i("checkFinalFlow : ", " 20 fingerprint model, constructor()");
         this.mContext = mContext;
     }
 
 
     public void startAuthFingerPrint(FingerprintManager fingerprintManager){
 
-        Log.i("checkFinal : ", " flow 11 ,model, startAuthFingerPrint(), ");
-        CancellationSignal cancellationSignal = new CancellationSignal();
 
+        this.fingerprintManager = fingerprintManager;
+
+        //
+
+        Log.i("checkFinalFlow : ", " 21 fingerprint model, startAuthFingerPrint()");
+        cancellationSignal = new CancellationSignal();
         fingerprintManager.authenticate(null,cancellationSignal,0,this,null);
     }
 
@@ -40,7 +50,7 @@ public class FingerPrintFinal_Model extends FingerprintManager.AuthenticationCal
         if(passResult!=null){
             passResult.passingResult("error: "+errString);
 
-        Log.i("checkFinal : ", " flow 12 ,model, onAuthenticationError(), ");
+            Log.i("checkFinalFlow : ", " 22 fingerprint model, error()");
 
         }
 
@@ -52,6 +62,8 @@ public class FingerPrintFinal_Model extends FingerprintManager.AuthenticationCal
         super.onAuthenticationHelp(helpCode, helpString);
         if(passResult!=null){
             passResult.passingResult("please try again");
+
+            Log.i("checkFinalFlow : ", " 22 fingerprint model, help()");
         }
 
         return;
@@ -60,9 +72,9 @@ public class FingerPrintFinal_Model extends FingerprintManager.AuthenticationCal
     @Override
     public void onAuthenticationSucceeded(FingerprintManager.AuthenticationResult result) {
         super.onAuthenticationSucceeded(result);
-        Log.i("checkFinal : ", " flow 13 ,model, onAuthenticationSucceeded(), ");
+
         if(passResult!=null){
-            Log.i("checkFinal : ", " flow 14 ,model, onAuthenticationSucceeded(), passResult ");
+            Log.i("checkFinalFlow : ", " 23 fingerprint model, success()");
             passResult.passingResult("success verified");
         }
 
@@ -74,8 +86,15 @@ public class FingerPrintFinal_Model extends FingerprintManager.AuthenticationCal
         super.onAuthenticationFailed();
         if(passResult!=null){
             passResult.passingResult("fingerprint failed");
+            Log.i("checkFinalFlow : ", " 24 fingerprint model, failed()");
         }
         return;
+    }
+
+    public void stopListening(){
+
+        Log.i("checkFinalFlow : ", " 25 fingerprint model, stopListening()");
+        cancellationSignal.cancel();
     }
 
 

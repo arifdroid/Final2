@@ -26,6 +26,8 @@ class FingerPrintFinal_Presenter extends Observable {
 
     public FingerPrintFinal_Presenter(FingerPrintFinal_View_Interface view_interface) {
 
+        Log.i("checkFinalFlow : ", " 16 fingerprint presenter constructor() ");
+
         this.view_interface = view_interface;
         mContext = ((AppCompatActivity)view_interface).getApplicationContext();
         resultFinal = "";
@@ -35,14 +37,14 @@ class FingerPrintFinal_Presenter extends Observable {
 
         if(Build.VERSION.SDK_INT>=Build.VERSION_CODES.M){
             //run
-            Log.i("checkFinal : ", " flow 4 ,presenter, checkSupporedDevice(), before ");
+            Log.i("checkFinalFlow : ", " 17 presenter, checkSupportedDevice() ");
             fingerprintManager = (FingerprintManager) mContext.getSystemService(Context.FINGERPRINT_SERVICE);
-            Log.i("checkFinal : ", " flow 5 ,presenter, checkSupporedDevice(), after ");
+
             model_fingerPrint =new FingerPrintFinal_Model(mContext);
 
             if(model_fingerPrint!=null){
 
-               Log.i("checkFinal : ", " flow 6,presenter, checkSupporedDevice(), if not null ");
+
                startFingerPrintAuth();
             }
 
@@ -67,18 +69,24 @@ class FingerPrintFinal_Presenter extends Observable {
         //loop 3 times to test, then force to try again with main button
 
         //we can setup interface result here.
-
-        Log.i("checkFinal : ", " flow 8 ,presenter, startFingerPrintAuth(), before ");
+        Log.i("checkFinalFlow : ", " 18 presenter,startFingerPrintAuth(), before");
         model_fingerPrint.startAuthFingerPrint(fingerprintManager);
-        Log.i("checkFinal : ", " flow 9 ,presenter, startFingerPrintAuth(), after");
+        Log.i("checkFinalFlow : ", " 19 presenter,startFingerPrintAuth(), after");
 
 
         model_fingerPrint.setPassResult(new PassResult() {
             @Override
             public void passingResult(String result) {
 
-                if(result!=null){
+                if(!result.equals("success verified")){
 
+                    model_fingerPrint.stopListening();
+
+                    returnToRequest("try again");
+
+
+
+                }else {
 
                     returnToRequest(result);
                 }
@@ -110,7 +118,7 @@ class FingerPrintFinal_Presenter extends Observable {
 
         //we could use same design, but we suppose to use same node presenter to call for result.
 
-        Log.i("checkk flow: ","12");
+        Log.i("checkFinalFlow : ", " 19 presenter, returnToRequest()");
         resultFinal=result;
 
         setChanged();
@@ -121,6 +129,8 @@ class FingerPrintFinal_Presenter extends Observable {
 
 
     public String getFinalStringResult() {
+
+        Log.i("checkFinalFlow : ", " 20 presenter, return result");
 
         return resultFinal;
     }

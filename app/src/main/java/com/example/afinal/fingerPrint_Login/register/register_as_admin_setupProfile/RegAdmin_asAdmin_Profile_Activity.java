@@ -15,6 +15,8 @@ import android.net.wifi.WifiManager;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+
+import com.example.afinal.fingerPrint_Login.register.register_as_admin_add_userList.Add_User_Activity;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import androidx.core.app.ActivityCompat;
 import androidx.appcompat.app.AppCompatActivity;
@@ -119,7 +121,7 @@ public class RegAdmin_asAdmin_Profile_Activity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
 
-                int count = 0, count2 = 1;
+                int count = 0;
                 for (AdminDetail adminDetail : returnAdminDetailList) {
 
                     Log.i("checkkLocation", "13 checkBox = " + adminDetail.isCheckBox());
@@ -146,7 +148,11 @@ public class RegAdmin_asAdmin_Profile_Activity extends AppCompatActivity {
                     if ((count) == adminDetailsList.size()) {
 
                         Toast.makeText(RegAdmin_asAdmin_Profile_Activity.this, "all " + count + " boxes checked", Toast.LENGTH_SHORT).show();
-                        ;
+
+                        Intent intent = new Intent(RegAdmin_asAdmin_Profile_Activity.this, Add_User_Activity.class);
+                        startActivity(intent);
+
+
                     } else {
 
                         Toast.makeText(RegAdmin_asAdmin_Profile_Activity.this, "only " + count + " boxes checked , size list "+ adminDetailsList.size() , Toast.LENGTH_SHORT).show();

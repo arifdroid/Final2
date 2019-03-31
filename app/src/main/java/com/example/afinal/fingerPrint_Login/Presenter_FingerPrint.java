@@ -5,7 +5,10 @@ import android.content.Context;
 import android.hardware.fingerprint.FingerprintManager;
 import android.os.Build;
 import android.util.Log;
+import android.widget.Toast;
 
+
+import com.example.afinal.fingerPrint_Login.fingerprint_login.FingerPrint_LogIn_Final_Activity;
 
 import java.util.Observable;
 
@@ -69,6 +72,8 @@ public class Presenter_FingerPrint extends Observable {
 
         Log.i("checkk flow: ","9");
 
+
+
         model_fingerPrint.startAuthFingerPrint(fingerprintManager);
         Log.i("checkk flow: ","10");
         model_fingerPrint.setPassResult(new PassResult() {
@@ -77,6 +82,20 @@ public class Presenter_FingerPrint extends Observable {
                 //this will run after result passed.
 
                 Log.i("checkk flow: ","11");
+
+                if(!result.equals("success verified")){
+
+                    //model_fingerPrint failed or cancelled, need to stop listening if failed.
+
+                    model_fingerPrint.stopListening();
+
+                    Toast.makeText(mContext,"stop listening fingerprint", Toast.LENGTH_LONG).show();
+
+                    return;
+
+
+                }
+
                 returnToRequest(result);
 
             }

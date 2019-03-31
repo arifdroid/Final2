@@ -30,8 +30,16 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.functions.FirebaseFunctions;
 import com.google.firebase.functions.HttpsCallableResult;
 
+import java.text.SimpleDateFormat;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.Observable;
 import java.util.Observer;
+import java.util.TimeZone;
 
 //introduce fingerprint id here,
 //need observer to watch, if string pull from fragment(sharedpreferences) exist.
@@ -67,28 +75,27 @@ public class FingerPrint_LogIn_Final_Activity extends AppCompatActivity implemen
             .document(globalAdminNameHere+globalAdminPhoneHere+"_doc").collection("all_employee_thisAdmin_collection");
 
 
-
-    // >> testing value
-
     //cloud function with time value
+
+    private String dayNow;
 
     private long timeStampthis;
 
     private OnServerTime_Interface onServerTime_interface;
 
-    ///
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_finger_print__log_in__final_);
 
-        //initially false, add observer to this.
+        onServerTime_interface = new FingerPrint_LogIn_Final_Activity();
 
-        FirebaseApp.initializeApp(this);
+        dayNow = null;
 
         dataPulled = false;
 
+        Log.i("checkFinalFlow : ", " 1 oncreate() fingerprint_main_activity");
 
 
         timeStampthis= 0;
@@ -113,13 +120,13 @@ public class FingerPrint_LogIn_Final_Activity extends AppCompatActivity implemen
 
         fragment = new Login_Select_Action_Fragment();
 
-        Log.i("checkFinal : ", " flow 1");
+
 
         getSupportFragmentManager().addOnBackStackChangedListener(new FragmentManager.OnBackStackChangedListener() {
             @Override
             public void onBackStackChanged() {
 
-                Log.i("checkFinal : ", " flow 2 , backstacklistener, before presenter activity");
+                Log.i("checkFinalFlow : ", " 2 backstackFragment() fingerprint_main_activity");
 
                 if(nameUser!=null) {
 
@@ -142,38 +149,54 @@ public class FingerPrint_LogIn_Final_Activity extends AppCompatActivity implemen
                             @Override
                             public void afterTextChanged(Editable s) {
 
+                                Log.i("checkFinalFlow : ", " 3 backfragment() aftertextchange");
+
                                 if(s.toString().equals("success verified")) {
+
+                                    Log.i("checkFinalFlow : ", " 4 backFragment(), success verified, before server time ");
 
                                     //check in with time stamp.
                                     //getServerTimeNow(this);
-
-                                    Log.i("checkkTime : ", " 00 ");
-
-
                                     getServerTimeNow(onServerTime_interface);
 
-                                    if(timeStampthis!=0){
-                                        Toast.makeText(FingerPrint_LogIn_Final_Activity.this,"time now is: "+ timeStampthis, Toast.LENGTH_SHORT).show();
-                                    }
+                                    Log.i("checkFinalFlow : ", " 5 backFragment(), success verified, AFTER server time ");
 
-                                    Intent intent = new Intent(FingerPrint_LogIn_Final_Activity.this, Main_BottomNav_Activity.class);
-                                    startActivity(intent);
+//
+//                                    Intent intent = new Intent(FingerPrint_LogIn_Final_Activity.this, Main_BottomNav_Activity.class);
+//                                    startActivity(intent);
 
                                     //intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
-                                    finish();
+//                                    finish();
+
+                                }else if(s.toString().equals("waiting")){
+
+                                    Log.i("checkFinalFlow : ", " 6 backFragment(), do nothing waiting for fingerprint ");
+
+                                }else if(s.toString().equals("try again")){
+
+                                    Log.i("checkFinalFlow : ", " 7 backFragment(), try again fingerprint ");
+
+                                    Toast.makeText(FingerPrint_LogIn_Final_Activity.this,"please select admin, try finger again" ,Toast.LENGTH_SHORT).show();
+
 
                                 }else {
-                                    Toast.makeText(FingerPrint_LogIn_Final_Activity.this,"please try fingerprint again" ,Toast.LENGTH_SHORT).show();
+
+                                    Log.i("checkFinalFlow : ", " 8 backFragment(), fingerprint need try again");
+
+                                    Toast.makeText(FingerPrint_LogIn_Final_Activity.this,"try fingerprint" ,Toast.LENGTH_SHORT).show();
                                 }
 
                             }
                         });
                     }
                 }else {
+
+                    Log.i("checkFinalFlow : ", " 9 backFragment(), waiting for fingerprint ");
+
                     textView.setText("waiting");
                 }
 
-                Log.i("checkFinal : ", " flow 3 , backstacklistener, after presenter activity");
+                Log.i("checkFinalFlow : ", " 10 backFragment(), prolem in flow ");
 
             }
         });
@@ -185,29 +208,56 @@ public class FingerPrint_LogIn_Final_Activity extends AppCompatActivity implemen
 
     public void getServerTimeNow(final OnServerTime_Interface onServerTime_interface){
 
-        FirebaseFunctions.getInstance().getHttpsCallable("getTime")
+        FirebaseFunctions.getInstance().getHttpsCallable("getTimeNow")
                 .call()
                 .addOnCompleteListener(new OnCompleteListener<HttpsCallableResult>() {
                     @Override
                     public void onComplete(@NonNull Task<HttpsCallableResult> task) {
 
-                        Log.i("checkkTime : ", " 22 before task" );
+                        Log.i("checkFinalFlow : ", " 11 getServerTimeNow(), before task");
 
                         if(task.isSuccessful()){
 
-                        long timm = (long) task.getResult().getData();
+                        //long timm = (long) (task.getResult().getData())/1000;
+                        long timm = (long) (task.getResult().getData());
 
-                        Log.i("checkkTime : ", " 1 "+ timm);
                         if(onServerTime_interface!=null) {
+
                             onServerTime_interface.onSuccess(timm);
+
+                            Date date = new Date(timm);
+
+                            dayNow  = (date.toString()).substring(0,3);
+
+                            Log.i("checkFinalFlow : ", " 11v1 getServerTimeNow(), getting the time: "+ date);
+
+                            Log.i("checkFinalFlow : ", " 12 getServerTimeNow(), getting the time");
+
+                             Toast.makeText(FingerPrint_LogIn_Final_Activity.this,"time now is: "+ date +" day:"+dayNow, Toast.LENGTH_LONG).show();
                         }else {
+
+                            //must handle this. in case server dont return time, how do we insert timestamp?
+                            Log.i("checkFinalFlow : ", " 13 getServerTimeNow(), no time recorded from server");
+
+                            //maybe we can get user timestamp,
+
+                           // getBackupTimeFromUser();
+
                             onServerTime_interface.onFailed();
                         }
 
 
-                    }else {
 
-                        Log.i("checkkTime : ", " 11 task failed?" );
+                        }else {
+
+                            Log.i("checkFinalFlow : ", " 14 getServerTimeNow(), task failed");
+
+
+                            if(dayNow==null){
+
+                                getBackupTimeFromUser();
+                            }
+
                     }
 
                     }
@@ -216,6 +266,7 @@ public class FingerPrint_LogIn_Final_Activity extends AppCompatActivity implemen
         return;
 
     }
+
 
 
     @Override
@@ -254,7 +305,7 @@ public class FingerPrint_LogIn_Final_Activity extends AppCompatActivity implemen
         presenter.deleteObserver(this);
     }
 
-
+    //probably unnecessary
     @Override
     public void onSuccess(long timeStampHere) {
 
@@ -265,6 +316,31 @@ public class FingerPrint_LogIn_Final_Activity extends AppCompatActivity implemen
 
     @Override
     public void onFailed() {
- 
+
+        if(dayNow==null) {
+            getBackupTimeFromUser();
+
+        return;
+        }
+    }
+
+    private void getBackupTimeFromUser() {
+
+        //getting date time from user
+
+        Log.i("checkFinalFlow : ", " 15 getBackupTimeFromUser(), setup our day without server ");
+
+        Date date2 = new Date();
+
+        Log.i("checkFinalFlow : ", " 15v` getBackupTimeFromUser(), setup our day without server :" + date2);
+
+        Toast.makeText(FingerPrint_LogIn_Final_Activity.this,"time without server is: "+ date2 +" day:"+dayNow, Toast.LENGTH_LONG).show();
+
+        dayNow  = (date2.toString()).substring(0,3);
+
+        return;
+
+
+
     }
 }
