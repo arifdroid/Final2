@@ -1,5 +1,9 @@
 package com.example.afinal.fingerPrint_Login.oop;
 
+import com.google.firebase.firestore.ServerTimestamp;
+
+import java.util.Date;
+
 public class UserCheckIn {
 
     private String name;
@@ -8,8 +12,15 @@ public class UserCheckIn {
    // private String ref_score_card;
     private String uid;
     private float rating;
-
     private int priority;
+
+    //data for each time stamp
+    // maybe we dont have to, we just get time from server, or get it from system as backup,
+    //then save as string inside data for easier read.
+    @ServerTimestamp
+    Date time;
+
+    //private
 
     public UserCheckIn(){
 

@@ -162,11 +162,11 @@ public class FingerPrint_LogIn_Final_Activity extends AppCompatActivity implemen
                                     Log.i("checkFinalFlow : ", " 5 backFragment(), success verified, AFTER server time ");
 
 //
-//                                    Intent intent = new Intent(FingerPrint_LogIn_Final_Activity.this, Main_BottomNav_Activity.class);
-//                                    startActivity(intent);
+                                    Intent intent = new Intent(FingerPrint_LogIn_Final_Activity.this, Main_BottomNav_Activity.class);
+                                    startActivity(intent);
 
-                                    //intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
-//                                    finish();
+                                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+                                    finish();
 
                                 }else if(s.toString().equals("waiting")){
 
