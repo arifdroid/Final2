@@ -188,14 +188,16 @@ public class TimeStampFireStore_Handler  extends Observable {
                             }
 
 
-                            testTimeStampsList.add(object);
+
+
+
 
                         } //end hash-map loop
 
                             //for test purpose, only add ryn and view to graph.
 
 
-
+                        testTimeStampsList.add(object); //mistake here.
 
 
                         //log to see if document data exist, successfully extracted.
@@ -308,6 +310,7 @@ public class TimeStampFireStore_Handler  extends Observable {
 
             setChanged();
             notifyObservers();
+            return;
 
         }
 

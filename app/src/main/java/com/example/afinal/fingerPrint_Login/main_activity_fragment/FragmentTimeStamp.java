@@ -89,6 +89,10 @@ public class FragmentTimeStamp extends Fragment implements Observer {
     private ArrayList<TestTimeStamp> finalListRemap;
     private ArrayList<ArrayList<Entry>> listof_entryList;
 
+    private ArrayList<LineDataSet> dataSetArrayList_Final;
+
+    XAxis xAxis;
+
 
     @Nullable
     @Override
@@ -101,6 +105,7 @@ public class FragmentTimeStamp extends Fragment implements Observer {
         dataSetArrayList = new ArrayList<>();
         testTimeStampsList = new ArrayList<>();
 
+        dataSetArrayList_Final = new ArrayList<>();
         finalListRemap = new ArrayList<>();
 
         listof_entryList = new ArrayList<>();
@@ -120,13 +125,13 @@ public class FragmentTimeStamp extends Fragment implements Observer {
 
 
 //
-        XAxis xAxis = chart.getXAxis();
+        xAxis = chart.getXAxis();
 
         xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
 
         //setting x axis values
 
-        final String[] months = new String[]{"Mon", "Tue","Wed","Thu","Fri","Sat"};
+        final String[] months = new String[]{"Mon", "Tue","Wed","Thu","Fri"};
 
         IAxisValueFormatter formatter = new IAxisValueFormatter() {
             @Override
@@ -163,7 +168,7 @@ public class FragmentTimeStamp extends Fragment implements Observer {
         dataSet = new LineDataSet(entries, "check out V1");
 
         dataSet.setColor(ContextCompat.getColor(getContext(),R.color.colorAccent));
-        dataSetArrayList.add(dataSet);
+        //dataSetArrayList.add(dataSet);
 
 
         data = new LineData(dataSet);
@@ -202,11 +207,11 @@ public class FragmentTimeStamp extends Fragment implements Observer {
         //////// >>>
 
 
-        addNewEntry();
+       // addNewEntry();
 
        // getTimeStampDataNow(collectionReferenceTest); // marked out because this is not resulting as expected. asynchronous
 
-        addEntryAfterFinish();
+       // addEntryAfterFinish();
 
 
         return rootView;
@@ -522,6 +527,8 @@ public class FragmentTimeStamp extends Fragment implements Observer {
 
             //handle null and zero
 
+                //if ts_mon_morning not set, will have problem. crash, null pointer.
+
             if(testTimeStamp.getMon_morning().equals("")||testTimeStamp.getMon_morning().isEmpty()|| testTimeStamp.getMon_morning()==null){
                 testTimeStamp.setMon_morning("0");
             }
@@ -567,34 +574,46 @@ public class FragmentTimeStamp extends Fragment implements Observer {
 
             for(int hh=0; hh<listof_entryList.size(); hh++){
 
-
-                LineDataSet dataSet
+                //create list of dataset.
+                dataSetArrayList_Final.add(new LineDataSet(listof_entryList.get(hh), finalListRemap.get(hh).getName()));
 
             }
 
+            for(int jj=0; jj<listof_entryList.size();jj++){
 
+                data.addDataSet(dataSetArrayList_Final.get(jj));
+            }
+
+
+    //         dataSet.notifyDataSetChanged();
+//            dataSet2.notifyDataSetChanged();
+
+            dataSet.notifyDataSetChanged();
+
+            data.notifyDataChanged();
+            chart.notifyDataSetChanged();
 
 
             // >> >>>>>>>> redone 3pm     // >> >>>>>>>> redone 3pm     // >> >>>>>>>> redone 3pm     // >> >>>>>>>> redone 3pm
 
 
 
-            entriesV2 = (ArrayList<Entry>) ((TimeStampFireStore_Handler) o).returnEntry();
+       //     entriesV2 = (ArrayList<Entry>) ((TimeStampFireStore_Handler) o).returnEntry();
 
 
-
-            dataSet2 = new LineDataSet(entriesV2,"Final");
-            dataSet2.setColor(ContextCompat.getColor(getContext(), R.color.colorPrimary));
-            dataSetArrayList.add(dataSet2);
-            dataSet2.notifyDataSetChanged();
-
-
-            data.addDataSet(dataSet2);
-
-            int i = data.getDataSetCount();
-            Log.i("checkDataSet : ", ""+i);
-
-            data.notifyDataChanged();
+//
+//            dataSet2 = new LineDataSet(entriesV2,"Final");
+//            dataSet2.setColor(ContextCompat.getColor(getContext(), R.color.colorPrimary));
+//            dataSetArrayList.add(dataSet2);
+//            dataSet2.notifyDataSetChanged();
+//
+//
+//            data.addDataSet(dataSet2);
+//
+//            int i = data.getDataSetCount();
+//            Log.i("checkDataSet : ", ""+i);
+//
+//            data.notifyDataChanged();
 
 //            chart.invalidate();
 
@@ -606,23 +625,19 @@ public class FragmentTimeStamp extends Fragment implements Observer {
 //
 //
 
-            chart.notifyDataSetChanged(); // THIS ONE FUKIN LINE
+            //chart.notifyDataSetChanged(); // THIS ONE FUKIN LINE
              Legend legend = chart.getLegend();
 //
-////             LegendEntry l_1 = new LegendEntry("test 1",Legend.LegendForm.)
+
 //
              List<LegendEntry> entrieList = new ArrayList<>();
 //
-             List<Integer> colorList = new ArrayList<>();
-////             for(int i=0; i<3; i++){
-////
-////
-////             }
-//
+
+
 
             RandomColor randomColor = new RandomColor();
 
-            int[] colors = randomColor.randomColor(data.getDataSetCount());
+            int[] colors = randomColor.randomColor(finalListRemap.size());
 
 
 
@@ -637,14 +652,14 @@ public class FragmentTimeStamp extends Fragment implements Observer {
 
 
 //
-             for(int j=0;j<3;j++){
+             for(int j=0;j<dataSetArrayList_Final.size();j++){
 
                  LegendEntry entry = new LegendEntry();
 
                  entry.formColor = colors[j];
-                 dataSetArrayList.get(j).setColor(colors[j]);
-                 dataSetArrayList.get(j).notifyDataSetChanged();
-                 entry.label = "person "+(j+1);
+                 dataSetArrayList_Final.get(j).setColor(colors[j]);
+                 dataSetArrayList_Final.get(j).notifyDataSetChanged();
+                 entry.label = finalListRemap.get(j).getName();
                  entrieList.add(entry);
              }
 //
@@ -652,8 +667,8 @@ public class FragmentTimeStamp extends Fragment implements Observer {
 //
 
 
-             dataSet.notifyDataSetChanged();
-             data.notifyDataChanged();
+            data.notifyDataChanged();
+            chart.notifyDataSetChanged();
 //             //chart.setExtraBottomOffset(00);
 //
 //  //           chart.getLegend().setEnabled(true);
@@ -663,6 +678,8 @@ public class FragmentTimeStamp extends Fragment implements Observer {
 //           //  chart.getLegend().setEnabled(true);
 //
             chart.invalidate();
+
+            return;
 //         }
 
         }
