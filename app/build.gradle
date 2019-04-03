@@ -37,6 +37,11 @@ dependencies {
 //    implementation 'com.github.PhilJay:MPAndroidChart:v3.1.0'
     implementation 'com.github.PhilJay:MPAndroidChart:v3.0.3'
 
+
+    //random color
+    compile 'com.github.lzyzsd.randomcolor:library:1.0.0'
+
+
     //request location permission
     implementation 'pub.devrel:easypermissions:2.0.1'
 

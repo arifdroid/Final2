@@ -10,36 +10,42 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.afinal.R;
 import com.example.afinal.fingerPrint_Login.oop.TestTimeStamp;
+import com.github.lzyzsd.randomcolor.RandomColor;
 import com.github.mikephil.charting.charts.LineChart;
 import com.github.mikephil.charting.components.AxisBase;
+import com.github.mikephil.charting.components.Legend;
+import com.github.mikephil.charting.components.LegendEntry;
 import com.github.mikephil.charting.components.XAxis;
 import com.github.mikephil.charting.components.YAxis;
 import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
 import com.github.mikephil.charting.formatter.IAxisValueFormatter;
+import com.github.mikephil.charting.utils.ColorTemplate;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
-import com.google.firebase.FirebaseApp;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.Query;
-import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Observable;
+import java.util.Observer;
+import java.util.Queue;
 
-public class FragmentTimeStamp extends Fragment {
+public class FragmentTimeStamp extends Fragment implements Observer {
 
     private LineChart chart;
+
+
 
     public FragmentTimeStamp() {
     }
@@ -58,13 +64,30 @@ public class FragmentTimeStamp extends Fragment {
     private ArrayList<Entry> entries = new ArrayList<>();
 
     private ArrayList<Entry> entriesV2 = new ArrayList<>();
+
     ArrayList<Entry> entries3 = new ArrayList<>();
 
 
 
     LineDataSet dataSet;
 
+    LineDataSet dataSet2;
+
     LineData data;
+
+    /// list of dataset, reset color.
+
+    ArrayList<LineDataSet> dataSetArrayList;
+
+    //wrap firestore for observable
+
+    private TimeStampFireStore_Handler timeStampFireStore_handler;
+
+
+    //// LAST
+
+    private ArrayList<TestTimeStamp> finalListRemap;
+    private ArrayList<ArrayList<Entry>> listof_entryList;
 
 
     @Nullable
@@ -75,7 +98,12 @@ public class FragmentTimeStamp extends Fragment {
         View rootView = inflater.inflate(R.layout.bottom_nav_timestamp_fragment, container, false);
         //textView = rootView.findViewById(R.id.bottom_nav_fragment_timeStamp_textView);
 
+        dataSetArrayList = new ArrayList<>();
         testTimeStampsList = new ArrayList<>();
+
+        finalListRemap = new ArrayList<>();
+
+        listof_entryList = new ArrayList<>();
 
         Log.i("checkTimeStamp ", "flow: 1");
 
@@ -131,10 +159,11 @@ public class FragmentTimeStamp extends Fragment {
         entries.add(new Entry(4,0));
 
 
-
+        //dataSet2 = new LineDataSet();
         dataSet = new LineDataSet(entries, "check out V1");
 
         dataSet.setColor(ContextCompat.getColor(getContext(),R.color.colorAccent));
+        dataSetArrayList.add(dataSet);
 
 
         data = new LineData(dataSet);
@@ -142,7 +171,12 @@ public class FragmentTimeStamp extends Fragment {
         chart.setData(data);  //set adapter
 //        chart.getLegend().setWordWrapEnabled(true);
 
-        chart.getLegend();
+        //chart.getLegend();
+
+        chart.getLegend().setEnabled(true);
+
+
+
         chart.animateX(1500);
 
         Log.i("checkChart Flow: ", "2");
@@ -150,10 +184,27 @@ public class FragmentTimeStamp extends Fragment {
 
      //   chart.invalidate();
 
+        // part >> we wrap firestore process in a class,
+
+        Log.i("checkChartFlowFinal ", "observer, 1");
+
+        timeStampFireStore_handler = new TimeStampFireStore_Handler(getContext(),dataSet,data, chart);
+
+        timeStampFireStore_handler.addObserver(this);
+
+        Log.i("checkChartFlowFinal ", "observer, 2");
+
+        timeStampFireStore_handler.startFecthData(); //will always be false, unless notified update, and update ui once return true
+
+        Log.i("checkChartFlowFinal ", "observer, 3");
+
+
+        //////// >>>
+
 
         addNewEntry();
 
-        getTimeStampDataNow(collectionReferenceTest);
+       // getTimeStampDataNow(collectionReferenceTest); // marked out because this is not resulting as expected. asynchronous
 
         addEntryAfterFinish();
 
@@ -164,9 +215,15 @@ public class FragmentTimeStamp extends Fragment {
 
     private void addEntryAfterFinish() {
 
+    // https://stackoverflow.com/questions/42094577/update-fragment-from-async-task
+
 
 
     }
+
+    // https://stackoverflow.com/questions/39945050/update-fragment-ui-from-service-or-broadcastreceiver-if-fragment-is-visible
+
+
 
     private void addNewEntry() {
 
@@ -181,6 +238,7 @@ public class FragmentTimeStamp extends Fragment {
         dataSet = new LineDataSet(entries3,"check out now");
 
         dataSet.setColor(ContextCompat.getColor(getContext(),R.color.check));
+        dataSetArrayList.add(dataSet);
 
         dataSet.notifyDataSetChanged();
         data.addDataSet(dataSet);
@@ -430,7 +488,6 @@ public class FragmentTimeStamp extends Fragment {
 
                     }
 
-                    //return; return here dont work
 
 
                 }else {
@@ -439,6 +496,181 @@ public class FragmentTimeStamp extends Fragment {
                 }
             }
         });
+
+    }
+
+    @Override
+    public void update(Observable o, Object arg) {
+
+        Log.i("checkChartFlowFinal ", "observer, 4");
+
+        if(o instanceof TimeStampFireStore_Handler){
+
+//        TimeStampFireStore_Handler handler = (TimeStampFireStore_Handler) o;
+
+            Log.i("checkChartFlowFinal ", "observer, 5");
+
+        //this is updated dataset
+         //dataSet = ((TimeStampFireStore_Handler) o).returnDataSet();
+
+           finalListRemap= ((TimeStampFireStore_Handler) o).reTURNFINAL();
+
+           // >> >>>>>>>>
+
+
+            for(TestTimeStamp testTimeStamp: finalListRemap){
+
+            //handle null and zero
+
+            if(testTimeStamp.getMon_morning().equals("")||testTimeStamp.getMon_morning().isEmpty()|| testTimeStamp.getMon_morning()==null){
+                testTimeStamp.setMon_morning("0");
+            }
+
+            if(testTimeStamp.getTue_morning().equals("")||testTimeStamp.getTue_morning().isEmpty()|| testTimeStamp.getTue_morning()==null){
+                    testTimeStamp.setTue_morning("0");
+            }
+
+            if(testTimeStamp.getWed_morning().equals("")||testTimeStamp.getWed_morning().isEmpty()|| testTimeStamp.getWed_morning()==null){
+                    testTimeStamp.setWed_morning("0");
+            }
+
+            if(testTimeStamp.getThu_morning().equals("")||testTimeStamp.getThu_morning().isEmpty()|| testTimeStamp.getThu_morning()==null){
+                    testTimeStamp.setThu_morning("0");
+            }
+
+            if(testTimeStamp.getFri_morning().equals("")||testTimeStamp.getFri_morning().isEmpty()|| testTimeStamp.getFri_morning()==null){
+                    testTimeStamp.setFri_morning("0");
+            }
+
+
+            ArrayList<Entry> entryArrayList = new ArrayList<>();
+
+            entryArrayList.add(new Entry(0,Float.valueOf(testTimeStamp.getMon_morning())));
+            entryArrayList.add(new Entry(0,Float.valueOf(testTimeStamp.getTue_morning())));
+            entryArrayList.add(new Entry(0,Float.valueOf(testTimeStamp.getWed_morning())));
+            entryArrayList.add(new Entry(0,Float.valueOf(testTimeStamp.getThu_morning())));
+            entryArrayList.add(new Entry(0,Float.valueOf(testTimeStamp.getFri_morning())));
+            //now we created new single list of entry, add to return listsss
+
+            listof_entryList.add(entryArrayList); //problem with this, though is that we dont return the data name.
+
+        }
+
+
+
+
+
+            /// then for each entry, extract each entry, create separate dataset.
+
+      //      LineDataSet dataSet3 = new LineDataSet(listof_entryList.get(0))
+
+
+            for(int hh=0; hh<listof_entryList.size(); hh++){
+
+
+                LineDataSet dataSet
+
+            }
+
+
+
+
+            // >> >>>>>>>> redone 3pm     // >> >>>>>>>> redone 3pm     // >> >>>>>>>> redone 3pm     // >> >>>>>>>> redone 3pm
+
+
+
+            entriesV2 = (ArrayList<Entry>) ((TimeStampFireStore_Handler) o).returnEntry();
+
+
+
+            dataSet2 = new LineDataSet(entriesV2,"Final");
+            dataSet2.setColor(ContextCompat.getColor(getContext(), R.color.colorPrimary));
+            dataSetArrayList.add(dataSet2);
+            dataSet2.notifyDataSetChanged();
+
+
+            data.addDataSet(dataSet2);
+
+            int i = data.getDataSetCount();
+            Log.i("checkDataSet : ", ""+i);
+
+            data.notifyDataChanged();
+
+//            chart.invalidate();
+
+
+
+//            if(dataSet!=null) {
+//             dataSet.setColor(ContextCompat.getColor(getContext(), R.color.colorPrimary));
+//             data.addDataSet(dataSet);
+//
+//
+
+            chart.notifyDataSetChanged(); // THIS ONE FUKIN LINE
+             Legend legend = chart.getLegend();
+//
+////             LegendEntry l_1 = new LegendEntry("test 1",Legend.LegendForm.)
+//
+             List<LegendEntry> entrieList = new ArrayList<>();
+//
+             List<Integer> colorList = new ArrayList<>();
+////             for(int i=0; i<3; i++){
+////
+////
+////             }
+//
+
+            RandomColor randomColor = new RandomColor();
+
+            int[] colors = randomColor.randomColor(data.getDataSetCount());
+
+
+
+            //colorList.add(colors[])
+
+//             //colorList.add(ColorTemplate.getHoloBlue());
+//             colorList.add(R.color.check);
+//            colorList.add(R.color.colorPrimary);
+//
+//             //problem is only register 2 label.
+
+
+
+//
+             for(int j=0;j<3;j++){
+
+                 LegendEntry entry = new LegendEntry();
+
+                 entry.formColor = colors[j];
+                 dataSetArrayList.get(j).setColor(colors[j]);
+                 dataSetArrayList.get(j).notifyDataSetChanged();
+                 entry.label = "person "+(j+1);
+                 entrieList.add(entry);
+             }
+//
+             legend.setCustom(entrieList);
+//
+
+
+             dataSet.notifyDataSetChanged();
+             data.notifyDataChanged();
+//             //chart.setExtraBottomOffset(00);
+//
+//  //           chart.getLegend().setEnabled(true);
+//            //chart.getLegend().isLegendCustom();
+////  legend.setCustom(Color.BLACK,new String[]{"test","test2","test3"});
+//
+//           //  chart.getLegend().setEnabled(true);
+//
+            chart.invalidate();
+//         }
+
+        }
+
+
+        /// if o return entry
+
+
 
     }
 }
