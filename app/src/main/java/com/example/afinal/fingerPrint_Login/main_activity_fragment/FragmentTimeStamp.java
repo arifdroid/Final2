@@ -43,13 +43,12 @@ import java.util.Queue;
 
 public class FragmentTimeStamp extends Fragment implements Observer {
 
+    // https://javadoc.jitpack.io/com/github/PhilJay/MPAndroidChart/v3.0.3/javadoc/com/github/mikephil/charting/data/BaseEntry.html#setIcon-android.graphics.drawable.Drawable-
+
     private LineChart chart;
-
-
 
     public FragmentTimeStamp() {
     }
-
 
     //setup collection reference
 
@@ -167,9 +166,14 @@ public class FragmentTimeStamp extends Fragment implements Observer {
         //dataSet2 = new LineDataSet();
         dataSet = new LineDataSet(entries, "check out V1");
 
-        dataSet.setColor(ContextCompat.getColor(getContext(),R.color.colorAccent));
-        //dataSetArrayList.add(dataSet);
+        dataSet.setColor(ContextCompat.getColor(getContext(),R.color.colorPrimary));
 
+
+
+        dataSet.getEntryForIndex(1).setIcon(ContextCompat.getDrawable(getContext(),R.drawable.ic_error_outline_black_24dp));
+        //dataSet.getEntryForIndex(1).
+
+        //dataSetArrayList.add(dataSet);
 
         data = new LineData(dataSet);
 
@@ -179,8 +183,6 @@ public class FragmentTimeStamp extends Fragment implements Observer {
         //chart.getLegend();
 
         chart.getLegend().setEnabled(true);
-
-
 
         chart.animateX(1500);
 
@@ -218,291 +220,6 @@ public class FragmentTimeStamp extends Fragment implements Observer {
 
     }
 
-    private void addEntryAfterFinish() {
-
-    // https://stackoverflow.com/questions/42094577/update-fragment-from-async-task
-
-
-
-    }
-
-    // https://stackoverflow.com/questions/39945050/update-fragment-ui-from-service-or-broadcastreceiver-if-fragment-is-visible
-
-
-
-    private void addNewEntry() {
-
-
-        entries3.add(new Entry(0,3));
-        entries3.add(new Entry(1,1));
-        entries3.add(new Entry(2,10));
-
-        //entries.add(new Entry(5,5));
-
-
-        dataSet = new LineDataSet(entries3,"check out now");
-
-        dataSet.setColor(ContextCompat.getColor(getContext(),R.color.check));
-        dataSetArrayList.add(dataSet);
-
-        dataSet.notifyDataSetChanged();
-        data.addDataSet(dataSet);
-
-
-        data.notifyDataChanged();
-
-        chart.invalidate();
-
-        return;
-    }
-
-    private void getTimeStampDataNow(CollectionReference collectionReferenceTest) {
-
-        collectionReferenceTest.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-            @Override
-            public void onComplete(@NonNull Task<QuerySnapshot> task) {
-
-                if(task.isSuccessful()){
-
-                    //puling out map into hashmap
-
-                    Log.i("checkTimeStamp ", "flow: 2");
-                    //for index reference, set document number as reference number,
-
-                    int i =0;
-
-                    for(DocumentSnapshot documentSnapshot: task.getResult().getDocuments()) {
-
-                        Log.i("checkTimeStamp ", "flow: 3");
-                        //snapshot of each employee data, pull out, every ts available for each document.
-                        //process may take more than 10 secs.
-                        //need to check from early check, what is today's day. then only pull relevant todays data.
-                        //for faster doc, cached it, load daily only. but for testing purpose,
-                        // load it all at once, update using observable.
-
-                        //https://stackoverflow.com/questions/50107921/how-to-know-that-snapshot-listener-is-finished-firestore
-
-                        Map<String, Object> map;
-                        map = documentSnapshot.getData();
-
-                        //set reference first for our list
-
-                        i++;
-
-                        //problem is we will always overwrite this object.
-                        TestTimeStamp object = new TestTimeStamp(i);
-
-                        //testTimeStampsList.add(new TestTimeStamp(i));
-
-                        Log.i("checkTimeStamp ", "flow: before 4 : i is : " +i);
-
-
-                        //we need to map back into a list, so that we can show it to the user, or
-                        for (Map.Entry<String, Object> kk : map.entrySet()) { //remap back each document.
-
-
-                            Log.i("checkTimeStamp ", "flow: 4");
-
-                            if (kk.getKey().equals("name")) {
-                                //first access value might be ts morning, hence, when found name, this field not available anymore
-                                //this is the problem, since we have to retrieve evrything now.
-                                //lets try first
-
-                                String namehere = kk.getValue().toString();
-
-                                Log.i("checkTimeStamp ", "flow: special 99 : " + namehere);
-
-
-                                if (kk.getValue().equals("ryn")) {
-//
-//                                        if(kk.getKey().equals("ts_mon_morning")){
-//
-//                                            //try to get
-//
-//                                            //remap into single array of object.
-//                                            String monday_morning = kk.getValue().toString();
-//
-//                                        }
-
-                                    String name = kk.getValue().toString();
-
-                                    Log.i("checkTimeStamp ", "flow: 5 : " + name);
-                                    object.setName(name);
-                                }else {
-
-                                    object.setName(namehere);
-                                }
-
-                            }
-
-                                if (kk.getKey().equals("ts_mon_morning")) { //this is never set? why?
-
-                                    //try to get
-
-                                    //remap into single array of object.
-                                    //Float mon_morning = (Float) kk.getValue();
-
-                                    String mon_morning =  kk.getValue().toString();
-
-                                     object.setMon_morning(mon_morning);
-
-                                    Log.i("checkTimeStamp ", "flow: 6" + mon_morning);
-
-
-                                }
-
-                                if (kk.getKey().equals("ts_tue_morning")) {
-
-                                    //try to get
-
-                                    //remap into single array of object.
-                                    //Float tue_morning = (Float) kk.getValue();
-                                    String tue_morning =  kk.getValue().toString();
-
-                                    object.setTue_morning(tue_morning);
-
-                                    Log.i("checkTimeStamp ", "flow: 7" + tue_morning);
-
-                                }
-
-                                if (kk.getKey().equals("ts_wed_morning")) {
-
-                                    //try to get
-
-                                    //remap into single array of object.
-                                    //Float wed_morning = (Float) kk.getValue();
-
-                                    String wed_morning =kk.getValue().toString();
-
-                                    object.setWed_morning(wed_morning);
-
-                                }
-
-                                if (kk.getKey().equals("ts_thu_morning")) {
-
-                                    //try to get
-
-                                    //remap into single array of object.
-                                    //Float thu_morning = (Float) kk.getValue();
-                                    String thu_morning = kk.getValue().toString();
-
-
-                                    object.setThu_morning(thu_morning);
-                                }
-
-                                if (kk.getKey().equals("ts_fri_morning")) {
-
-                                    //try to get
-
-                                    //remap into single array of object.
-                                    //Float fri_morning = (Float) kk.getValue();
-
-                                    String fri_morning = kk.getValue().toString();
-                                    object.setFri_morning(fri_morning);
-                                }
-
-
-
-
-                            //
-
-                        }
-                        //once finisih loop, add object to our list.
-
-                        Log.i("c ", "flow: 8");
-
-   //                     if (!object.getName().isEmpty()) {      //if (!object.getName().isEmpty()) { //which object. when it exist.
-
-                            if (object.getName().equals("ryn")) {
-
-
-                                //for test purpose, only add ryn and view to graph.
-                                testTimeStampsList.add(object);
-
-                                Log.i("checkTimeStamp ", "flow: 9 , size" + testTimeStampsList.size());
-                            }
-
-
-                            //log to see if document data exist, successfully extracted.
-
-                            Log.i("checkTimeStamp ", "flow: 10");
-
-                            if(testTimeStampsList.size()>0) {
-
-                                String name = testTimeStampsList.get(0).getName();
-
-                                String monday = testTimeStampsList.get(0).getMon_morning();
-                                String tuesday = testTimeStampsList.get(0).getTue_morning();
-                                String wednesday = testTimeStampsList.get(0).getWed_morning();
-                                String thursday = testTimeStampsList.get(0).getThu_morning();
-                                if(thursday==null||thursday.isEmpty()||thursday==""||thursday.equals("")){
-                                    thursday="0";
-                                }
-                                String friday = testTimeStampsList.get(0).getFri_morning();
-
-
-                                Log.i("checkTimeStamp ", "name: " + name);
-                                Log.i("checkTimeStamp ", "monday: " + monday);
-                                Log.i("checkTimeStamp ", "tuesday: " + tuesday);
-                                Log.i("checkTimeStamp ", "wednesday: " + wednesday);
-                                Log.i("checkTimeStamp ", "thursday: " + thursday);
-                                Log.i("checkTimeStamp ", "friday: " + friday);
-
-                                Toast.makeText(getContext(), "check time stamp now", Toast.LENGTH_SHORT).show();
-
-                                //
-                                //                }
-
-                                //draw
-
-//                                entries.add(new Entry(0, Float.valueOf(object.getMon_morning()+"F")));
-//                                entries.add(new Entry(1,Float.valueOf(object.getTue_morning()+"F")));
-//                                entries.add(new Entry(2,Float.valueOf(object.getWed_morning()+"F")));
-//                                entries.add(new Entry(3,0F));
-//                                entries.add(new Entry(4,Float.valueOf(object.getFri_morning()+"F")));
-
-                                Log.i("checkChart Flow: ", "3");
-
-                                entriesV2.add(new Entry(0, 7));
-                                entriesV2.add(new Entry(1,8));
-                                entriesV2.add(new Entry(2,9));
-                                entriesV2.add(new Entry(3,0));
-
-
-                                //chart.clear();
-
-                                dataSet = new LineDataSet(entriesV2,"check out Test");
-                                //dataSet = new LineDataSet(entriesV2, "check out V2");
-                                dataSet.setColor(ContextCompat.getColor(Objects.requireNonNull(getContext()),R.color.colorPrimary));
-
-                                //
-
-                                dataSet.notifyDataSetChanged();
-                                data.addDataSet(dataSet);
-                                data.notifyDataChanged();
-                                chart.invalidate();
-
-
-                                Log.i("checkChart Flow: ", "4");
-
-                                 //didnt return making our list
-
-                            return;
-
-                            }
-
-                    }
-
-
-
-                }else {
-
-                    //task not successful
-                }
-            }
-        });
-
-    }
 
     @Override
     public void update(Observable o, Object arg) {
@@ -579,6 +296,9 @@ public class FragmentTimeStamp extends Fragment implements Observer {
 
             //entry for evening.
 
+            //cant do this, since, we have two data for the same entry point.
+            //solution, make entire different data set, but keep color legend same, and keep size for
+
             entryArrayList.add(new Entry(0,Float.valueOf(testTimeStamp.getMon_evening())));
             entryArrayList.add(new Entry(1,Float.valueOf(testTimeStamp.getTue_evening())));
             entryArrayList.add(new Entry(2,Float.valueOf(testTimeStamp.getWed_evening())));
@@ -625,32 +345,7 @@ public class FragmentTimeStamp extends Fragment implements Observer {
 
 
 
-       //     entriesV2 = (ArrayList<Entry>) ((TimeStampFireStore_Handler) o).returnEntry();
 
-
-//
-//            dataSet2 = new LineDataSet(entriesV2,"Final");
-//            dataSet2.setColor(ContextCompat.getColor(getContext(), R.color.colorPrimary));
-//            dataSetArrayList.add(dataSet2);
-//            dataSet2.notifyDataSetChanged();
-//
-//
-//            data.addDataSet(dataSet2);
-//
-//            int i = data.getDataSetCount();
-//            Log.i("checkDataSet : ", ""+i);
-//
-//            data.notifyDataChanged();
-
-//            chart.invalidate();
-
-
-
-//            if(dataSet!=null) {
-//             dataSet.setColor(ContextCompat.getColor(getContext(), R.color.colorPrimary));
-//             data.addDataSet(dataSet);
-//
-//
 
             //chart.notifyDataSetChanged(); // THIS ONE FUKIN LINE
              Legend legend = chart.getLegend();
@@ -666,54 +361,36 @@ public class FragmentTimeStamp extends Fragment implements Observer {
 
             int[] colors = randomColor.randomColor(finalListRemap.size());
 
+            //first need to validate, random color dont generate red Variant.
 
 
-            //colorList.add(colors[])
+            for(int j=0;j<dataSetArrayList_Final.size();j++){
 
-//             //colorList.add(ColorTemplate.getHoloBlue());
-//             colorList.add(R.color.check);
-//            colorList.add(R.color.colorPrimary);
-//
-//             //problem is only register 2 label.
-
-
-
-//
-             for(int j=0;j<dataSetArrayList_Final.size();j++){
-
-                 LegendEntry entry = new LegendEntry();
+             LegendEntry entry = new LegendEntry();
 
                  entry.formColor = colors[j];
                  dataSetArrayList_Final.get(j).setColor(colors[j]);
+
                  dataSetArrayList_Final.get(j).notifyDataSetChanged();
                  entry.label = finalListRemap.get(j).getName();
                  entrieList.add(entry);
              }
-//
+
+             //for some data which exceeds pre-defined constraint time stamp, will be coloured red.
+
              legend.setCustom(entrieList);
-//
+
 
 
             data.notifyDataChanged();
             chart.notifyDataSetChanged();
-//             //chart.setExtraBottomOffset(00);
-//
-//  //           chart.getLegend().setEnabled(true);
-//            //chart.getLegend().isLegendCustom();
-////  legend.setCustom(Color.BLACK,new String[]{"test","test2","test3"});
-//
-//           //  chart.getLegend().setEnabled(true);
-//
+
             chart.invalidate();
 
             return;
-//         }
+
 
         }
-
-
-        /// if o return entry
-
 
 
     }
