@@ -8,6 +8,54 @@ public class TestTimeStamp {
     private String thu_morning;
     private String fri_morning;
 
+    //set evening code
+
+    private String mon_evening;
+    private String tue_evening;
+    private String wed_evening;
+    private String thu_evening;
+    private String fri_evening;
+
+    public String getMon_evening() {
+        return mon_evening;
+    }
+
+    public String getTue_evening() {
+        return tue_evening;
+    }
+
+    public String getWed_evening() {
+        return wed_evening;
+    }
+
+    public String getThu_evening() {
+        return thu_evening;
+    }
+
+    public String getFri_evening() {
+        return fri_evening;
+    }
+
+    public void setMon_evening(String mon_evening) {
+        this.mon_evening = mon_evening;
+    }
+
+    public void setTue_evening(String tue_evening) {
+        this.tue_evening = tue_evening;
+    }
+
+    public void setWed_evening(String wed_evening) {
+        this.wed_evening = wed_evening;
+    }
+
+    public void setThu_evening(String thu_evening) {
+        this.thu_evening = thu_evening;
+    }
+
+    public void setFri_evening(String fri_evening) {
+        this.fri_evening = fri_evening;
+    }
+
     private int referenceiD;
 
     private String name;

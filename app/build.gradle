@@ -39,7 +39,7 @@ dependencies {
 
 
     //random color
-    compile 'com.github.lzyzsd.randomcolor:library:1.0.0'
+    implementation 'com.github.lzyzsd.randomcolor:library:1.0.0'
 
 
     //request location permission

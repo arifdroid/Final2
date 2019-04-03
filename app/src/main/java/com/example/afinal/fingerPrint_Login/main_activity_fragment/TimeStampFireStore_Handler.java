@@ -79,6 +79,7 @@ public class TimeStampFireStore_Handler  extends Observable {
     }
 
 
+    //decide to fetch which data.
     public void startFecthData(){
 
 
@@ -101,8 +102,6 @@ public class TimeStampFireStore_Handler  extends Observable {
                         //what we want to do, we set each object, as references that we want to extract.
 
                         // then setup return array list of array list of entries,
-
-
 
                         for (Map.Entry<String, Object> kk : map.entrySet()) {
 
@@ -178,72 +177,59 @@ public class TimeStampFireStore_Handler  extends Observable {
 
                             if (kk.getKey().equals("ts_fri_morning")) {
 
-                                //try to get
-
-                                //remap into single array of object.
-                                //Float fri_morning = (Float) kk.getValue();
-
                                 String fri_morning = kk.getValue().toString();
                                 object.setFri_morning(fri_morning);
+
                             }
 
+                            //>> here fetch evening data.
 
+                            if(kk.getKey().equals("ts_mon_evening")){
 
+                                String mon_evening = kk.getValue().toString();
+                                //object
+                                object.setMon_evening(mon_evening);
+                            }
 
+                            if(kk.getKey().equals("ts_tue_evening")){
 
+                                String tue_evening = kk.getValue().toString();
+                                //object
+                                object.setTue_evening(tue_evening);
+                            }
+                            if(kk.getKey().equals("ts_wed_evening")){
+
+                                String wed_evening = kk.getValue().toString();
+                                //object
+                                object.setWed_evening(wed_evening);
+                            }
+                            if(kk.getKey().equals("ts_thu_evening")){
+
+                                String thu_evening = kk.getValue().toString();
+                                //object
+                                object.setThu_evening(thu_evening);
+                            }
+                            if(kk.getKey().equals("ts_fri_evening")){
+
+                                String fri_evening = kk.getValue().toString();
+                                //object
+                                object.setFri_evening(fri_evening);
+                            }
 
                         } //end hash-map loop
 
-                            //for test purpose, only add ryn and view to graph.
-
-
                         testTimeStampsList.add(object); //mistake here.
-
 
                         //log to see if document data exist, successfully extracted.
 
                         Log.i("checkTimeStamp ", "flow: 10");
 
-//                        if(testTimeStampsList.size()>0) {
-//
-////                            String name = testTimeStampsList.get(0).getName();
-////
-////                            String monday = testTimeStampsList.get(0).getMon_morning();
-////                            String tuesday = testTimeStampsList.get(0).getTue_morning();
-////                            String wednesday = testTimeStampsList.get(0).getWed_morning();
-////                            String thursday = testTimeStampsList.get(0).getThu_morning();
-////                            if(thursday==null||thursday.isEmpty()||thursday==""||thursday.equals("")){
-////                                thursday="0";
-////                            }
-////                            String friday = testTimeStampsList.get(0).getFri_morning();
-////
-////
-////                            Log.i("checkTimeStamp ", "name: " + name);
-////                            Log.i("checkTimeStamp ", "monday: " + monday);
-////                            Log.i("checkTimeStamp ", "tuesday: " + tuesday);
-////                            Log.i("checkTimeStamp ", "wednesday: " + wednesday);
-////                            Log.i("checkTimeStamp ", "thursday: " + thursday);
-////                            Log.i("checkTimeStamp ", "friday: " + friday);
-////
-////                            Toast.makeText(mContext, "check time stamp now", Toast.LENGTH_SHORT).show();
-////
-////                            Log.i("checkChartFlowFinal ", "handler, 4");
-//
-//
-//
-//
-//
-//
-//                        }
 
-//
 
 
                     } //document loop
 //
-//                    if(sizeDoc==i){ //meaning, finish loop all document, then we can update returned result, return true with result.
-//
-//                    setReturnData();
+
 //
 //                    }
 
@@ -282,29 +268,7 @@ public class TimeStampFireStore_Handler  extends Observable {
 
         //then we want to populate entry.
         int k=0;
-//        for(TestTimeStamp testTimeStamp: testTimeStampsList){
-//            k++;
-//
-//            ArrayList<Entry> entryArrayList = new ArrayList<>();
-//
-//            entryArrayList.add(new Entry(0,Float.valueOf(testTimeStamp.getMon_morning())));
-//            entryArrayList.add(new Entry(0,Float.valueOf(testTimeStamp.getTue_morning())));
-//            entryArrayList.add(new Entry(0,Float.valueOf(testTimeStamp.getWed_morning())));
-//            entryArrayList.add(new Entry(0,Float.valueOf(testTimeStamp.getThu_morning())));
-//            entryArrayList.add(new Entry(0,Float.valueOf(testTimeStamp.getFri_morning())));
-//            //now we created new single list of entry, add to return listsss
-//
-//            listof_entryList.add(entryArrayList); //problem with this, though is that we dont return the data name.
-//
-//
-//
-//        }
 
-        //            //create entry from each timestamplist, then create single point list of entry after finish.
-//
-//            Float.valueOf(testTimeStamp.getMon_morning());
-
-        //listof_entryList.add(new ArrayList<Entry>((Collection<? extends Entry>) new Entry(0,Float.valueOf(testTimeStamp.getMon_morning()))));
 
         if(testTimeStampsList.size()==sizeDoc){
 
@@ -321,70 +285,6 @@ public class TimeStampFireStore_Handler  extends Observable {
 
         return testTimeStampsList;
     }
-
-    private void setReturnData() {
-
-        Log.i("checkChartFlowFinal ", "handler, 7");
-
-        entriesV2.add(new Entry(0, 7));
-        entriesV2.add(new Entry(1,8));
-        entriesV2.add(new Entry(2,9));
-        entriesV2.add(new Entry(3,0));
-
-
-        //chart.clear();
-
-       this.dataSet = new LineDataSet(entriesV2,"check out Test"); //we never return this?
-        //dataSet = new LineDataSet(entriesV2, "check out V2");
-//        dataSet.setColor(ContextCompat.getColor(mContext,R.color.colorPrimary));
-//
-//        //
-//
-//        dataSet.notifyDataSetChanged();
-//        data.addDataSet(dataSet);
-//        data.notifyDataChanged();
-//        chart.invalidate();
-
-
-       setChanged();
-       notifyObservers();
-    }
-
-    public LineDataSet returnDataSet(){
-
-       // this.dataSet = dataSet;
-
-        Log.i("checkChartFlowFinal ", "handler, 1");
-
-        if(dataSet!=null) {
-            return this.dataSet;
-        }
-        return null;
-    }
-
-    public void setReturnEntry(){
-
-
-
-        entriesV3.add(new Entry(0, 7));
-        entriesV3.add(new Entry(1,2));
-        entriesV3.add(new Entry(2,9));
-        entriesV3.add(new Entry(3,3));
-
-       setChanged();
-       notifyObservers();
-    }
-
-    public List<Entry> returnEntry(){
-
-
-        if(entriesV3!=null){
-            return entriesV3;
-        }
-
-        return null;
-    }
-
 
 
 

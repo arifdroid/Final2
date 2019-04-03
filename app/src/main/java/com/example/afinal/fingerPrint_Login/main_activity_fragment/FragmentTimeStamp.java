@@ -549,14 +549,42 @@ public class FragmentTimeStamp extends Fragment implements Observer {
                     testTimeStamp.setFri_morning("0");
             }
 
+            //evening setup
 
-            ArrayList<Entry> entryArrayList = new ArrayList<>();
+            if(testTimeStamp.getMon_evening().equals("")||testTimeStamp.getMon_evening().isEmpty()|| testTimeStamp.getMon_evening()==null){
+                    testTimeStamp.setMon_evening("0");
+            }
+            if (testTimeStamp.getTue_evening().equals("") || testTimeStamp.getTue_evening().isEmpty() || testTimeStamp.getTue_evening() == null) {
+                    testTimeStamp.setTue_evening("0");
+            }
+
+            if (testTimeStamp.getWed_evening().equals("") || testTimeStamp.getWed_evening().isEmpty() || testTimeStamp.getWed_evening() == null) {
+                    testTimeStamp.setWed_evening("0");
+            }
+            if (testTimeStamp.getThu_evening().equals("") || testTimeStamp.getThu_evening().isEmpty() || testTimeStamp.getThu_evening() == null) {
+                    testTimeStamp.setThu_evening("0");
+             }
+            if (testTimeStamp.getFri_evening().equals("") || testTimeStamp.getFri_evening().isEmpty() || testTimeStamp.getFri_evening() == null) {
+                    testTimeStamp.setFri_evening("0");
+             }
+
+
+             ArrayList<Entry> entryArrayList = new ArrayList<>();
 
             entryArrayList.add(new Entry(0,Float.valueOf(testTimeStamp.getMon_morning())));
-            entryArrayList.add(new Entry(0,Float.valueOf(testTimeStamp.getTue_morning())));
-            entryArrayList.add(new Entry(0,Float.valueOf(testTimeStamp.getWed_morning())));
-            entryArrayList.add(new Entry(0,Float.valueOf(testTimeStamp.getThu_morning())));
-            entryArrayList.add(new Entry(0,Float.valueOf(testTimeStamp.getFri_morning())));
+            entryArrayList.add(new Entry(1,Float.valueOf(testTimeStamp.getTue_morning())));
+            entryArrayList.add(new Entry(2,Float.valueOf(testTimeStamp.getWed_morning())));
+            entryArrayList.add(new Entry(3,Float.valueOf(testTimeStamp.getThu_morning())));
+            entryArrayList.add(new Entry(4,Float.valueOf(testTimeStamp.getFri_morning())));
+
+            //entry for evening.
+
+            entryArrayList.add(new Entry(0,Float.valueOf(testTimeStamp.getMon_evening())));
+            entryArrayList.add(new Entry(1,Float.valueOf(testTimeStamp.getTue_evening())));
+            entryArrayList.add(new Entry(2,Float.valueOf(testTimeStamp.getWed_evening())));
+            entryArrayList.add(new Entry(3,Float.valueOf(testTimeStamp.getThu_evening())));
+            entryArrayList.add(new Entry(4,Float.valueOf(testTimeStamp.getFri_evening())));
+
             //now we created new single list of entry, add to return listsss
 
             listof_entryList.add(entryArrayList); //problem with this, though is that we dont return the data name.
@@ -585,8 +613,7 @@ public class FragmentTimeStamp extends Fragment implements Observer {
             }
 
 
-    //         dataSet.notifyDataSetChanged();
-//            dataSet2.notifyDataSetChanged();
+
 
             dataSet.notifyDataSetChanged();
 
