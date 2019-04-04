@@ -10,9 +10,9 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
 
 import com.example.afinal.R;
+import com.example.afinal.fingerPrint_Login.oop.EntryMorning;
 import com.example.afinal.fingerPrint_Login.oop.TestTimeStamp;
 import com.github.lzyzsd.randomcolor.RandomColor;
 import com.github.mikephil.charting.charts.LineChart;
@@ -25,21 +25,14 @@ import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
 import com.github.mikephil.charting.formatter.IAxisValueFormatter;
-import com.github.mikephil.charting.utils.ColorTemplate;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.CollectionReference;
-import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
-import java.util.Map;
-import java.util.Objects;
 import java.util.Observable;
 import java.util.Observer;
-import java.util.Queue;
 
 public class FragmentTimeStamp extends Fragment implements Observer {
 
@@ -86,7 +79,15 @@ public class FragmentTimeStamp extends Fragment implements Observer {
     //// LAST
 
     private ArrayList<TestTimeStamp> finalListRemap;
-    private ArrayList<ArrayList<Entry>> listof_entryList;
+
+    private ArrayList<ArrayList<Entry>> listof_entryList_Morning;
+
+    //revise
+    private ArrayList<EntryMorning> entryMorningArrayList;
+    private ArrayList<EntryEvening> entryEveningArrayList;
+
+    private ArrayList<ArrayList<Entry>> listof_entryList_Evening;
+
 
     private ArrayList<LineDataSet> dataSetArrayList_Final;
 
@@ -104,10 +105,16 @@ public class FragmentTimeStamp extends Fragment implements Observer {
         dataSetArrayList = new ArrayList<>();
         testTimeStampsList = new ArrayList<>();
 
+        //revise
+        entryMorningArrayList = new ArrayList<>();
+        entryEveningArrayList = new ArrayList<>();
+
         dataSetArrayList_Final = new ArrayList<>();
         finalListRemap = new ArrayList<>();
 
-        listof_entryList = new ArrayList<>();
+        listof_entryList_Morning = new ArrayList<>();
+
+        listof_entryList_Evening = new ArrayList<>();
 
         Log.i("checkTimeStamp ", "flow: 1");
 
@@ -150,16 +157,17 @@ public class FragmentTimeStamp extends Fragment implements Observer {
         // Controlling left side of y axis
         YAxis yAxisLeft = chart.getAxisLeft();
         yAxisLeft.setGranularity(1f);
+        yAxisLeft.setInverted(true);
 
 
 
         Log.i("checkChart Flow: ", "1");
 
         // Setting Data
-        entries.add(new Entry(0, 10));
-        entries.add(new Entry(1,5));
-        entries.add(new Entry(2,10));
-        entries.add(new Entry(3,5));
+        entries.add(new Entry(0, 0));
+        entries.add(new Entry(1,0));
+        entries.add(new Entry(2,0));
+        entries.add(new Entry(3,0));
         entries.add(new Entry(4,0));
 
 
@@ -237,103 +245,264 @@ public class FragmentTimeStamp extends Fragment implements Observer {
 
            finalListRemap= ((TimeStampFireStore_Handler) o).reTURNFINAL();
 
-           // >> >>>>>>>>
 
+           ////////////>>>>>>>>>>>>>>>> 4 april 10AM
+
+           for(TestTimeStamp testTimeStamp: finalListRemap){
+
+//
+//               entryMorningArrayList.add(new EntryMorning(testTimeStamp.getName(), new Entry(0, Float.valueOf(testTimeStamp.getMon_morning()))));
+//
+//               //entryMorningArrayList.add(new EntryMorning(1, Float.valueOf(testTimeStamp.getTue_morning())));
+//                entryMorningArrayList.set()
+
+               // create different structure
+
+                // we need another for(){   }
+
+               ArrayList<Entry> entryArrayList = new ArrayList<>();
+
+
+
+                   if(testTimeStamp.getMon_morning().equals("")||testTimeStamp.getMon_morning().isEmpty()|| testTimeStamp.getMon_morning()==null){
+                       testTimeStamp.setMon_morning("8");
+                   }
+
+                   if(testTimeStamp.getTue_morning().equals("")||testTimeStamp.getTue_morning().isEmpty()|| testTimeStamp.getTue_morning()==null){
+                       testTimeStamp.setTue_morning("8");
+                   }
+
+                   if(testTimeStamp.getWed_morning().equals("")||testTimeStamp.getWed_morning().isEmpty()|| testTimeStamp.getWed_morning()==null){
+                       testTimeStamp.setWed_morning("8");
+                   }
+
+                   if(testTimeStamp.getThu_morning().equals("")||testTimeStamp.getThu_morning().isEmpty()|| testTimeStamp.getThu_morning()==null){
+                       testTimeStamp.setThu_morning("8");
+                   }
+
+                   if(testTimeStamp.getFri_morning().equals("")||testTimeStamp.getFri_morning().isEmpty()|| testTimeStamp.getFri_morning()==null){
+                       testTimeStamp.setFri_morning("8");
+                   }
+
+                   //ArrayList<Entry> entryArrayList = new ArrayList<>();
+
+                   entryArrayList.add(new Entry(0, Float.valueOf(testTimeStamp.getMon_morning())));
+                   entryArrayList.add(new Entry(1, Float.valueOf(testTimeStamp.getTue_morning())));
+                   entryArrayList.add(new Entry(2, Float.valueOf(testTimeStamp.getWed_morning())));
+                   entryArrayList.add(new Entry(3, Float.valueOf(testTimeStamp.getThu_morning())));
+                   entryArrayList.add(new Entry(4, Float.valueOf(testTimeStamp.getFri_morning())));
+
+
+               for(int i = 0; i< entryArrayList.size();i++){
+
+                   Float checkConstraintTime = entryArrayList.get(i).getY();
+
+                   if(checkConstraintTime>8f){
+                       entryArrayList.get(i).setIcon(ContextCompat.getDrawable(getContext(),R.drawable.ic_error_small_16dp));
+                   }
+               }
+
+               entryMorningArrayList.add(new EntryMorning(testTimeStamp.getName(),entryArrayList)); // hence this list, will always correspond to how big our document/employee is
+            //settle morning
+           }
+
+            //evening
 
             for(TestTimeStamp testTimeStamp: finalListRemap){
 
-            //handle null and zero
 
-                //if ts_mon_morning not set, will have problem. crash, null pointer.
+                if(testTimeStamp.getMon_evening().equals("")||testTimeStamp.getMon_evening().isEmpty()|| testTimeStamp.getMon_evening()==null){
+                    testTimeStamp.setMon_evening("5");
+                }
+                if (testTimeStamp.getTue_evening().equals("") || testTimeStamp.getTue_evening().isEmpty() || testTimeStamp.getTue_evening() == null) {
+                    testTimeStamp.setTue_evening("5");
+                }
 
-            if(testTimeStamp.getMon_morning().equals("")||testTimeStamp.getMon_morning().isEmpty()|| testTimeStamp.getMon_morning()==null){
-                testTimeStamp.setMon_morning("0");
+                if (testTimeStamp.getWed_evening().equals("") || testTimeStamp.getWed_evening().isEmpty() || testTimeStamp.getWed_evening() == null||testTimeStamp.getWed_evening().equals("0")) {
+                    testTimeStamp.setWed_evening("5");
+                }
+                if (testTimeStamp.getThu_evening().equals("") || testTimeStamp.getThu_evening().isEmpty() || testTimeStamp.getThu_evening() == null) {
+                    testTimeStamp.setThu_evening("5");
+                }
+                if (testTimeStamp.getFri_evening().equals("") || testTimeStamp.getFri_evening().isEmpty() || testTimeStamp.getFri_evening() == null) {
+                    testTimeStamp.setFri_evening("5");
+                }
+
+                ArrayList<Entry> entryArrayList = new ArrayList<>();
+
+                 entryArrayList.add(new Entry(0,Float.valueOf(testTimeStamp.getMon_evening())+12f));
+                 entryArrayList.add(new Entry(1,Float.valueOf(testTimeStamp.getTue_evening())+12f));
+                 entryArrayList.add(new Entry(2,Float.valueOf(testTimeStamp.getWed_evening())+12f));
+                 entryArrayList.add(new Entry(3,Float.valueOf(testTimeStamp.getThu_evening())+12f));
+                 entryArrayList.add(new Entry(4,Float.valueOf(testTimeStamp.getFri_evening())+12f));
+
+                 // figure out which time stamp not following threshold.
+
+                // entryArrayList.get(0).setIcon();
+
+                for(int i = 0; i< entryArrayList.size();i++){
+
+                    Float checkConstraintTime = entryArrayList.get(i).getY();
+
+                    if(checkConstraintTime<17f){
+                        //entryArrayList.get(i).setIcon(ContextCompat.getDrawable(getContext(),R.drawable.));
+
+
+
+                    }
+                }
+
+                entryEveningArrayList.add(new EntryEvening(testTimeStamp.getName(),entryArrayList));
             }
 
-            if(testTimeStamp.getTue_morning().equals("")||testTimeStamp.getTue_morning().isEmpty()|| testTimeStamp.getTue_morning()==null){
-                    testTimeStamp.setTue_morning("0");
-            }
+           ////////////>>>>>>>>>>>>>>>>
 
-            if(testTimeStamp.getWed_morning().equals("")||testTimeStamp.getWed_morning().isEmpty()|| testTimeStamp.getWed_morning()==null){
-                    testTimeStamp.setWed_morning("0");
-            }
+           // >> >>>>>>>>
 
-            if(testTimeStamp.getThu_morning().equals("")||testTimeStamp.getThu_morning().isEmpty()|| testTimeStamp.getThu_morning()==null){
-                    testTimeStamp.setThu_morning("0");
-            }
-
-            if(testTimeStamp.getFri_morning().equals("")||testTimeStamp.getFri_morning().isEmpty()|| testTimeStamp.getFri_morning()==null){
-                    testTimeStamp.setFri_morning("0");
-            }
-
-            //evening setup
-
-            if(testTimeStamp.getMon_evening().equals("")||testTimeStamp.getMon_evening().isEmpty()|| testTimeStamp.getMon_evening()==null){
-                    testTimeStamp.setMon_evening("0");
-            }
-            if (testTimeStamp.getTue_evening().equals("") || testTimeStamp.getTue_evening().isEmpty() || testTimeStamp.getTue_evening() == null) {
-                    testTimeStamp.setTue_evening("0");
-            }
-
-            if (testTimeStamp.getWed_evening().equals("") || testTimeStamp.getWed_evening().isEmpty() || testTimeStamp.getWed_evening() == null) {
-                    testTimeStamp.setWed_evening("0");
-            }
-            if (testTimeStamp.getThu_evening().equals("") || testTimeStamp.getThu_evening().isEmpty() || testTimeStamp.getThu_evening() == null) {
-                    testTimeStamp.setThu_evening("0");
-             }
-            if (testTimeStamp.getFri_evening().equals("") || testTimeStamp.getFri_evening().isEmpty() || testTimeStamp.getFri_evening() == null) {
-                    testTimeStamp.setFri_evening("0");
-             }
+            chart.clearValues();
 
 
-             ArrayList<Entry> entryArrayList = new ArrayList<>();
+//            for(TestTimeStamp testTimeStamp: finalListRemap){
+//
+//            //handle null and zero
+//
+//                //if ts_mon_morning not set, will have problem. crash, null pointer.
+//
+//            if(testTimeStamp.getMon_morning().equals("")||testTimeStamp.getMon_morning().isEmpty()|| testTimeStamp.getMon_morning()==null){
+//                testTimeStamp.setMon_morning("0");
+//            }
+//
+//            if(testTimeStamp.getTue_morning().equals("")||testTimeStamp.getTue_morning().isEmpty()|| testTimeStamp.getTue_morning()==null){
+//                    testTimeStamp.setTue_morning("0");
+//            }
+//
+//            if(testTimeStamp.getWed_morning().equals("")||testTimeStamp.getWed_morning().isEmpty()|| testTimeStamp.getWed_morning()==null){
+//                    testTimeStamp.setWed_morning("0");
+//            }
+//
+//            if(testTimeStamp.getThu_morning().equals("")||testTimeStamp.getThu_morning().isEmpty()|| testTimeStamp.getThu_morning()==null){
+//                    testTimeStamp.setThu_morning("0");
+//            }
+//
+//            if(testTimeStamp.getFri_morning().equals("")||testTimeStamp.getFri_morning().isEmpty()|| testTimeStamp.getFri_morning()==null){
+//                    testTimeStamp.setFri_morning("0");
+//            }
+//
+//
+//             ArrayList<Entry> entryArrayList = new ArrayList<>();
+//
+//            entryArrayList.add(new Entry(0,Float.valueOf(testTimeStamp.getMon_morning())));
+//            entryArrayList.add(new Entry(1,Float.valueOf(testTimeStamp.getTue_morning())));
+//            entryArrayList.add(new Entry(2,Float.valueOf(testTimeStamp.getWed_morning())));
+//            entryArrayList.add(new Entry(3,Float.valueOf(testTimeStamp.getThu_morning())));
+//            entryArrayList.add(new Entry(4,Float.valueOf(testTimeStamp.getFri_morning())));
+//
+//
+//
+//            listof_entryList_Morning.add(entryArrayList); //problem with this, though is that we dont return the data name.
+//
+//        }
 
-            entryArrayList.add(new Entry(0,Float.valueOf(testTimeStamp.getMon_morning())));
-            entryArrayList.add(new Entry(1,Float.valueOf(testTimeStamp.getTue_morning())));
-            entryArrayList.add(new Entry(2,Float.valueOf(testTimeStamp.getWed_morning())));
-            entryArrayList.add(new Entry(3,Float.valueOf(testTimeStamp.getThu_morning())));
-            entryArrayList.add(new Entry(4,Float.valueOf(testTimeStamp.getFri_morning())));
+        // evening list,
 
-            //entry for evening.
+//            for (TestTimeStamp testTimeStamp : finalListRemap){
+//
+//                //evening setup
+//
+//                if(testTimeStamp.getMon_evening().equals("")||testTimeStamp.getMon_evening().isEmpty()|| testTimeStamp.getMon_evening()==null){
+//                    testTimeStamp.setMon_evening("0");
+//                }
+//                if (testTimeStamp.getTue_evening().equals("") || testTimeStamp.getTue_evening().isEmpty() || testTimeStamp.getTue_evening() == null) {
+//                    testTimeStamp.setTue_evening("0");
+//                }
+//
+//                if (testTimeStamp.getWed_evening().equals("") || testTimeStamp.getWed_evening().isEmpty() || testTimeStamp.getWed_evening() == null) {
+//                    testTimeStamp.setWed_evening("0");
+//                }
+//                if (testTimeStamp.getThu_evening().equals("") || testTimeStamp.getThu_evening().isEmpty() || testTimeStamp.getThu_evening() == null) {
+//                    testTimeStamp.setThu_evening("0");
+//                }
+//                if (testTimeStamp.getFri_evening().equals("") || testTimeStamp.getFri_evening().isEmpty() || testTimeStamp.getFri_evening() == null) {
+//                    testTimeStamp.setFri_evening("0");
+//                }
+//
+//
+//                //entry for evening.
+//                ArrayList<Entry> entryArrayList = new ArrayList<>(); //problem is we cant access this later?
+//
+//                //cant do this, since, we have two data for the same entry point.
+//                //solution, make entire different data set, but keep color legend same, and keep size for
+//
+//                entryArrayList.add(new Entry(0,Float.valueOf(testTimeStamp.getMon_evening())));
+//                entryArrayList.add(new Entry(1,Float.valueOf(testTimeStamp.getTue_evening())));
+//                entryArrayList.add(new Entry(2,Float.valueOf(testTimeStamp.getWed_evening())));
+//                entryArrayList.add(new Entry(3,Float.valueOf(testTimeStamp.getThu_evening())));
+//                entryArrayList.add(new Entry(4,Float.valueOf(testTimeStamp.getFri_evening())));
+//
+//                //now we created new single list of entry, add to return listsss
+//
+//                listof_entryList_Evening.add(entryArrayList);
+//
+//            }
 
-            //cant do this, since, we have two data for the same entry point.
-            //solution, make entire different data set, but keep color legend same, and keep size for
+            // listof_entryList_Morning.get(0).get(0). // this already towards particular entry
 
-            entryArrayList.add(new Entry(0,Float.valueOf(testTimeStamp.getMon_evening())));
-            entryArrayList.add(new Entry(1,Float.valueOf(testTimeStamp.getTue_evening())));
-            entryArrayList.add(new Entry(2,Float.valueOf(testTimeStamp.getWed_evening())));
-            entryArrayList.add(new Entry(3,Float.valueOf(testTimeStamp.getThu_evening())));
-            entryArrayList.add(new Entry(4,Float.valueOf(testTimeStamp.getFri_evening())));
+            // one way, create custom entry list, then match it when we need it, extract it when we need exact value.
 
-            //now we created new single list of entry, add to return listsss
-
-            listof_entryList.add(entryArrayList); //problem with this, though is that we dont return the data name.
-
-        }
-
-
-
+            // we create custom evening / morning entry
 
 
             /// then for each entry, extract each entry, create separate dataset.
 
-      //      LineDataSet dataSet3 = new LineDataSet(listof_entryList.get(0))
+      //      LineDataSet dataSet3 = new LineDataSet(listof_entryList_Morning.get(0))
+
+//
+//            for(int hh = 0; hh< listof_entryList_Morning.size(); hh++){
+//
+//                //create list of dataset.
+//                dataSetArrayList_Final.add(new LineDataSet(listof_entryList_Morning.get(hh), finalListRemap.get(hh).getName()));
+//
+//            }
+//
+////
+//            for(int jj = 0; jj< listof_entryList_Morning.size(); jj++){
+//
+//                data.addDataSet(dataSetArrayList_Final.get(jj));
+//            }
+
+            //4 april 10.40AM , create list of data set, from entry, then add to data.
+
+            //first add morning.
+
+            for(int listDataSet=0; listDataSet<entryMorningArrayList.size(); listDataSet++){
 
 
-            for(int hh=0; hh<listof_entryList.size(); hh++){
+                dataSetArrayList_Final.add(new LineDataSet(entryMorningArrayList.get(listDataSet).getEntryArrayList(),entryMorningArrayList.get(listDataSet).getName()));
 
-                //create list of dataset.
-                dataSetArrayList_Final.add(new LineDataSet(listof_entryList.get(hh), finalListRemap.get(hh).getName()));
+
+                int sizeHere2 = dataSetArrayList_Final.size();
+            }
+
+            //
+
+            for (int listDataSet2=0; listDataSet2<entryEveningArrayList.size(); listDataSet2++){
+
+                //adding to the same list of data set
+                dataSetArrayList_Final.add(new LineDataSet(entryEveningArrayList.get(listDataSet2).getEntryArrayList(),entryEveningArrayList.get(listDataSet2).getName()));
+
+
+
 
             }
 
-            for(int jj=0; jj<listof_entryList.size();jj++){
 
-                data.addDataSet(dataSetArrayList_Final.get(jj));
+            //then add to the data.
+
+            //add all
+            for(int dataCount = 0; dataCount< (entryEveningArrayList.size()*2); dataCount++){
+
+                data.addDataSet(dataSetArrayList_Final.get(dataCount));
             }
-
-
-
 
             dataSet.notifyDataSetChanged();
 
@@ -341,42 +510,128 @@ public class FragmentTimeStamp extends Fragment implements Observer {
             chart.notifyDataSetChanged();
 
 
-            // >> >>>>>>>> redone 3pm     // >> >>>>>>>> redone 3pm     // >> >>>>>>>> redone 3pm     // >> >>>>>>>> redone 3pm
-
-
-
 
 
             //chart.notifyDataSetChanged(); // THIS ONE FUKIN LINE
-             Legend legend = chart.getLegend();
-//
 
-//
-             List<LegendEntry> entrieList = new ArrayList<>();
-//
+            Legend legend = chart.getLegend();
 
-
+            List<LegendEntry> entrieList = new ArrayList<>();
 
             RandomColor randomColor = new RandomColor();
 
-            int[] colors = randomColor.randomColor(finalListRemap.size());
+            int[] colors = randomColor.randomColor(entryMorningArrayList.size()); //only need color correspond to number of users
 
-            //first need to validate, random color dont generate red Variant.
+            //go through colors, if detect red variant generate again., can improve by editing [ randomColor() library ]
 
 
-            for(int j=0;j<dataSetArrayList_Final.size();j++){
+            for(int i = 0; i<colors.length;i++){
 
-             LegendEntry entry = new LegendEntry();
+                Log.i("checkColor now: "," flow : 2"+"  >> i:"+i);
 
-                 entry.formColor = colors[j];
+                //while((colors[i]<-90000 && colors[i]>-180000 )|| colors[i]>-5000 || (colors[i]>-67000 && colors[i]<-40000)||(colors[i]>-1838656 && colors[i]<-1238656) ) {  // non of the while loop gets triggered
+
+                while((colors[i]>-67000 && colors[i]<-40000)) {  // non of the while loop gets triggered
+
+                        Log.i("checkColor now: "," flow : 3"+"  >> i:"+i);
+
+                    colors[i] = randomColor.randomColor(); //making sure color not too bright.
+
+                    Log.i("checkColor now: "," flow : 3"+ " random color generated: "+colors[i]+"  >> i:"+i);
+
+
+                        if(i<(colors.length-1)) {
+
+                            Log.i("checkColor now: "," flow : 5" );
+
+                            int check = -(colors[i]) + colors[i + 1];
+
+                            Log.i("checkColor diff: ", "check difference 1 : " + colors[i]+"  >> i:"+i);
+                            Log.i("checkColor diff: ", "check difference 2 : " + colors[i+1]+"  >> i:"+i);
+                            Log.i("checkColor diff: ", "check difference color : " + check+"  >> i:"+i);
+
+                            if(colors[i]<-900035) { //for other variant
+
+                                int check2 = -(colors[i]) + colors[i + 1];
+
+                                while (check2<=100000 && check2>=-100000){ // numbers could be
+                                  colors[i] = randomColor.randomColor();
+
+
+                                    check2 = -colors[i] + colors[i + 1]; //everytime we create we check this
+
+                                    Log.i("checkColor now: "," flow : 6" +"  >> i:"+i);
+                                }
+
+                            }
+
+
+                            while (check<=10000 && check>=-10000){
+                                colors[i] = randomColor.randomColor();
+                                check = -colors[i] + colors[i + 1]; //everytime we create we check this
+
+                                Log.i("checkColor now: "," flow : 6" +"  >> i:"+i);
+                            }
+
+                        }
+                 //   } //still check if color[i] within red
+
+                } // still check if color[i] too bright
+
+            }
+
+
+            //finish making sure no red, recored
+
+
+
+//
+//            for(int j=0;j<dataSetArrayList_Final.size();j++){
+//
+//             LegendEntry entry = new LegendEntry();
+//                 //we want to
+//                                    // color will hit null
+//                 entry.formColor = colors[j]; //color only 3, data set 6,
+//                 dataSetArrayList_Final.get(j).setColor(colors[j]);
+//
+//                 dataSetArrayList_Final.get(j).notifyDataSetChanged();
+//                 entry.label = finalListRemap.get(j).getName();
+//                 entrieList.add(entry);
+//             }
+
+             for(int j = 0; j< entryMorningArrayList.size(); j++){
+
+                 LegendEntry legendEntry_Morning = new LegendEntry();
+
+                 legendEntry_Morning.formColor = colors[j];
                  dataSetArrayList_Final.get(j).setColor(colors[j]);
-
                  dataSetArrayList_Final.get(j).notifyDataSetChanged();
-                 entry.label = finalListRemap.get(j).getName();
-                 entrieList.add(entry);
+                 legendEntry_Morning.label = entryMorningArrayList.get(j).getName();
+                 entrieList.add(legendEntry_Morning);
              }
 
+             int offset = dataSetArrayList_Final.size()-entryMorningArrayList.size();
+
+            for(int j = 0; j< entryEveningArrayList.size(); j++){
+
+                LegendEntry legendEntry_Evening = new LegendEntry();
+
+               // legendEntry_Evening.formColor = colors[j];
+                dataSetArrayList_Final.get(j+offset).setColor(colors[j]);
+                dataSetArrayList_Final.get(j+offset).notifyDataSetChanged();
+                //legendEntry_Morning.label = entryMorningArrayList.get(j).getName();
+               // legendEntry_Evening.label = "NONE";
+
+                entrieList.add(legendEntry_Evening);
+
+                //label
+            }
+
+
+
              //for some data which exceeds pre-defined constraint time stamp, will be coloured red.
+
+           // dataSetArrayList_Final.get(4).setLabel();
 
              legend.setCustom(entrieList);
 
