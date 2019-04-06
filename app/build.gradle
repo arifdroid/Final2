@@ -35,7 +35,7 @@ dependencies {
     //chart android
 //    implementation 'com.github.PhilJay:MPAndroidChart:v3.1.0'
 //    implementation 'com.github.PhilJay:MPAndroidChart:v3.1.0'
-    implementation 'com.github.PhilJay:MPAndroidChart:v3.0.3'
+    implementation 'com.github.PhilJay:MPAndroidChart:v3.1.0'
 
 
     //random color
