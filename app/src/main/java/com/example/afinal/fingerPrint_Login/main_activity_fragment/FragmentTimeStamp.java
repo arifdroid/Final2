@@ -170,10 +170,11 @@ public class FragmentTimeStamp extends Fragment implements Observer, View.OnClic
         //***
         // Controlling left side of y axis
         YAxis yAxisLeft = chart.getAxisLeft();
-        yAxisLeft.setGranularity(1f);
+       // yAxisLeft.setGranularity(1f);
         //yAxisLeft.setInverted(true);
 //
-        yAxisLeft.setAxisMinimum(1f);
+        yAxisLeft.setAxisMinimum(0f);
+        yAxisLeft.setGranularity(1f);
         //yAxisLeft.setAxisMaximum(21f);
 //
 //        final String[] hours = new String[]{"","","","","","",   "",   "2100", "2000","1900","1800","1700","1600", "1500","1400","1300","1200", "1100", "1000","0900","0800","0700"};
@@ -186,8 +187,8 @@ public class FragmentTimeStamp extends Fragment implements Observer, View.OnClic
 //        });
 
 
-        final String[] hours2 = new String[]{   "2400", "2300", "2200", "2100", "2000", "1900", "1800", "1700", "1600", "1500", "1400", "1300", "1200", "1100", "1000", "0900", "0800", "0700", "0600", "0500", "0400", "0300", "0200", "0100"};
-        //           0,   1,      2,     3,      4,     5,    6,     7,      8      9,     10,     11,   12,     13,     14,    15,    16,    17,     18,    19,    20,    21,      22,  23
+        final String[] hours2 = new String[]{"2300", "2200", "2100", "2000", "1900", "1800", "1700", "1600", "1500", "1400", "1300", "1200", "1100", "1000", "0900", "0800", "0700", "0600", "0500", "0400", "0300", "0200", "0100", "0000"};
+                                     //           0,   1,      2,     3,      4,     5,    6,     7,      8      9,     10,     11,   12,     13,     14,    15,    16,    17,     18,    19,    20,    21,      22,  23
         yAxisLeft.setValueFormatter(new ValueFormatter() {
             @Override
             public String getFormattedValue(float value) {
@@ -374,42 +375,48 @@ public class FragmentTimeStamp extends Fragment implements Observer, View.OnClic
                             Float afterAdjusted=0f;
 
                             if (entry.getValue() >= 6f && entry.getValue() < 7f) { // which entry got extracted,
-                                Float beforeAdjusted = entry.getValue();
-                                entry.setValue(beforeAdjusted + 12f); // here we adjusted right?
+                                Float beforeAdjusted = entry.getValue()+ ((7-entry.getValue()/0.6f));
+                                entry.setValue(beforeAdjusted + 12f-2f); // here we adjusted right?
 
+                                //  float a = 16.45f -16f;
+                                //
+                                //        Log.i("checkResult ", "a: "+ String.valueOf(a));
+                                //
+                                //        float c = a/0.6f;
+                                check here
                                 afterAdjusted = entry.getValue();
 
                             }
 
                             if (entry.getValue() >= 7f && entry.getValue() < 8f) {
                                 Float beforeAdjusted = entry.getValue();
-                                entry.setValue(beforeAdjusted + 10f);
+                                entry.setValue(beforeAdjusted + 10f-2f);
                                 afterAdjusted = entry.getValue();
                             }
 
                             if (entry.getValue() >= 8f && entry.getValue() < 9f) {
                                 Float beforeAdjusted = entry.getValue();
-                                entry.setValue(beforeAdjusted + 8f);
+                                entry.setValue(beforeAdjusted + 8f-2f);
                                 afterAdjusted = entry.getValue();
                             }
 
                             if (entry.getValue() >= 9f && entry.getValue() < 10f) {
                                 Float beforeAdjusted = entry.getValue();
-                                entry.setValue(beforeAdjusted + 6f);
+                                entry.setValue(beforeAdjusted + 6f-2f);
                                 afterAdjusted = entry.getValue();
                             }
 
 
                             if (entry.getValue() >= 10f && entry.getValue() < 11f) {
                                 Float beforeAdjusted = entry.getValue();
-                                entry.setValue(beforeAdjusted + 4f);
+                                entry.setValue(beforeAdjusted + 4f-2f);
                                 afterAdjusted = entry.getValue();
 
                             }
 
                             if (entry.getValue() >= 11f && entry.getValue() < 12f) {
                                 Float beforeAdjusted = entry.getValue();
-                                entry.setValue(beforeAdjusted + 2f);
+                                entry.setValue(beforeAdjusted + 2f-2f);
 
                                 afterAdjusted = entry.getValue();
                             }
@@ -418,7 +425,7 @@ public class FragmentTimeStamp extends Fragment implements Observer, View.OnClic
 //                           Float beforeAdjusted = entry.getValue();
 //                           entry.setValue(beforeAdjusted);
 
-                                afterAdjusted= entry.getValue();
+                                afterAdjusted= entry.getValue()-2f;
                             }
 
                             remapAfter.put("mon_morning",afterAdjusted);
@@ -430,35 +437,35 @@ public class FragmentTimeStamp extends Fragment implements Observer, View.OnClic
                         Float afterAdjusted=0f;
 
                         if (entry.getValue() >= 6f && entry.getValue() < 7f) { // which entry got extracted,
-                            afterAdjusted = entry.getValue()+12f;
+                            afterAdjusted = entry.getValue()+12f-1f;
 
                         }
 
                         if (entry.getValue() >= 7f && entry.getValue() < 8f) {
-                            afterAdjusted = entry.getValue()+10f;
+                            afterAdjusted = entry.getValue()+10f-1f;
                         }
 
                         if (entry.getValue() >= 8f && entry.getValue() < 9f) {
-                            afterAdjusted = entry.getValue()+8f;
+                            afterAdjusted = entry.getValue()+8f-1f;
                         }
 
                         if (entry.getValue() >= 9f && entry.getValue() < 10f) {
-                            afterAdjusted = entry.getValue()+6f;
+                            afterAdjusted = entry.getValue()+6f-1f;
                         }
 
 
                         if (entry.getValue() >= 10f && entry.getValue() < 11f) {
-                            afterAdjusted = entry.getValue()+4f;
+                            afterAdjusted = entry.getValue()+4f-1f;
                         }
 
                         if (entry.getValue() >= 11f && entry.getValue() < 12f) {
-                            afterAdjusted = entry.getValue()+2f;
+                            afterAdjusted = entry.getValue()+2f-1f;
 
                         }
 
                         if (entry.getValue() >= 12f && entry.getValue() < 13f) {
 
-                            afterAdjusted= entry.getValue();
+                            afterAdjusted= entry.getValue()-1f;
                         }
 
                         remapAfter.put("tue_morning",afterAdjusted);
@@ -470,35 +477,35 @@ public class FragmentTimeStamp extends Fragment implements Observer, View.OnClic
                         Float afterAdjusted=0f;
 
                         if (entry.getValue() >= 6f && entry.getValue() < 7f) { // which entry got extracted,
-                            afterAdjusted = entry.getValue()+12f;
+                            afterAdjusted = entry.getValue()+12f-1f;
 
                         }
 
                         if (entry.getValue() >= 7f && entry.getValue() < 8f) {
-                            afterAdjusted = entry.getValue()+10f;
+                            afterAdjusted = entry.getValue()+10f-1f;
                         }
 
                         if (entry.getValue() >= 8f && entry.getValue() < 9f) {
-                            afterAdjusted = entry.getValue()+8f;
+                            afterAdjusted = entry.getValue()+8f-1f;
                         }
 
                         if (entry.getValue() >= 9f && entry.getValue() < 10f) {
-                            afterAdjusted = entry.getValue()+6f;
+                            afterAdjusted = entry.getValue()+6f-1f;
                         }
 
 
                         if (entry.getValue() >= 10f && entry.getValue() < 11f) {
-                            afterAdjusted = entry.getValue()+4f;
+                            afterAdjusted = entry.getValue()+4f-1f;
                         }
 
                         if (entry.getValue() >= 11f && entry.getValue() < 12f) {
-                            afterAdjusted = entry.getValue()+2f;
+                            afterAdjusted = entry.getValue()-2f+1f;
 
                         }
 
                         if (entry.getValue() >= 12f && entry.getValue() < 13f) {
 
-                            afterAdjusted= entry.getValue();
+                            afterAdjusted= entry.getValue()-1f;
                         }
 
                         remapAfter.put("wed_morning",afterAdjusted);
@@ -510,35 +517,35 @@ public class FragmentTimeStamp extends Fragment implements Observer, View.OnClic
                         Float afterAdjusted=0f;
 
                         if (entry.getValue() >= 6f && entry.getValue() < 7f) { // which entry got extracted,
-                            afterAdjusted = entry.getValue()+12f;
+                            afterAdjusted = entry.getValue()+12f-2f;
 
                         }
 
                         if (entry.getValue() >= 7f && entry.getValue() < 8f) {
-                            afterAdjusted = entry.getValue()+10f;
+                            afterAdjusted = entry.getValue()+10f-2f;
                         }
 
                         if (entry.getValue() >= 8f && entry.getValue() < 9f) {
-                            afterAdjusted = entry.getValue()+8f;
+                            afterAdjusted = entry.getValue()+8f-2f;
                         }
 
                         if (entry.getValue() >= 9f && entry.getValue() < 10f) {
-                            afterAdjusted = entry.getValue()+6f;
+                            afterAdjusted = entry.getValue()+6f-2f;
                         }
 
 
                         if (entry.getValue() >= 10f && entry.getValue() < 11f) {
-                            afterAdjusted = entry.getValue()+4f;
+                            afterAdjusted = entry.getValue()+4f-2f;
                         }
 
                         if (entry.getValue() >= 11f && entry.getValue() < 12f) {
-                            afterAdjusted = entry.getValue()+2f;
+                            afterAdjusted = entry.getValue()+2f-2f;
 
                         }
 
                         if (entry.getValue() >= 12f && entry.getValue() < 13f) {
 
-                            afterAdjusted= entry.getValue();
+                            afterAdjusted= entry.getValue()-2f;
                         }
 
                         remapAfter.put("thu_morning",afterAdjusted);
@@ -550,35 +557,35 @@ public class FragmentTimeStamp extends Fragment implements Observer, View.OnClic
                         Float afterAdjusted=0f;
 
                         if (entry.getValue() >= 6f && entry.getValue() < 7f) { // which entry got extracted,
-                            afterAdjusted = entry.getValue()+12f;
+                            afterAdjusted = entry.getValue()+12f-1f;
 
                         }
 
                         if (entry.getValue() >= 7f && entry.getValue() < 8f) {
-                            afterAdjusted = entry.getValue()+10f;
+                            afterAdjusted = entry.getValue()+10f-1f;
                         }
 
                         if (entry.getValue() >= 8f && entry.getValue() < 9f) {
-                            afterAdjusted = entry.getValue()+8f;
+                            afterAdjusted = entry.getValue()+8f-1f;
                         }
 
                         if (entry.getValue() >= 9f && entry.getValue() < 10f) {
-                            afterAdjusted = entry.getValue()+6f;
+                            afterAdjusted = entry.getValue()+6f-1f;
                         }
 
 
                         if (entry.getValue() >= 10f && entry.getValue() < 11f) {
-                            afterAdjusted = entry.getValue()+4f;
+                            afterAdjusted = entry.getValue()+4f-1f;
                         }
 
                         if (entry.getValue() >= 11f && entry.getValue() < 12f) {
-                            afterAdjusted = entry.getValue()+2f;
+                            afterAdjusted = entry.getValue()+2f-1f;
 
                         }
 
                         if (entry.getValue() >= 12f && entry.getValue() < 13f) {
 
-                            afterAdjusted= entry.getValue();
+                            afterAdjusted= entry.getValue()-1f;
                         }
 
                         remapAfter.put("fri_morning",afterAdjusted);
