@@ -40,12 +40,15 @@ import java.util.List;
 import java.util.Map;
 import java.util.Observable;
 import java.util.Observer;
+import java.util.Timer;
+import java.util.TimerTask;
 
 public class FragmentTimeStamp extends Fragment implements Observer, View.OnClickListener {
 
     // https://javadoc.jitpack.io/com/github/PhilJay/MPAndroidChart/v3.0.3/javadoc/com/github/mikephil/charting/data/BaseEntry.html#setIcon-android.graphics.drawable.Drawable-
 
     private LineChart chart;
+    private int loopCount;
 
     public FragmentTimeStamp() {
     }
@@ -146,6 +149,8 @@ public class FragmentTimeStamp extends Fragment implements Observer, View.OnClic
 
     private CountDownTimer countDownTimer;
 
+    private Timer timer;
+
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -176,6 +181,7 @@ public class FragmentTimeStamp extends Fragment implements Observer, View.OnClic
 
         finalPointerArrayList = new ArrayList<>();
 
+        loopCount=0;
 
         Log.i("checkTimeStamp ", "flow: 1");
 
@@ -1344,21 +1350,42 @@ public class FragmentTimeStamp extends Fragment implements Observer, View.OnClic
                 //we want to
 
 
-                countDownTimer = new CountDownTimer() {
+
+
+//
+//                countDownTimer = new CountDownTimer() {
+//                    @Override
+//                    public void onTick(long millisUntilFinished) {
+//
+//                    }
+//
+//                    @Override
+//                    public void onFinish() {
+//
+//
+//
+//                    }
+//                }.start();
+
+
+
+                timer = new Timer();
+
+                chart.setVisibleXRange(0f, 2f);
+                chart.setVisibleYRange(0f, 2f, dataSetArrayList_Final.get(1).getAxisDependency());
+
+                timer.scheduleAtFixedRate(new TimerTask() {
                     @Override
-                    public void onTick(long millisUntilFinished) {
+                    public void run() {
 
+                        if(loopCount<finalPointerArrayList.size()) {
+                            loopWhosLate();
+                        }else {
+
+                            resizechart_andStopLoop();
+                        }
                     }
-
-                    @Override
-                    public void onFinish() {
-
-
-
-                    }
-                }.start();
-
-
+                },0,2200);
 
 //                for(int i =0; i<finalPointerArrayList.size();i++){
 //
@@ -1401,5 +1428,25 @@ public class FragmentTimeStamp extends Fragment implements Observer, View.OnClic
 
 
         }
+    }
+
+    private void resizechart_andStopLoop() {
+
+        chart.centerViewToAnimated(4f, 18f, dataSetArrayList_Final.get(4).getAxisDependency(), 1500);
+        chart.zoomOut();
+        chart.setVisibleXRange(0f, 4f);
+        chart.setVisibleYRange(0f, dataSetArrayList_Final.get(1).getYMax(), dataSetArrayList_Final.get(1).getAxisDependency());
+
+
+        // chart.fitScreen();
+            timer.cancel();
+
+    }
+
+    private void loopWhosLate(){
+
+        chart.centerViewToAnimated(dataSetArrayList_Final.get(finalPointerArrayList.get(loopCount).getPointer_1()).getEntryForIndex(finalPointerArrayList.get(loopCount).getPointer_2()).getX(), dataSetArrayList_Final.get(finalPointerArrayList.get(loopCount).getPointer_1()).getEntryForIndex(finalPointerArrayList.get(loopCount).getPointer_2()).getY(), dataSetArrayList_Final.get(4).getAxisDependency(), 1500);
+
+        loopCount++;
     }
 }
