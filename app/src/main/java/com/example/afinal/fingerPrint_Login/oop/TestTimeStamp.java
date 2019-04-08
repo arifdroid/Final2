@@ -2,6 +2,110 @@ package com.example.afinal.fingerPrint_Login.oop;
 
 public class TestTimeStamp {
 
+    //recorded data, missing, means, got mc. also need to point out, which data was it?
+
+    private MC_Null_TestTimeStamp testTimeStamp; // a class of this object, but
+
+    //we will set an object of MC_Null_TestTimeStamp, set its value, with current object of testtimestamp.
+    //like name, id, and which day
+
+    /// new solution >> 11.23AM 8 April
+
+    private boolean prob_mon_morning;
+    private boolean prob_tue_morning;
+    private boolean prob_wed_morning;
+    private boolean prob_thu_morning;
+    private boolean prob_fri_morning;
+
+    private boolean prob_mon_evening;
+    private boolean prob_tue_evening;
+    private boolean prob_wed_evening;
+    private boolean prob_thu_evening;
+
+    public boolean isProb_mon_morning() {
+        return prob_mon_morning;
+    }
+
+    public void setProb_mon_morning(boolean prob_mon_morning) {
+        this.prob_mon_morning = prob_mon_morning;
+    }
+
+    public boolean isProb_tue_morning() {
+        return prob_tue_morning;
+    }
+
+    public void setProb_tue_morning(boolean prob_tue_morning) {
+        this.prob_tue_morning = prob_tue_morning;
+    }
+
+    public boolean isProb_wed_morning() {
+        return prob_wed_morning;
+    }
+
+    public void setProb_wed_morning(boolean prob_wed_morning) {
+        this.prob_wed_morning = prob_wed_morning;
+    }
+
+    public boolean isProb_thu_morning() {
+        return prob_thu_morning;
+    }
+
+    public void setProb_thu_morning(boolean prob_thu_morning) {
+        this.prob_thu_morning = prob_thu_morning;
+    }
+
+    public boolean isProb_fri_morning() {
+        return prob_fri_morning;
+    }
+
+    public void setProb_fri_morning(boolean prob_fri_morning) {
+        this.prob_fri_morning = prob_fri_morning;
+    }
+
+    public boolean isProb_mon_evening() {
+        return prob_mon_evening;
+    }
+
+    public void setProb_mon_evening(boolean prob_mon_evening) {
+        this.prob_mon_evening = prob_mon_evening;
+    }
+
+    public boolean isProb_tue_evening() {
+        return prob_tue_evening;
+    }
+
+    public void setProb_tue_evening(boolean prob_tue_evening) {
+        this.prob_tue_evening = prob_tue_evening;
+    }
+
+    public boolean isProb_wed_evening() {
+        return prob_wed_evening;
+    }
+
+    public void setProb_wed_evening(boolean prob_wed_evening) {
+        this.prob_wed_evening = prob_wed_evening;
+    }
+
+    public boolean isProb_thu_evening() {
+        return prob_thu_evening;
+    }
+
+    public void setProb_thu_evening(boolean prob_thu_evening) {
+        this.prob_thu_evening = prob_thu_evening;
+    }
+
+    public boolean isProb_fri_evening() {
+        return prob_fri_evening;
+    }
+
+    public void setProb_fri_evening(boolean prob_fri_evening) {
+        this.prob_fri_evening = prob_fri_evening;
+    }
+
+    private boolean prob_fri_evening;
+
+
+    ///
     private String mon_morning;
     private String tue_morning;
     private String wed_morning;
