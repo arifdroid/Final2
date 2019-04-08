@@ -369,6 +369,8 @@ public class FragmentTimeStamp extends Fragment implements Observer, View.OnClic
 
                 //we could remap timeStampList, single out all morning entry into single morning list.,, remap into hasmap
 
+                boolean check = testTimeStamp.isProb_fri_evening();
+
                 HashMap<String, Float> remap = new HashMap<>();
 
                 Float mon_morning_remap = Float.valueOf(testTimeStamp.getMon_morning());
@@ -944,29 +946,6 @@ public class FragmentTimeStamp extends Fragment implements Observer, View.OnClic
 
                         }
 
-//                        if(testTimeStamp.isProb_mon_morning()){
-//                            entryArrayList.get(i).setIcon(ContextCompat.getDrawable(getContext(), R.drawable.ic_error_small_16dp));
-//                        }
-//
-//
-//                        if(testTimeStamp.isProb_tue_morning()){
-//                            entryArrayList.get(i).setIcon(ContextCompat.getDrawable(getContext(), R.drawable.ic_error_small_16dp));
-//                        }
-//
-//
-//                        if(testTimeStamp.isProb_wed_morning()){
-//                            entryArrayList.get(i).setIcon(ContextCompat.getDrawable(getContext(), R.drawable.ic_error_small_16dp));
-//                        }
-//
-//
-//                        if(testTimeStamp.isProb_thu_morning()){
-//                            entryArrayList.get(i).setIcon(ContextCompat.getDrawable(getContext(), R.drawable.ic_error_small_16dp));
-//                        }
-//
-//                        if(testTimeStamp.isProb_fri_morning()){
-//                            entryArrayList.get(i).setIcon(ContextCompat.getDrawable(getContext(), R.drawable.ic_error_small_16dp));
-//                        }
-
 
                     }
 
@@ -994,38 +973,11 @@ public class FragmentTimeStamp extends Fragment implements Observer, View.OnClic
                         entryArrayList2.get(i).setIcon(ContextCompat.getDrawable(getContext(), R.drawable.ic_error_small_16dp));
 
                     }
-//
-//                    if(testTimeStamp.isProb_mon_evening()){
-//                        entryArrayList2.get(i).setIcon(ContextCompat.getDrawable(getContext(), R.drawable.ic_error_small_16dp));
-//                    }
-//
-//
-//                    if(testTimeStamp.isProb_tue_morning()){
-//                        entryArrayList2.get(i).setIcon(ContextCompat.getDrawable(getContext(), R.drawable.ic_error_small_16dp));
-//                    }
-//
-//
-//                    if(testTimeStamp.isProb_wed_morning()){
-//                        entryArrayList2.get(i).setIcon(ContextCompat.getDrawable(getContext(), R.drawable.ic_error_small_16dp));
-//                    }
-//
-//
-//                    if(testTimeStamp.isProb_thu_morning()){
-//                        entryArrayList2.get(i).setIcon(ContextCompat.getDrawable(getContext(), R.drawable.ic_error_small_16dp));
-//                    }
-//
-//                    if(testTimeStamp.isProb_fri_morning()){
-//                        entryArrayList2.get(i).setIcon(ContextCompat.getDrawable(getContext(), R.drawable.ic_error_small_16dp));
-//                    } // problem with this code is, only run once.
+
                 }
 
                 entryEveningArrayList.add(new EntryEvening(testTimeStamp.getName(), entryArrayList2));
 //
-//                    if(testTimeStamp.isProb_mon_morning()){
-//
-//                        //this person monday morning is true, then set. this person
-//                    }
-
 
                 }
 
@@ -1033,35 +985,6 @@ public class FragmentTimeStamp extends Fragment implements Observer, View.OnClic
 
 
                 //evening
-
-//                for (TestTimeStamp testTimeStamp : finalListRemap) {   //list remap will be 3.
-////
-////                    ArrayList<Entry> entryArrayList = new ArrayList<>();
-////
-////                    entryArrayList.add(new Entry(0, remapAfter.get("mon_evening")));
-////                    entryArrayList.add(new Entry(1, remapAfter.get("tue_evening")));
-////                    entryArrayList.add(new Entry(2, remapAfter.get("wed_evening")));
-////                    entryArrayList.add(new Entry(3, remapAfter.get("thu_evening")));
-////                    entryArrayList.add(new Entry(4, remapAfter.get("fri_evening")));
-////
-////                    // figure out which time stamp not following threshold.
-////
-////                    // entryArrayList.get(0).setIcon();
-////
-////                    for (int i = 0; i < entryArrayList.size(); i++) {
-////
-////                        Float checkConstraintTime = entryArrayList.get(i).getY();
-////
-////                        if (checkConstraintTime < 7f) {
-////                            entryArrayList.get(i).setIcon(ContextCompat.getDrawable(getContext(), R.drawable.ic_error_small_16dp));
-////
-////
-////                        }
-////                    }
-////
-////                    entryEveningArrayList.add(new EntryEvening(testTimeStamp.getName(), entryArrayList));
-////                }
-
                 ////////////>>>>>>>>>>>>>>>>
 
                 // >> >>>>>>>>
@@ -1091,33 +1014,38 @@ public class FragmentTimeStamp extends Fragment implements Observer, View.OnClic
 
                 //set up icon for null value, and mc , check morning first
 
-                for(TestTimeStamp testTimeStamp: testTimeStampsList) {
+
+
+
+                for(TestTimeStamp testTimeStamp: finalListRemap) {
+
+
 
                     //for(EntryMorning entryMorning: entryMorningArrayList){
-                        // we not sure entry represent which. , so better use index since, 0 always mean monday, and so on
-                    for(int k =0; k< entryMorningArrayList.size();k++){
+                    // we not sure entry represent which. , so better use index since, 0 always mean monday, and so on
+                    for (int k = 0; k < entryMorningArrayList.size(); k++) {
 
-                        if(testTimeStamp.getName()==entryMorningArrayList.get(k).getName()){
+                        if (testTimeStamp.getName() == entryMorningArrayList.get(k).getName()) {
 
-                            if(testTimeStamp.isProb_mon_morning()){
+                            if (testTimeStamp.isProb_mon_morning()) {
                                 //entryMorning.getEntry().setIcon(); // something wrong ,, we not sure which entry , is
 
                                 entryMorningArrayList.get(k).getEntryArrayList().get(0).setIcon(ContextCompat.getDrawable(getContext(), R.drawable.ic_error_small_16dp));
 
                             }
-                            if(testTimeStamp.isProb_tue_morning()){
+                            if (testTimeStamp.isProb_tue_morning()) {
                                 entryMorningArrayList.get(k).getEntryArrayList().get(1).setIcon(ContextCompat.getDrawable(getContext(), R.drawable.ic_error_small_16dp));
 
                             }
-                            if(testTimeStamp.isProb_wed_morning()){
+                            if (testTimeStamp.isProb_wed_morning()) {
                                 entryMorningArrayList.get(k).getEntryArrayList().get(2).setIcon(ContextCompat.getDrawable(getContext(), R.drawable.ic_error_small_16dp));
 
                             }
-                            if(testTimeStamp.isProb_thu_morning()){
+                            if (testTimeStamp.isProb_thu_morning()) {
                                 entryMorningArrayList.get(k).getEntryArrayList().get(3).setIcon(ContextCompat.getDrawable(getContext(), R.drawable.ic_error_small_16dp));
 
                             }
-                            if(testTimeStamp.isProb_fri_morning()){
+                            if (testTimeStamp.isProb_fri_morning()) {
                                 entryMorningArrayList.get(k).getEntryArrayList().get(4).setIcon(ContextCompat.getDrawable(getContext(), R.drawable.ic_error_small_16dp));
 
                             }
@@ -1126,7 +1054,12 @@ public class FragmentTimeStamp extends Fragment implements Observer, View.OnClic
 
                     }
 
-                    //now set evening MC or null
+                }
+
+            for(TestTimeStamp testTimeStamp: finalListRemap) {
+
+
+                //now set evening MC or null
 
                     for(int k =0; k< entryEveningArrayList.size();k++){
 
