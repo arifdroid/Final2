@@ -6,6 +6,7 @@ import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
+import android.os.CountDownTimer;
 import android.os.Handler;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -108,6 +109,43 @@ public class FragmentTimeStamp extends Fragment implements Observer, View.OnClic
 
     private ArrayList<MC_Null_TestTimeStamp> arrayListMC_Null;
 
+    //// check  int pointer for late person, from datasetFinal point of view.
+
+    class FinalPointer{
+
+        int pointer_1;
+        int pointer_2;
+
+        public FinalPointer(){
+
+        }
+
+        public FinalPointer(int pointer_1,int pointer_2){
+            this.pointer_1 = pointer_1;
+            this.pointer_2 = pointer_2;
+        }
+
+        public int getPointer_1() {
+            return pointer_1;
+        }
+
+        public void setPointer_1(int pointer_1) {
+            this.pointer_1 = pointer_1;
+        }
+
+        public int getPointer_2() {
+            return pointer_2;
+        }
+
+        public void setPointer_2(int pointer_2) {
+            this.pointer_2 = pointer_2;
+        }
+    }
+
+    ArrayList<FinalPointer> finalPointerArrayList;
+
+    private CountDownTimer countDownTimer;
+
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -136,8 +174,10 @@ public class FragmentTimeStamp extends Fragment implements Observer, View.OnClic
 
         listof_entryList_Evening = new ArrayList<>();
 
-        Log.i("checkTimeStamp ", "flow: 1");
+        finalPointerArrayList = new ArrayList<>();
 
+
+        Log.i("checkTimeStamp ", "flow: 1");
 
         chart = rootView.findViewById(R.id.chartiD);
 
@@ -1183,21 +1223,6 @@ public class FragmentTimeStamp extends Fragment implements Observer, View.OnClic
 
                 //finish making sure no red, recored
 
-
-//
-//            for(int j=0;j<dataSetArrayList_Final.size();j++){
-//
-//             LegendEntry entry = new LegendEntry();
-//                 //we want to
-//                                    // color will hit null
-//                 entry.formColor = colors[j]; //color only 3, data set 6,
-//                 dataSetArrayList_Final.get(j).setColor(colors[j]);
-//
-//                 dataSetArrayList_Final.get(j).notifyDataSetChanged();
-//                 entry.label = finalListRemap.get(j).getName();
-//                 entrieList.add(entry);
-//             }
-
                 //adding setup
 
                 for (int i = 0; i < dataSetArrayList_Final.size(); i++) {
@@ -1254,6 +1279,50 @@ public class FragmentTimeStamp extends Fragment implements Observer, View.OnClic
     }
 
 
+    private void setupWhosLate(){
+
+        //for(LineDataSet dataSet: dataSetArrayList_Final){
+
+
+        // check morning first., mean halve the data
+        for(int j= 0; j<dataSetArrayList_Final.size()/2;j++){
+
+            for(int i=0; i<5; i++){
+
+                float timestampthis = dataSetArrayList_Final.get(j).getEntryForIndex(i).getY();
+
+                if(timestampthis<=14.99f){
+
+                    finalPointerArrayList.add(new FinalPointer(j,i));
+
+                }
+
+            }
+
+        }
+
+        //then evening logic.
+
+        for(int j= dataSetArrayList_Final.size()/2; j<dataSetArrayList_Final.size();j++){
+
+            for(int i=0; i<5; i++){
+
+                float timestampthis = dataSetArrayList_Final.get(j).getEntryForIndex(i).getY();
+
+                if(timestampthis>=5.99f){ // relative to final data, not chart, no offset.
+
+                    finalPointerArrayList.add(new FinalPointer(j,i));
+
+                }
+
+            }
+
+        }
+
+        int sizepointer=finalPointerArrayList.size();
+    }
+
+
     @Override
     public void onClick(View v) {
 
@@ -1268,14 +1337,62 @@ public class FragmentTimeStamp extends Fragment implements Observer, View.OnClic
 
             case R.id.bottomNav_floatButtonShowLateTodayiD:
 
+                //logic for who we want to view. , so we need an array record, which entry is late. , correspond to who is late.
 
+                setupWhosLate(); //setup data first.
+
+                //we want to
+
+
+                countDownTimer = new CountDownTimer() {
+                    @Override
+                    public void onTick(long millisUntilFinished) {
+
+                    }
+
+                    @Override
+                    public void onFinish() {
+
+
+
+                    }
+                }.start();
+
+
+
+//                for(int i =0; i<finalPointerArrayList.size();i++){
 //
+//                    Handler handler = new Handler();
+//
+//                    Log.i("checkFinally ", "1 Flow, i: "+ i);
+//
+//                    final int finalI = i;
+//                    handler.postDelayed(new Runnable() {
+//
+//                        @Override
+//                        public void run() {
+//                            Log.i("checkFinally ", "2 Flow, finalI: "+ finalI);
+//                            chart.setVisibleXRange(0f, 2f);
+//                            chart.setVisibleYRange(0f, 2f, dataSetArrayList_Final.get(1).getAxisDependency());
+//
+//                           // chart.centerViewToAnimated(dataSetArrayList_Final.get(finalPointerArrayList.get(finalI).getPointer_1()).getEntryForIndex(2).getX(), , dataSetArrayList_Final.get(4).getAxisDependency(), 2500);
+//                            chart.centerViewToAnimated(dataSetArrayList_Final.get(finalPointerArrayList.get(finalI).getPointer_1()).getEntryForIndex(finalPointerArrayList.get(finalI).getPointer_2()).getX(), dataSetArrayList_Final.get(finalPointerArrayList.get(finalI).getPointer_1()).getEntryForIndex(finalPointerArrayList.get(finalI).getPointer_2()).getY(), dataSetArrayList_Final.get(4).getAxisDependency(), 1500);
+//
+//                        }
+//                    },3000);
+//
+//                    Log.i("checkFinally ", "3 Flow, i: "+ i);
+//                //we need to wait before we iterate to next loop.
+//
+//                }
 
-
-                chart.setVisibleXRange(0f, 2f);
-                chart.setVisibleYRange(0f, 2f, dataSetArrayList_Final.get(4).getAxisDependency());
-
-                chart.centerViewToAnimated(dataSetArrayList_Final.get(4).getEntryForIndex(2).getX(), 16, dataSetArrayList_Final.get(4).getAxisDependency(), 2500);
+                /////////////>>>>>>>>>>>>>
+//
+//
+//                chart.setVisibleXRange(0f, 2f);
+//                chart.setVisibleYRange(0f, 2f, dataSetArrayList_Final.get(4).getAxisDependency());
+//
+//                chart.centerViewToAnimated(dataSetArrayList_Final.get(4).getEntryForIndex(2).getX(), 16, dataSetArrayList_Final.get(4).getAxisDependency(), 2500);
 
                 Log.i("checkLate ", " name :" + dataSetArrayList_Final.get(4).getLabel() + " , x: " + dataSetArrayList_Final.get(4).getEntryForIndex(2).getX() + " , y: " + dataSetArrayList_Final.get(4).getEntryForIndex(2).getY());
 
