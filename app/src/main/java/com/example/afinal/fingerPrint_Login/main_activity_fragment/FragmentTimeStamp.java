@@ -5,6 +5,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.RecyclerView;
 
 import android.os.CountDownTimer;
 import android.os.Handler;
@@ -14,6 +15,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.example.afinal.R;
+import com.example.afinal.fingerPrint_Login.customclass.OurLayoutManager;
 import com.example.afinal.fingerPrint_Login.oop.EntryMorning;
 import com.example.afinal.fingerPrint_Login.oop.MC_Null_TestTimeStamp;
 import com.example.afinal.fingerPrint_Login.oop.TestTimeStamp;
@@ -49,6 +51,7 @@ public class FragmentTimeStamp extends Fragment implements Observer, View.OnClic
 
     private LineChart chart;
     private int loopCount;
+
 
     public FragmentTimeStamp() {
     }
@@ -151,6 +154,16 @@ public class FragmentTimeStamp extends Fragment implements Observer, View.OnClic
 
     private Timer timer;
 
+    //adding recycler view showing whos late.
+
+    private RecyclerView recyclerView;
+
+    private RecyclerView_Frag_Adapter recyclerView_frag_adapter;
+
+    private OurLayoutManager layoutManager;
+
+    private ArrayList<ReturnToRecycler> returnToRecyclerArrayList;
+
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -158,6 +171,24 @@ public class FragmentTimeStamp extends Fragment implements Observer, View.OnClic
 
         View rootView = inflater.inflate(R.layout.bottom_nav_timestamp_fragment, container, false);
         //textView = rootView.findViewById(R.id.bottom_nav_fragment_timeStamp_textView);
+
+        returnToRecyclerArrayList = new ArrayList<>();
+        returnToRecyclerArrayList.add(new ReturnToRecycler("name","date","0800","on time"));
+        //recycler view setup 10.20AM
+
+        recyclerView = rootView.findViewById(R.id.bottom_nav_timeStamp_recycler_id);
+
+
+
+        layoutManager = new OurLayoutManager(getContext(), OurLayoutManager.VERTICAL,false);
+        recyclerView.setLayoutManager(layoutManager);
+
+
+        //pass data, and pointer.
+        recyclerView_frag_adapter = new RecyclerView_Frag_Adapter(getContext(),returnToRecyclerArrayList); // pass pointer, and data.
+
+
+        ///
 
         fButton = rootView.findViewById(R.id.bottomNav_floatButtonShowLateTodayiD);
 
@@ -1300,6 +1331,44 @@ public class FragmentTimeStamp extends Fragment implements Observer, View.OnClic
                 if(timestampthis<=14.99f){
 
                     finalPointerArrayList.add(new FinalPointer(j,i));
+                    if(returnToRecyclerArrayList.get(0).getName().equals("name")){
+                        returnToRecyclerArrayList.remove(0);
+                    }
+
+                    //float timenow = dataSetArrayList_Final.get(j).getEntryForIndex(i).getY();
+
+                    String namehere = dataSetArrayList_Final.get(j).getLabel();
+
+                    for(TestTimeStamp testTimeStamp: finalListRemap){
+
+                        if(testTimeStamp.getName().equals(namehere)){
+
+                            if(i==0){
+
+                                returnToRecyclerArrayList.add(new ReturnToRecycler(namehere,"8 April",testTimeStamp.getMon_morning(),"LATE"));
+                            }if(i==1){
+
+                                returnToRecyclerArrayList.add(new ReturnToRecycler(namehere,"9 April",testTimeStamp.getTue_morning(),"LATE"));
+                            }
+                            if(i==2){
+
+                                returnToRecyclerArrayList.add(new ReturnToRecycler(namehere,"10 April",testTimeStamp.getWed_morning(),"LATE"));
+                            }
+                            if(i==3){
+
+                                returnToRecyclerArrayList.add(new ReturnToRecycler(namehere,"11 April",testTimeStamp.getThu_morning(),"LATE"));
+                            }
+                            if(i==4){
+
+                                returnToRecyclerArrayList.add(new ReturnToRecycler(namehere,"12 April",testTimeStamp.getFri_morning(),"LATE"));
+                            }
+
+
+
+                        }
+                    }
+
+                    //returnToRecyclerArrayList.add(new ReturnToRecycler(dataSetArrayList_Final.get(j).getLabel(),"9 April",dataSetArrayList_Final.get(j).getEntryForIndex(i).getY(),))
 
                 }
 
@@ -1317,13 +1386,55 @@ public class FragmentTimeStamp extends Fragment implements Observer, View.OnClic
 
                 if(timestampthis>=5.99f){ // relative to final data, not chart, no offset.
 
+                    finalPointerArrayList.add(new FinalPointer(j,i)); // add another complete set pointer.
+
                     finalPointerArrayList.add(new FinalPointer(j,i));
+                    if(returnToRecyclerArrayList.get(0).getName().equals("name")){
+                        returnToRecyclerArrayList.remove(0);
+                    }
+
+                    //float timenow = dataSetArrayList_Final.get(j).getEntryForIndex(i).getY();
+
+                    String namehere = dataSetArrayList_Final.get(j).getLabel();
+
+                    for(TestTimeStamp testTimeStamp: finalListRemap){
+
+                        if(testTimeStamp.getName().equals(namehere)){
+
+                            if(i==0){
+
+                                returnToRecyclerArrayList.add(new ReturnToRecycler(namehere,"8 April",testTimeStamp.getMon_evening(),"LATE"));
+                            }if(i==1){
+
+                                returnToRecyclerArrayList.add(new ReturnToRecycler(namehere,"9 April",testTimeStamp.getTue_evening(),"LATE"));
+                            }
+                            if(i==2){
+
+                                returnToRecyclerArrayList.add(new ReturnToRecycler(namehere,"10 April",testTimeStamp.getWed_evening(),"LATE"));
+                            }
+                            if(i==3){
+
+                                returnToRecyclerArrayList.add(new ReturnToRecycler(namehere,"11 April",testTimeStamp.getThu_evening(),"LATE"));
+                            }
+                            if(i==4){
+
+                                returnToRecyclerArrayList.add(new ReturnToRecycler(namehere,"12 April",testTimeStamp.getFri_evening(),"LATE"));
+                            }
+
+
+
+                        }
+                    }
+
 
                 }
 
             }
 
         }
+
+        recyclerView_frag_adapter.notifyDataSetChanged();
+        recyclerView.setAdapter(recyclerView_frag_adapter);
 
         int sizepointer=finalPointerArrayList.size();
     }
@@ -1347,27 +1458,6 @@ public class FragmentTimeStamp extends Fragment implements Observer, View.OnClic
 
                 setupWhosLate(); //setup data first.
 
-                //we want to
-
-
-
-
-//
-//                countDownTimer = new CountDownTimer() {
-//                    @Override
-//                    public void onTick(long millisUntilFinished) {
-//
-//                    }
-//
-//                    @Override
-//                    public void onFinish() {
-//
-//
-//
-//                    }
-//                }.start();
-
-
 
                 timer = new Timer();
 
@@ -1386,40 +1476,6 @@ public class FragmentTimeStamp extends Fragment implements Observer, View.OnClic
                         }
                     }
                 },0,2200);
-
-//                for(int i =0; i<finalPointerArrayList.size();i++){
-//
-//                    Handler handler = new Handler();
-//
-//                    Log.i("checkFinally ", "1 Flow, i: "+ i);
-//
-//                    final int finalI = i;
-//                    handler.postDelayed(new Runnable() {
-//
-//                        @Override
-//                        public void run() {
-//                            Log.i("checkFinally ", "2 Flow, finalI: "+ finalI);
-//                            chart.setVisibleXRange(0f, 2f);
-//                            chart.setVisibleYRange(0f, 2f, dataSetArrayList_Final.get(1).getAxisDependency());
-//
-//                           // chart.centerViewToAnimated(dataSetArrayList_Final.get(finalPointerArrayList.get(finalI).getPointer_1()).getEntryForIndex(2).getX(), , dataSetArrayList_Final.get(4).getAxisDependency(), 2500);
-//                            chart.centerViewToAnimated(dataSetArrayList_Final.get(finalPointerArrayList.get(finalI).getPointer_1()).getEntryForIndex(finalPointerArrayList.get(finalI).getPointer_2()).getX(), dataSetArrayList_Final.get(finalPointerArrayList.get(finalI).getPointer_1()).getEntryForIndex(finalPointerArrayList.get(finalI).getPointer_2()).getY(), dataSetArrayList_Final.get(4).getAxisDependency(), 1500);
-//
-//                        }
-//                    },3000);
-//
-//                    Log.i("checkFinally ", "3 Flow, i: "+ i);
-//                //we need to wait before we iterate to next loop.
-//
-//                }
-
-                /////////////>>>>>>>>>>>>>
-//
-//
-//                chart.setVisibleXRange(0f, 2f);
-//                chart.setVisibleYRange(0f, 2f, dataSetArrayList_Final.get(4).getAxisDependency());
-//
-//                chart.centerViewToAnimated(dataSetArrayList_Final.get(4).getEntryForIndex(2).getX(), 16, dataSetArrayList_Final.get(4).getAxisDependency(), 2500);
 
                 Log.i("checkLate ", " name :" + dataSetArrayList_Final.get(4).getLabel() + " , x: " + dataSetArrayList_Final.get(4).getEntryForIndex(2).getX() + " , y: " + dataSetArrayList_Final.get(4).getEntryForIndex(2).getY());
 
@@ -1446,7 +1502,7 @@ public class FragmentTimeStamp extends Fragment implements Observer, View.OnClic
     private void loopWhosLate(){
 
         chart.centerViewToAnimated(dataSetArrayList_Final.get(finalPointerArrayList.get(loopCount).getPointer_1()).getEntryForIndex(finalPointerArrayList.get(loopCount).getPointer_2()).getX(), dataSetArrayList_Final.get(finalPointerArrayList.get(loopCount).getPointer_1()).getEntryForIndex(finalPointerArrayList.get(loopCount).getPointer_2()).getY(), dataSetArrayList_Final.get(4).getAxisDependency(), 1500);
-
+        recyclerView.smoothScrollToPosition(loopCount);
         loopCount++;
     }
 }
