@@ -13,6 +13,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import com.example.afinal.R;
 import com.example.afinal.fingerPrint_Login.customclass.OurLayoutManager;
@@ -51,7 +52,24 @@ public class FragmentTimeStamp extends Fragment implements Observer, View.OnClic
 
     private LineChart chart;
     private int loopCount;
+    private int seconds;
+    private boolean startRun;
+    private Handler mTimerHandler;
+    private Timer mTimer1;
+    private TimerTask mTt1;
+    private int iii;
 
+    //interface pass result.
+
+    interface PassText{
+        void updateTextView(String text);
+    }
+
+    public PassText passText;
+
+    public void setPassText(PassText passText){
+        this.passText=passText;
+    }
 
     public FragmentTimeStamp() {
     }
@@ -164,6 +182,10 @@ public class FragmentTimeStamp extends Fragment implements Observer, View.OnClic
 
     private ArrayList<ReturnToRecycler> returnToRecyclerArrayList;
 
+    Timer timer2;
+
+    private TextView textView;
+
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -175,9 +197,12 @@ public class FragmentTimeStamp extends Fragment implements Observer, View.OnClic
         returnToRecyclerArrayList = new ArrayList<>();
         returnToRecyclerArrayList.add(new ReturnToRecycler("name","date","0800","on time"));
         //recycler view setup 10.20AM
-
+        startRun = false;
         recyclerView = rootView.findViewById(R.id.bottom_nav_timeStamp_recycler_id);
 
+        textView = rootView.findViewById(R.id.bottom_nav_timeStamp_textView2);
+
+        seconds=0;
 
 
         layoutManager = new OurLayoutManager(getContext(), OurLayoutManager.VERTICAL,false);
@@ -1328,7 +1353,7 @@ public class FragmentTimeStamp extends Fragment implements Observer, View.OnClic
 
                 float timestampthis = dataSetArrayList_Final.get(j).getEntryForIndex(i).getY();
 
-                if(timestampthis<=14.99f){
+                if(timestampthis<=15.01f){
 
                     finalPointerArrayList.add(new FinalPointer(j,i));
                     if(returnToRecyclerArrayList.get(0).getName().equals("name")){
@@ -1388,7 +1413,7 @@ public class FragmentTimeStamp extends Fragment implements Observer, View.OnClic
 
                     finalPointerArrayList.add(new FinalPointer(j,i)); // add another complete set pointer.
 
-                    finalPointerArrayList.add(new FinalPointer(j,i));
+                   // finalPointerArrayList.add(new FinalPointer(j,i));
                     if(returnToRecyclerArrayList.get(0).getName().equals("name")){
                         returnToRecyclerArrayList.remove(0);
                     }
@@ -1454,9 +1479,16 @@ public class FragmentTimeStamp extends Fragment implements Observer, View.OnClic
 
             case R.id.bottomNav_floatButtonShowLateTodayiD:
 
+
+
                 //logic for who we want to view. , so we need an array record, which entry is late. , correspond to who is late.
 
                 setupWhosLate(); //setup data first.
+
+
+
+                 mTimerHandler = new Handler();
+
 
 
                 timer = new Timer();
@@ -1464,19 +1496,37 @@ public class FragmentTimeStamp extends Fragment implements Observer, View.OnClic
                 chart.setVisibleXRange(0f, 2f);
                 chart.setVisibleYRange(0f, 2f, dataSetArrayList_Final.get(1).getAxisDependency());
 
+
+
                 timer.scheduleAtFixedRate(new TimerTask() {
+
                     @Override
                     public void run() {
 
+
                         if(loopCount<finalPointerArrayList.size()) {
+
                             loopWhosLate();
+                            // this will not work, because, ,,
+                            // or maybe we can detect, if changing
+
+
+                            getActivity().runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    textView.setText(loopCount+"");
+                                }
+                            });
+
+
                         }else {
 
                             resizechart_andStopLoop();
                         }
                     }
-                },0,2200);
-
+                },0,4000);
+                //problem with this method, will increase exponentially everytime executed.
+                //for small number, no problem, when number gets bigger, we will run into problem.
                 Log.i("checkLate ", " name :" + dataSetArrayList_Final.get(4).getLabel() + " , x: " + dataSetArrayList_Final.get(4).getEntryForIndex(2).getX() + " , y: " + dataSetArrayList_Final.get(4).getEntryForIndex(2).getY());
 
 
@@ -1486,9 +1536,11 @@ public class FragmentTimeStamp extends Fragment implements Observer, View.OnClic
         }
     }
 
+
+
     private void resizechart_andStopLoop() {
 
-        chart.centerViewToAnimated(4f, 18f, dataSetArrayList_Final.get(4).getAxisDependency(), 1500);
+        chart.centerViewToAnimated(4f, 18f, dataSetArrayList_Final.get(4).getAxisDependency(), 900);
         chart.zoomOut();
         chart.setVisibleXRange(0f, 4f);
         chart.setVisibleYRange(0f, dataSetArrayList_Final.get(1).getYMax(), dataSetArrayList_Final.get(1).getAxisDependency());
@@ -1500,9 +1552,11 @@ public class FragmentTimeStamp extends Fragment implements Observer, View.OnClic
     }
 
     private void loopWhosLate(){
-
-        chart.centerViewToAnimated(dataSetArrayList_Final.get(finalPointerArrayList.get(loopCount).getPointer_1()).getEntryForIndex(finalPointerArrayList.get(loopCount).getPointer_2()).getX(), dataSetArrayList_Final.get(finalPointerArrayList.get(loopCount).getPointer_1()).getEntryForIndex(finalPointerArrayList.get(loopCount).getPointer_2()).getY(), dataSetArrayList_Final.get(4).getAxisDependency(), 1500);
         recyclerView.smoothScrollToPosition(loopCount);
+        chart.centerViewToAnimated(dataSetArrayList_Final.get(finalPointerArrayList.get(loopCount).getPointer_1()).getEntryForIndex(finalPointerArrayList.get(loopCount).getPointer_2()).getX(), dataSetArrayList_Final.get(finalPointerArrayList.get(loopCount).getPointer_1()).getEntryForIndex(finalPointerArrayList.get(loopCount).getPointer_2()).getY(), dataSetArrayList_Final.get(4).getAxisDependency(), 1500);
+        //chart.centerViewToAnimated(dataSetArrayList_Final.get(finalPointerArrayList.get(loopCount).getPointer_1()));
         loopCount++;
     }
+
+    //runOnUiThread()
 }

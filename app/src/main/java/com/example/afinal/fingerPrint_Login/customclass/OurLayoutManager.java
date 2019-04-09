@@ -36,7 +36,7 @@ public class OurLayoutManager extends LinearLayoutManager {
 
     // for making smooth with delay
 
-    private static final float MILLISECONDS_PER_INCH = 150f;
+    private static float MILLISECONDS_PER_INCH = 150f;
 
 
     public OurLayoutManager(Context context, int orientation, boolean reverseLayout) {
@@ -369,8 +369,12 @@ public class OurLayoutManager extends LinearLayoutManager {
 
                 return MILLISECONDS_PER_INCH/displayMetrics.densityDpi;
 
+                //control speed has to vary
+
                 //return super.calculateSpeedPerPixel(displayMetrics);
             }
+
+
         };
 
         linearSmoothScroller.setTargetPosition(position);
