@@ -16,7 +16,8 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".fingerPrint_Login.register.register_as_admin_add_userList.Add_User_Activity"></activity>
+        <activity android:name=".fingerPrint_Login.register.setup_pin_code.Setup_Pin_Activity"></activity>
+        <activity android:name=".fingerPrint_Login.register.register_as_admin_add_userList.Add_User_Activity" />
         <activity
             android:name=".fingerPrint_Login.main_activity_fragment.Main_BottomNav_Activity"
             android:label="@string/title_activity_main__bottom_nav_" />

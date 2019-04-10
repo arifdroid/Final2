@@ -21,6 +21,7 @@ import android.widget.Toast;
 
 import com.example.afinal.R;
 import com.example.afinal.fingerPrint_Login.register.register_with_activity.RegAdmin_Activity;
+import com.example.afinal.fingerPrint_Login.register.setup_pin_code.Setup_Pin_Activity;
 import com.google.android.gms.tasks.OnCanceledListener;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -488,8 +489,16 @@ public class RegUser_Activity extends AppCompatActivity implements View.OnClickL
             editor.putString("final_Admin_Phone",adminPhone);
             editor.putString("final_Admin_Name", adminName);
 
+            editor.putString("final_User_Picture", documentReference.toString());
 
             Toast.makeText(this,"user succesfully created", Toast.LENGTH_SHORT).show();
+
+            Intent intent = new Intent(RegUser_Activity.this, Setup_Pin_Activity.class);
+
+            startActivity(intent);
+
+            finish();
+
         }
 
         if(status.equals("please contact admin")){
