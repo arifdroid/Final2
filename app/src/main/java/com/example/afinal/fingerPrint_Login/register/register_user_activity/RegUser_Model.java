@@ -21,22 +21,26 @@ private boolean checkUserDocStatus;
 
         checkUserDocStatus=false;
 
-        final CollectionReference cR_uid_employee_this = FirebaseFirestore.getInstance().collection("employees_to_offices")
-                .document((adminName+adminPhone)).collection("uid_employee_this");
+        // check inside, wrong path
+
+        final CollectionReference cR_uid_employee_this = FirebaseFirestore.getInstance().collection("all_admin_doc_collections")
+                .document((adminName+adminPhone)+"doc").collection("all_employee_thisAdmin_collection");
 
 
-        Query query_CheckDoc = cR_uid_employee_this.whereEqualTo("phone",phone);
+        //Query query_CheckDoc = cR_uid_employee_this.whereEqualTo("phone",phone);
 
-        Log.i("checkk UserReg: ", "1");
+        Query query1 = cR_uid_employee_this.whereEqualTo("phone",phone);
 
-        query_CheckDoc.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+        Log.i("checkUserReg Flow: ", "[Model] , 29 , checkUserMode");
+
+        query1.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
 
             @Override
             public void onComplete(@NonNull Task<QuerySnapshot> task) {
 
                 if(task.isSuccessful()){
 
-                    Log.i("checkk UserReg: ", "2");
+                    Log.i("checkUserReg Flow: ", "[Model] , 30 , task successfull");
 
                     //should return 1 document only
 
@@ -44,17 +48,23 @@ private boolean checkUserDocStatus;
 
                     if(size==1){
 
-                        checkUserDocStatus=false;
-                        Log.i("checkk UserReg: ", "3");
+                        //checkUserDocStatus=false; //means user document already existed
+
+                        Log.i("checkUserReg Flow: ", "[Model] , 31 , task existed");
+                        setNewReturn(false);
+
+
                     }else if(size==0){
-                        Log.i("checkk UserReg: ", "4");
+
+                        Log.i("checkUserReg Flow: ", "[Model] , 31 , no document, can create");
 
                         setNewReturn(true);
-
-                        checkUserDocStatus=true;
+                       // checkUserDocStatus=true;
                     }else {
-                        Log.i("checkk UserReg: ", "2");
-                        checkUserDocStatus=false;
+                        Log.i("checkUserReg Flow: ", "[Model] , 32 , fault, dont create");
+                        //checkUserDocStatus=false;
+
+                        setNewReturn(false);
 
                      }
 
@@ -62,7 +72,7 @@ private boolean checkUserDocStatus;
             }
         });
 
-        Log.i("checkk UserReg: ", " 99");
+        Log.i("checkUserReg Flow: ", "[Model] , 33 , task checkUserDocStatus: "+ checkUserDocStatus);
 
 
         //does it always return this first? >> yes it does return first, we need to update and tell observer.
@@ -72,16 +82,30 @@ private boolean checkUserDocStatus;
     //this is where we tell observer
     private void setNewReturn(boolean b) {
 
+        Log.i("checkUserReg Flow: ", "[Model] , 34 , setReturn b: "+ b + " ,checkUserDocStatus : "+ checkUserDocStatus);
+
+
         if(b==true) {
+
+            Log.i("checkUserReg Flow: ", "[Model] , 35 , task checkUserDocStatus: "+ checkUserDocStatus);
+
             checkUserDocStatus = b;
 
             setChanged();
             notifyObservers();
 
-            //returnCheckDoc_Updated(b);
+            //here we set the document, shared preferences.
+
+
 
         }else {
-            return;
+
+            Log.i("checkUserReg Flow: ", "[Model] , 36 , task checkUserDocStatus: "+ checkUserDocStatus);
+
+            checkUserDocStatus = false;
+
+            setChanged();
+            notifyObservers();
         }
 
     }
@@ -90,6 +114,9 @@ private boolean checkUserDocStatus;
 
     @Override
     public boolean getReturnDoc_Updated() {
+
+        Log.i("checkUserReg Flow: ", "[Model] , 37 , task checkUserDocStatus: "+ checkUserDocStatus);
+
 
         return  checkUserDocStatus;
     }

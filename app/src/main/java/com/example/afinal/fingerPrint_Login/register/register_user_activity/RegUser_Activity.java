@@ -1,21 +1,32 @@
 package com.example.afinal.fingerPrint_Login.register.register_user_activity;
 
+import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import de.hdodenhof.circleimageview.CircleImageView;
+import pub.devrel.easypermissions.EasyPermissions;
+
+import android.content.SharedPreferences;
+import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.afinal.R;
+import com.example.afinal.fingerPrint_Login.register.register_with_activity.RegAdmin_Activity;
 import com.google.android.gms.tasks.OnCanceledListener;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.FirebaseApp;
 import com.google.firebase.FirebaseException;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
@@ -23,16 +34,26 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.PhoneAuthCredential;
 import com.google.firebase.auth.PhoneAuthProvider;
 import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Observable;
 import java.util.Observer;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.concurrent.TimeUnit;
 
 public class RegUser_Activity extends AppCompatActivity implements View.OnClickListener, RegUserView_Interface, Observer {
 
+    private static final int READ_REQUEST_CODE = 42;
     private Button buttonLogin, buttonGetCode;
 
     private EditText editTextName, editTextPhone, editTextCode;
@@ -55,9 +76,21 @@ public class RegUser_Activity extends AppCompatActivity implements View.OnClickL
     private String adminPhone;
     private String userName,userPhone;
 
+    private String statusnow="";
+
     private PhoneAuthProvider.OnVerificationStateChangedCallbacks mCallBack;
 
+    //Timer to start while checking doc process
+    //if doc method not updated, we stop observable, and clear data, ask user to try again.
 
+    Timer timer;
+
+    private CircleImageView circleImageView;
+
+    ////// storage
+
+    private StorageReference storageReference;
+    private Uri mImageuri;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -74,20 +107,38 @@ public class RegUser_Activity extends AppCompatActivity implements View.OnClickL
         textViewMessage = findViewById(R.id.regUser_textViewID);
         textViewMessage.setText("enter your name and phone");
 
+
+
+        circleImageView = findViewById(R.id.regUser_circlerImageView);
+
+        circleImageView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
+                intent.addCategory(Intent.CATEGORY_OPENABLE);
+                intent.setType("image/*");
+
+                startActivityForResult(intent,READ_REQUEST_CODE);
+
+            }
+        });
+
+        Log.i("checkUserReg Flow: ", "[Activity] , 1 ");
+
         Intent intent =getIntent();
 
-        adminName = intent.getStringExtra("admin_name");
+        adminName = intent.getStringExtra("admin_name"); //pulling data
         adminPhone = intent.getStringExtra("admin_phone");
+
+        Toast.makeText(this, "admin number: "+adminPhone + ", admin name: "+adminName,Toast.LENGTH_SHORT).show();
 
         inputValid=false;
 
-        Log.i("checkk UserReg: ", "tt starting");
-
+        timer = new Timer();
 
         presenter = new RegUser_Presenter(this);
         presenter.addObserver(this);
-
-
 
 
         mCallBack = new PhoneAuthProvider.OnVerificationStateChangedCallbacks() {
@@ -95,31 +146,67 @@ public class RegUser_Activity extends AppCompatActivity implements View.OnClickL
             public void onVerificationCompleted(PhoneAuthCredential phoneAuthCredential) {
 
                 textViewMessage.setText("got credential");
+
+                Log.i("checkUserReg Flow: ", "[Activity] , 2 , verification completed");
+
                 verifyCredential(phoneAuthCredential);
+
 
             }
 
             @Override
             public void onVerificationFailed(FirebaseException e) {
-
+                textViewMessage.setText("verification failed");
+                Log.i("checkUserReg Flow: ", "[Activity] , 3 , verification failed ");
             }
 
             @Override
             public void onCodeSent(String s, PhoneAuthProvider.ForceResendingToken forceResendingToken) {
                 super.onCodeSent(s, forceResendingToken);
                 codeFromFirebase=s;
-                Log.i("checkk UserReg: ", "tt 5 code Receiver: " +codeFromFirebase);
+                Log.i("checkUserReg Flow: ", "[Activity] , 4 , codesent, codeReceived: " +codeFromFirebase);
 
-                checkDocResult("received code, enter code now");
+                //checkDocResult("received code, enter code now");
             }
         };
 
+    }
 
+    //handle image
+
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if(requestCode==42 && resultCode== Activity.RESULT_OK){
+
+            mImageuri = null;
+
+            if(data!=null){
+
+                mImageuri = data.getData();
+
+                showImage(mImageuri);
+            }
+
+        }
+    }
+
+    private void showImage(Uri uri) {
+
+        circleImageView.setImageURI(uri);
 
 
     }
 
     private void verifyCredential(PhoneAuthCredential phoneAuthCredential) {
+
+
+        statusnow= "wait..";
+        textViewMessage.setText(statusnow);
+
+        Log.i("checkUserReg Flow: ", "[Activity] , 5 , getting credential process");
 
         FirebaseAuth.getInstance().signInWithCredential(phoneAuthCredential).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
             @Override
@@ -127,7 +214,10 @@ public class RegUser_Activity extends AppCompatActivity implements View.OnClickL
 
                 if(task.isSuccessful()){
 
+                    textViewMessage.setText("credential verified, wait..");
+
                     //then check with firebase.
+                    Log.i("checkUserReg Flow: ", "[Activity] , 6 , task successfull");
 
                     final FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
 
@@ -137,52 +227,43 @@ public class RegUser_Activity extends AppCompatActivity implements View.OnClickL
                     //check array of field "employee_this_admin", if contain UserCheckIn phone number
                     Query query_ifRegistered = cR_ifRegistered.whereArrayContains("employee_this_admin",user.getPhoneNumber());
 
-                    query_ifRegistered.get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+                    query_ifRegistered.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                         @Override
-                        public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+                        public void onComplete(@NonNull Task<QuerySnapshot> task) {
 
-                            //here we dont have to retrieve the number or, get from which document,
-                            //if it is exist, means number of document >=1, //though as this code written, or
-                            //the way the data is structured, one phone number can belong to only one admin at a time.
+                            if(task.isSuccessful()) {
 
-                            //we just check. size of document.
+                                Log.i("checkUserReg Flow: ", "[Activity] , 7 , ");
 
-                            if(queryDocumentSnapshots.size()>=1){
+                                int documentSnapshotSize = task.getResult().getDocuments().size();
 
-                                //then here we can log in
+                                if (documentSnapshotSize == 1) {
 
-                                registrationProcessFireStore();
+                                    //then here we can log in
 
-                            }else {
+                                    registrationProcessFireStore();
 
-                                //return as UserCheckIn is not verified by any admin,
-                                //sign him out from firebase authentication page.
+                                    Log.i("checkUserReg Flow: ", "[Activity] , 8 , go to creating document now ");
+
+
+                                } else {
+
+                                    //return as UserCheckIn is not verified by any admin,
+                                    //sign him out from firebase authentication page.
+                                    //or somehow he already registered to other admin // this is supposed to be admin functions.
+
+                                    Log.i("checkUserReg Flow: ", "[Activity] , 9 ,fail if  ");
+
+
+                                    logOutNow();
+                                }
+
+                            }
+                            else {
+                                Log.i("checkUserReg Flow: ", "[Activity] , 10 , task fail ");
 
                                 logOutNow();
                             }
-
-
-
-
-
-                        }
-                    }).addOnFailureListener(new OnFailureListener() {
-                        @Override
-                        public void onFailure(@NonNull Exception e) {
-
-                            //failure to retrieve data, ask UserCheckIn to try again, log in.
-
-                                logOutNow();
-
-                        }
-                    }).addOnCanceledListener(new OnCanceledListener() {
-                        @Override
-                        public void onCanceled() {
-
-                            //canceled to retrieve data, ask UserCheckIn to enter again if consent.
-
-                                logOutNow();
-
                         }
                     });
 
@@ -196,18 +277,33 @@ public class RegUser_Activity extends AppCompatActivity implements View.OnClickL
             @Override
             public void onCanceled() {
 
-                    onStartOur();
+                Log.i("checkUserReg Flow: ", "[Activity] , 11 ,canceled  ");
+
+
+                logOutNow();
             }
         });
 
     }
 
     private void onStartOur() {
-        textViewMessage.setText("please try again");
-        onStart();
+
+        Log.i("checkUserReg Flow: ", "[Activity] , 12 ,stop  ");
+
+
+        Toast.makeText(this,"please try register again", Toast.LENGTH_SHORT).show();
+        textViewMessage.setText("press back, and try again");
+        //onStart();
+
+        Intent intent = new Intent(RegUser_Activity.this, RegAdmin_Activity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+        startActivity(intent);
+        finish();
     }
 
     private void logOutNow() {
+
+        Log.i("checkUserReg Flow: ", "[Activity] , 13 , logoutNow  ");
 
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
 
@@ -230,13 +326,14 @@ public class RegUser_Activity extends AppCompatActivity implements View.OnClickL
 
     //check first if alreadt exist.
 
-        Log.i("checkk UserReg: ", "registrationprocess");
+        Log.i("checkUserReg Flow: ", "[Activity] , 14 ,go to presenter  ");
+
         presenter.checkUserDoc(userName,userPhone,adminName,adminPhone);
-        Log.i("checkk UserReg: ", "registrationprocess AFTER");
 
-
+        Log.i("checkUserReg Flow: ", "[Activity] , 15 ,back from presenter  ");
 
     }
+
 
     @Override
     public void onClick(View v) {
@@ -260,6 +357,8 @@ public class RegUser_Activity extends AppCompatActivity implements View.OnClickL
             switch (v.getId()) {
 
                 case R.id.regUser_Button_GetCodeID:
+
+                    textViewMessage.setText("getting code..");
 
                     Log.i("checkk UserReg: ", "tt 4");
 
@@ -297,6 +396,8 @@ public class RegUser_Activity extends AppCompatActivity implements View.OnClickL
 
         PhoneAuthCredential credential = PhoneAuthProvider.getCredential(code,codeFromFirebase);
 
+        Log.i("checkUserReg Flow: ", "[Activity] , 16 ,check credential  ");
+
         verifyCredential(credential);
 
     }
@@ -314,19 +415,129 @@ public class RegUser_Activity extends AppCompatActivity implements View.OnClickL
 
     @Override
     public void checkDocResult(String status) {
-        textViewMessage.setText(status);
+        //textViewMessage.setText(status);
+
+        //here we create, but what if constant fail.
+        //after 60 seconds, observable do not return update. we need to delete all operation,
+
+        Log.i("checkUserReg Flow: ", "[Activity] , 17 ,checkDocResutl, result suppose to create ");
+
+        if(status.equals("doc created")){
+
+            //creating document here.
+            //then after finish, move to next.
+
+            DocumentReference documentReference = FirebaseFirestore.getInstance().collection("all_admin_doc_collections")
+                    .document(adminName+adminPhone+"doc").collection("all_employee_thisAdmin_collection")
+                    .document(userName+userPhone+"doc");
+
+            Map<Object,String> userprofile_data = new HashMap<>();
+
+            userprofile_data.put("name",userName);
+            userprofile_data.put("phone",userPhone);
+            userprofile_data.put("rating","2.5");
+            userprofile_data.put("image","");
+
+            textViewMessage.setText("success.. setting up account");
+
+            documentReference.set(userprofile_data);
+
+
+            if(mImageuri!=null) {
+
+                storageReference = FirebaseStorage.getInstance().getReference("" + adminName + adminPhone+"doc").child("" + userPhone + userName +"image");
+
+
+                storageReference.putFile(mImageuri).addOnCompleteListener(new OnCompleteListener<UploadTask.TaskSnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<UploadTask.TaskSnapshot> task) {
+
+                        if(task.isSuccessful()){
+
+                            Log.i("checkImageUploaded", "1");
+
+                        }else {
+                            //task not successful
+
+                            Log.i("checkImageUploaded", "2");
+
+                        }
+
+                    }
+                }).addOnCanceledListener(new OnCanceledListener() {
+                    @Override
+                    public void onCanceled() {
+
+                        Log.i("checkImageUploaded", "3");
+                    }
+                });
+
+            }
+
+            //should we check,
+
+            //here we saved all in sharedpreferences //create 4 pin id.
+
+            SharedPreferences prefs = this.getSharedPreferences(
+                    "com.example.finalV8_punchCard", Context.MODE_PRIVATE);
+
+            SharedPreferences.Editor editor = prefs.edit();
+
+            editor.putString("final_User_Name",userName);
+            editor.putString("final_User_Phone",userPhone);
+            editor.putString("final_Admin_Phone",adminPhone);
+            editor.putString("final_Admin_Name", adminName);
+
+
+            Toast.makeText(this,"user succesfully created", Toast.LENGTH_SHORT).show();
+        }
+
+        if(status.equals("please contact admin")){
+
+            //this will be called, if false return from check document,
+            //document existed
+            textViewMessage.setText("registration failed");
+            logOutNow();
+        }
+
+
     }
-
-
-
 
     @Override
     public void update(Observable o, Object arg) {
 
         if(o instanceof RegUser_Presenter){
 
-            checkDocResult("success doc created");
+            Log.i("checkUserReg Flow: ", "[Activity] , 18 ,update , o is: "+((RegUser_Presenter) o).getReturnStatus());
+
+
+            //String resultHere = ((RegUser_Presenter) o).getReturnStatus();
+
+            Boolean resultBoolean = ((RegUser_Presenter) o).getFinally();
+
+            if(resultBoolean){
+            //if(resultHere.equals("doc created")){
+
+                Log.i("checkUserReg Flow: ", "[Activity] , 19 ,update doc created ");
+
+
+                checkDocResult("doc created");
+            }
+
+            else {
+
+            //if(resultHere.equals("please contact admin")){
+
+                Log.i("checkUserReg Flow: ", "[Activity] , 20 ,contact admin , fail ");
+
+                checkDocResult("please contact admin");
+            }
+            //
+
+
         }
+
+        return;
 
     }
 }

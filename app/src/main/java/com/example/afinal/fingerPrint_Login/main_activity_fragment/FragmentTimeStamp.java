@@ -186,6 +186,8 @@ public class FragmentTimeStamp extends Fragment implements Observer, View.OnClic
 
     private TextView textView;
 
+    // we need the time pass today. so we request here.
+
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {

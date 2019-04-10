@@ -51,7 +51,7 @@ class RegAdmin_Presenter extends Observable implements  RegAdminPresenter_Interf
     @Override
     public boolean checkFinalFromFirebase() {
 
-       return modelReturn;
+       return modelReturn; //is this always return true
        // return false;
     }
 
@@ -79,7 +79,11 @@ class RegAdmin_Presenter extends Observable implements  RegAdminPresenter_Interf
 
 
             }else {
-                return;
+
+                modelReturn = false;
+               setChanged();
+               notifyObservers();
+
             }
 
         }

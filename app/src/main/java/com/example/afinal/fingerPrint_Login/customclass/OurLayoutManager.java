@@ -36,7 +36,7 @@ public class OurLayoutManager extends LinearLayoutManager {
 
     // for making smooth with delay
 
-    private static float MILLISECONDS_PER_INCH = 150f;
+    private static float MILLISECONDS_PER_INCH = 250f;
 
 
     public OurLayoutManager(Context context, int orientation, boolean reverseLayout) {

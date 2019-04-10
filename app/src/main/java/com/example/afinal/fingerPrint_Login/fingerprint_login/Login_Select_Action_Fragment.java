@@ -52,6 +52,12 @@ public class Login_Select_Action_Fragment extends Fragment implements View.OnCli
         //we pull from shared preferences here once
         //then set text
 
+
+
+
+
+        ///
+
         textView_RegAdmin.setText("Register As Admin");
         textView_RegUser.setText("Register As UserCheckIn");
         textViewAdmin_1.setText("Log in to Admin 1");
@@ -100,7 +106,10 @@ public class Login_Select_Action_Fragment extends Fragment implements View.OnCli
                 //to disable register user, save data to shared preferences,
                 //then pull data, if data exist, dont allow for register, show toast
 
-                ((FingerPrint_LogIn_Final_Activity)getActivity()).nameUser = "arif";
+
+
+                ((FingerPrint_LogIn_Final_Activity)getActivity()).nameUser = "arif"; //
+                //this is we setup shared prefe
                 getFragmentManager().popBackStack();
 
                 break;

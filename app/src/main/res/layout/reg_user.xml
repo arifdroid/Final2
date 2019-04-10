@@ -6,24 +6,36 @@
     android:layout_height="match_parent"
     tools:context=".fingerPrint_Login.register.register_user_activity.RegUser_Activity">
 
+    <de.hdodenhof.circleimageview.CircleImageView
+        android:id="@+id/regUser_circlerImageView"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginBottom="8dp"
+        android:src="@drawable/profile_image_sample"
+        app:layout_constraintBottom_toTopOf="@+id/regUser_editText_NameID"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
     <EditText
         android:id="@+id/regUser_editText_NameID"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
 
-        android:textAlignment="center"
-        android:hint="name"
         android:layout_marginTop="8dp"
         android:layout_marginEnd="8dp"
         android:layout_marginBottom="8dp"
         android:ems="10"
+        android:hint="name"
         android:inputType="textPersonName"
+        android:textAlignment="center"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.19" />
+        app:layout_constraintVertical_bias="0.22000003" />
 
     <EditText
         android:id="@+id/regUser_editText_PhoneID"

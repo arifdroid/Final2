@@ -14,6 +14,8 @@ class RegUser_Presenter extends Observable implements RegUser_Presenter_Interfac
 
     private boolean gotDoc;
 
+    private String returnStatus;
+
 
     public RegUser_Presenter(RegUserView_Interface view_interface) {
 
@@ -21,6 +23,9 @@ class RegUser_Presenter extends Observable implements RegUser_Presenter_Interfac
         model_interface = new RegUser_Model();
 
         ((RegUser_Model) model_interface).addObserver(this);
+
+        Log.i("checkUserReg Flow: ", "[Presenter] , 21 ,constructor");
+
     }
 
 
@@ -37,16 +42,25 @@ class RegUser_Presenter extends Observable implements RegUser_Presenter_Interfac
 
                 //we need to tell this now, now it is set at false.
 
+                Log.i("checkUserReg Flow: ", "[Presenter] , 22 ,before model");
+
                 gotDoc = model_interface.checkUserDoc_Model(name,phone,adminName,adminPhone);
+
+                Log.i("checkUserReg Flow: ", "[Presenter] , 22 ,after model");
 
                 if(gotDoc){
 
+                    Log.i("checkUserReg Flow: ", "[Presenter] , 23 ,unlikely");
 
-                    view_interface.checkDocResult("doc created");
+                   // view_interface.checkDocResult("doc created");
 
                 }else {
 
-                    view_interface.checkDocResult("false :cannot create doc");
+                    Log.i("checkUserReg Flow: ", "[Presenter] , 24 , initially");
+
+
+                   // view_interface.checkDocResult("please wait");
+                    //this maybe
 
                 }
 
@@ -55,7 +69,12 @@ class RegUser_Presenter extends Observable implements RegUser_Presenter_Interfac
             }
         }
 
+        return;
+
     }
+
+
+
 
     @Override
     public boolean checkInputValid(String name, String phone) {
@@ -89,28 +108,82 @@ class RegUser_Presenter extends Observable implements RegUser_Presenter_Interfac
 
             //((RegUser_Model) o).returnCheckDoc_Updated();
 
+            Log.i("checkUserReg Flow: ", "[Presenter] , 25 , observer update, return: "+ ((RegUser_Model) o).getReturnDoc_Updated());
+
+
             boolean updatedCheckDoc = ((RegUser_Model) o).getReturnDoc_Updated();
 
             if(updatedCheckDoc==true){
+
+                Log.i("checkUserReg Flow: ", "[Presenter] , 26 , observer update, return true: ");
+
 
                 gotDoc = updatedCheckDoc;
 
                 setChanged();
                 notifyObservers();
 
+               // setBoolean(gotDoc);
 
-                setStatus("doc created");
+               // setStatus("doc created");
 
             }else {
-                return;
-            }
 
+                Log.i("checkUserReg Flow: ", "[Presenter] , 27 , observer update, return: false ");
+
+                gotDoc = false;
+
+                setChanged();
+                notifyObservers();
+
+              //  setBoolean(gotDoc);
+
+               // setStatus("please contact admin");
+            }
+            return;
         }
+
+        return;
     }
+
+//    private void setBoolean(Boolean b){
+//
+//        if()
+//
+//
+//    }
 
     private void setStatus(String doc_created) {
 
-        view_interface.checkDocResult(doc_created);
+        //sending result to ui
 
+        Log.i("checkUserReg Flow: ", "[Presenter] , 28 , observer update, return: "+doc_created);
+
+        if(gotDoc) {
+            returnStatus = doc_created;
+
+            Log.i("checkUserReg Flow: ", "[Presenter] , 28.1 , observer update, gotDoc: "+gotDoc + ", status:"+doc_created);
+
+        }
+
+        else {
+
+            Log.i("checkUserReg Flow: ", "[Presenter] , 28.1 , observer update, gotDoc: "+gotDoc+ ", status:"+doc_created);
+            returnStatus =doc_created;
+        }
+
+        return;
+
+    }
+
+    public String getReturnStatus() {
+
+        Log.i("checkUserReg Flow: ", "[Presenter] , 29 , observer update, return: "+returnStatus);
+        return returnStatus;
+    }
+
+    public boolean getFinally(){
+
+        return gotDoc;
     }
 }

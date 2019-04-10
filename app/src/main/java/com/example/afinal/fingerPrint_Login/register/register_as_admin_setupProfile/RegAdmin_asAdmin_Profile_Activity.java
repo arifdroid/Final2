@@ -29,6 +29,9 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.afinal.R;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -70,6 +73,11 @@ public class RegAdmin_asAdmin_Profile_Activity extends AppCompatActivity {
 
     private static final int READ_REQUEST_CODE = 42;
 
+    //setup firebase storage reference to test
+
+    private StorageReference storageReference;
+
+    private FirebaseFirestore firebaseFirestore;
 
 
     @Override
@@ -86,6 +94,12 @@ public class RegAdmin_asAdmin_Profile_Activity extends AppCompatActivity {
         circleImageView = findViewById(R.id.admin_Profile_circleImageViewID);
         textViewName = findViewById(R.id.admin_Profile_textViewNameiD);
         textViewPhone = findViewById(R.id.admin_Profile_textViewPhoneiD);
+
+        //firebase reference
+
+        storageReference = FirebaseStorage.getInstance().getReference();
+
+
 
         //setting up image
 

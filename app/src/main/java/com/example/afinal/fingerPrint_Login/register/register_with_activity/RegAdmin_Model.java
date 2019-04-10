@@ -160,8 +160,15 @@ public class RegAdmin_Model extends Observable implements RegAdminModel_Interfac
             notifyObservers();
 
         }else {
-            return;
+
+            returnSimulation = false;
+            setChanged();
+            notifyObservers();
+
+            //return;
         }
+
+        return;
     }
 
 

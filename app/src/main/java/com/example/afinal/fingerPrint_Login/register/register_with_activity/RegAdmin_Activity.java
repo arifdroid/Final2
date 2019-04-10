@@ -10,10 +10,13 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.afinal.R;
+import com.example.afinal.fingerPrint_Login.fingerprint_login.FingerPrint_LogIn_Final_Activity;
 import com.example.afinal.fingerPrint_Login.register.register_user_activity.RegUser_Activity;
 
 import java.util.Observable;
 import java.util.Observer;
+import java.util.Timer;
+import java.util.TimerTask;
 
 public class RegAdmin_Activity extends AppCompatActivity implements View.OnClickListener, RegAdminViewInterface, Observer {
 
@@ -27,6 +30,9 @@ public class RegAdmin_Activity extends AppCompatActivity implements View.OnClick
     private String globalAdminPhone;
 
     private boolean checkValid;
+    private Timer timer;
+    private String statusnow;
+    private int count;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -62,7 +68,9 @@ public class RegAdmin_Activity extends AppCompatActivity implements View.OnClick
 
     @Override
     public void onClick(View v) {
-        textViewMessage.setText("please enter admin name, phone");
+
+        statusnow = "wait..";
+        textViewMessage.setText(statusnow);
         String adminName = editTextName.getText().toString();
         String adminPhone = editTextPhone.getText().toString();
 
@@ -85,13 +93,22 @@ public class RegAdmin_Activity extends AppCompatActivity implements View.OnClick
             }
 
 
-
         }else {
 
            return;
         }
 
+
     }
+
+//    private void onReturn() {
+//        Toast.makeText(this, "please try again", Toast.LENGTH_SHORT).show();
+//        Intent intent = new Intent(this, FingerPrint_LogIn_Final_Activity.class);
+//        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+//        startActivity(intent);
+//        finish();
+//    }
+//
 
     @Override
     public void update(Observable o, Object arg) {
@@ -100,7 +117,7 @@ public class RegAdmin_Activity extends AppCompatActivity implements View.OnClick
 
         if(o instanceof RegAdmin_Presenter){
 
-            boolean checkHere = ((RegAdmin_Presenter) o).checkFinalFromFirebase();
+            boolean checkHere = ((RegAdmin_Presenter) o).checkFinalFromFirebase(); //maybe because we never return false.
 
             if(checkHere==true){
 
@@ -111,7 +128,17 @@ public class RegAdmin_Activity extends AppCompatActivity implements View.OnClick
 
 
             }else {
-                return;
+                //if not return, never update again, since,
+                //return; //or we just handle here.
+                //update will be called if theres an update, should always have update
+
+                textViewMessage.setText("not success, try again");
+
+              //  return;
+                //onReturn();
+
+
+
             }
         }
 
@@ -126,7 +153,7 @@ public class RegAdmin_Activity extends AppCompatActivity implements View.OnClick
 
             Intent intent = new Intent(RegAdmin_Activity.this, RegUser_Activity.class);
 
-            intent.putExtra("admin_name", globalAdminName);
+            intent.putExtra("admin_name", globalAdminName); //this just pass intent.
             intent.putExtra("admin_phone", globalAdminPhone);
 
             startActivity(intent);
