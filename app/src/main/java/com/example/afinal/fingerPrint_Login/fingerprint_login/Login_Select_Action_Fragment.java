@@ -2,6 +2,7 @@ package com.example.afinal.fingerPrint_Login.fingerprint_login;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -26,6 +27,10 @@ public class Login_Select_Action_Fragment extends Fragment implements View.OnCli
     private TextView textViewAdmin_1, textViewAdmin_2, textView_RegUser, textView_RegAdmin, textView_Note;
 
     private FingerPrintFinal_Presenter presenter;
+    private String nameHere;
+    private String phoneHere;
+    private String adminName;
+    private String adminPhone;
 
 
     @Nullable
@@ -52,6 +57,14 @@ public class Login_Select_Action_Fragment extends Fragment implements View.OnCli
         //we pull from shared preferences here once
         //then set text
 
+        SharedPreferences prefs = getActivity().getSharedPreferences("com.example.finalV8_punchCard", Context.MODE_PRIVATE);
+
+        //SharedPreferences prefs = (SharedPreferences) getActivity().getPreferences("com.example.finalV8_punchCard", Context.MODE_PRIVATE);
+
+        nameHere = prefs.getString("final_User_Name","");
+        phoneHere = prefs.getString("final_User_Phone","");
+        adminName = prefs.getString("final_Admin_Name","");
+        adminPhone = prefs.getString("final_Admin_Phone","");
 
 
 
@@ -105,10 +118,13 @@ public class Login_Select_Action_Fragment extends Fragment implements View.OnCli
 
                 //to disable register user, save data to shared preferences,
                 //then pull data, if data exist, dont allow for register, show toast
+                if(nameHere!=null) {
+                    ((FingerPrint_LogIn_Final_Activity) getActivity()).nameUser = nameHere; //
+                    ((FingerPrint_LogIn_Final_Activity) getActivity()).phoneUser = phoneHere; //
+                    ((FingerPrint_LogIn_Final_Activity) getActivity()).globalAdminNameHere = adminName; //
+                    ((FingerPrint_LogIn_Final_Activity) getActivity()).globalAdminPhoneHere = adminPhone; //
+                }
 
-
-
-                ((FingerPrint_LogIn_Final_Activity)getActivity()).nameUser = "arif"; //
                 //this is we setup shared prefe
                 getFragmentManager().popBackStack();
 

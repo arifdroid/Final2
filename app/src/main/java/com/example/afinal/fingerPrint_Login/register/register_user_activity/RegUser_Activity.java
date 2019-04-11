@@ -20,6 +20,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.afinal.R;
+import com.example.afinal.fingerPrint_Login.fingerprint_login.FingerPrint_LogIn_Final_Activity;
+import com.example.afinal.fingerPrint_Login.fingerprint_login.Login_Select_Action_Fragment;
 import com.example.afinal.fingerPrint_Login.register.register_with_activity.RegAdmin_Activity;
 import com.example.afinal.fingerPrint_Login.register.setup_pin_code.Setup_Pin_Activity;
 import com.google.android.gms.tasks.OnCanceledListener;
@@ -437,7 +439,8 @@ public class RegUser_Activity extends AppCompatActivity implements View.OnClickL
             userprofile_data.put("name",userName);
             userprofile_data.put("phone",userPhone);
             userprofile_data.put("rating","2.5");
-            userprofile_data.put("image","");
+            userprofile_data.put("image",documentReference.toString());
+            //userprofile_data.put("");
 
             textViewMessage.setText("success.. setting up account");
 
@@ -447,8 +450,6 @@ public class RegUser_Activity extends AppCompatActivity implements View.OnClickL
             if(mImageuri!=null) {
 
                 storageReference = FirebaseStorage.getInstance().getReference("" + adminName + adminPhone+"doc").child("" + userName + userPhone +"image");
-
-
                 storageReference.putFile(mImageuri).addOnCompleteListener(new OnCompleteListener<UploadTask.TaskSnapshot>() {
                     @Override
                     public void onComplete(@NonNull Task<UploadTask.TaskSnapshot> task) {
@@ -486,17 +487,21 @@ public class RegUser_Activity extends AppCompatActivity implements View.OnClickL
             SharedPreferences prefs = getSharedPreferences(
                     "com.example.finalV8_punchCard", Context.MODE_PRIVATE);
 
-            SharedPreferences.Editor editor = prefs.edit();
+            SharedPreferences.Editor editor = prefs.edit(); // we need to know, which preferences belong to which admin,
+            //if user registered to another admin.
+
 
             editor.putString("final_User_Name",userName);
             editor.putString("final_User_Phone",userPhone);
             editor.putString("final_Admin_Phone",adminPhone);
             editor.putString("final_Admin_Name", adminName);
 
-            editor.putString("final_User_Picture", documentReference.toString());
+            editor.putString("final_User_Picture", storageReference.toString());
 
             Log.i("checkSharedPreferences ", "before 1");
 
+
+            //FingerPrint_LogIn_Final_Activity.userCount++;
 
             editor.commit();
 

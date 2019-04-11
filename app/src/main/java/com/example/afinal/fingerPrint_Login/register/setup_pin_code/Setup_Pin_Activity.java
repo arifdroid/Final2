@@ -17,6 +17,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.afinal.R;
+import com.example.afinal.fingerPrint_Login.fingerprint_login.FingerPrint_LogIn_Final_Activity;
 import com.example.afinal.fingerPrint_Login.main_activity_fragment.Main_BottomNav_Activity;
 import com.google.android.gms.tasks.OnCanceledListener;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -27,6 +28,8 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.squareup.picasso.Picasso;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -74,6 +77,11 @@ public class Setup_Pin_Activity extends AppCompatActivity {
         final String phoneHere = prefs.getString("final_User_Phone","");
         String adminName = prefs.getString("final_Admin_Name","");
         String adminPhone = prefs.getString("final_Admin_Phone","");
+      //  String ref = prefs.getString("final_pth_user","");
+
+        documentReference = FirebaseFirestore.getInstance().collection("all_admin_doc_collections")
+                .document(adminName+adminPhone+"doc").collection("all_employee_thisAdmin_collection")
+                .document(nameHere+phoneHere+"doc");
 
         Log.i("checkSharedPreferences ", "1");
 
@@ -152,6 +160,10 @@ public class Setup_Pin_Activity extends AppCompatActivity {
 
                                 String number = number1+number2+number3+number4+"";
 
+                                //need to store to firestore as well.
+
+
+
                                 SharedPreferences prefs = getSharedPreferences(
                                         "com.example.finalV8_punchCard", Context.MODE_PRIVATE);
 
@@ -159,7 +171,34 @@ public class Setup_Pin_Activity extends AppCompatActivity {
 
                                 editor.putString("final_User_Pin",number);
 
-                                Intent intent = new Intent(Setup_Pin_Activity.this, Main_BottomNav_Activity.class);
+                                if(documentReference!=null){
+
+                                    Map<String,Object> map = new HashMap<>();
+
+                                    map.put("custom_pin",number);
+
+                                    documentReference.set(map).addOnSuccessListener(new OnSuccessListener<Void>() {
+                                        @Override
+                                        public void onSuccess(Void aVoid) {
+
+                                        }
+                                    }).addOnFailureListener(new OnFailureListener() {
+                                        @Override
+                                        public void onFailure(@NonNull Exception e) {
+
+                                        }
+                                    }).addOnCanceledListener(new OnCanceledListener() {
+                                        @Override
+                                        public void onCanceled() {
+
+                                        }
+                                    });
+                                }
+
+
+                                Toast.makeText(Setup_Pin_Activity.this,"pin : "+number+ " , is saved", Toast.LENGTH_LONG).show();
+
+                                Intent intent = new Intent(Setup_Pin_Activity.this, FingerPrint_LogIn_Final_Activity.class);
                                 startActivity(intent);
                                 finish();
 

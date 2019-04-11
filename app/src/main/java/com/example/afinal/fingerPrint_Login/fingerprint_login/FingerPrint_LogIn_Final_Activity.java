@@ -1,5 +1,6 @@
 package com.example.afinal.fingerPrint_Login.fingerprint_login;
 
+import android.content.Context;
 import android.content.Intent;
 
 import androidx.annotation.NonNull;
@@ -12,6 +13,8 @@ import com.google.android.gms.tasks.Task;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import androidx.fragment.app.FragmentManager;
 import androidx.appcompat.app.AppCompatActivity;
+
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -26,6 +29,8 @@ import com.example.afinal.fingerPrint_Login.main_activity_fragment.Main_BottomNa
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.functions.FirebaseFunctions;
 import com.google.firebase.functions.HttpsCallableResult;
@@ -37,6 +42,9 @@ import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Objects;
 import java.util.Observable;
 import java.util.Observer;
 import java.util.TimeZone;
@@ -48,6 +56,8 @@ import java.util.TimeZone;
 
 public class FingerPrint_LogIn_Final_Activity extends AppCompatActivity implements FingerPrintFinal_View_Interface, View.OnClickListener, Observer, OnServerTime_Interface {
 
+    public static int userCount;
+
     private FloatingActionButton floatButtonGetAction;
     private TextView textView;
     private ImageView imageView;
@@ -58,15 +68,15 @@ public class FingerPrint_LogIn_Final_Activity extends AppCompatActivity implemen
 
     private boolean dataPulled;
 
-    String nameUser;
-    String phoneUser;
+    public String nameUser;
+    public String phoneUser;
 
     ConstraintLayout backColor;
 
     //after log in register user data timestamp directly.
 
-    private String globalAdminNameHere = "ariff";
-    private String globalAdminPhoneHere= "+60190";
+    public String globalAdminNameHere ; //"ariff";
+    public String globalAdminPhoneHere;//"+60190";
 
     private FirebaseFirestore instance = FirebaseFirestore.getInstance();
 
@@ -78,30 +88,49 @@ public class FingerPrint_LogIn_Final_Activity extends AppCompatActivity implemen
     //cloud function with time value
 
     private String dayNow;
+    //private String dateNow;
 
     private long timeStampthis;
 
     private OnServerTime_Interface onServerTime_interface;
+    private String dateAndTimeNow;
 
+    /////////// constraint by admin
+
+    private String bssidConstraint;
+    private String locationConstraint;
+    private String morningConstraint;
+    private String eveningConstraint;
+    private String ssidConstraint;
+    private String latitudeConstraint;
+    private String longitudeConstraint;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_finger_print__log_in__final_);
 
+    //    userCount =0//;
         onServerTime_interface = new FingerPrint_LogIn_Final_Activity();
 
         dayNow = null;
-
+        dateAndTimeNow = null;
         dataPulled = false;
+
+        globalAdminPhoneHere =null;
+        globalAdminPhoneHere=null;
+
+        //pull our data from phone. get bssid, ssid, location also.
+
+        //pull constraint by admin, like, time constraint, location or bssid,, we do this below.
 
         Log.i("checkFinalFlow : ", " 1 oncreate() fingerprint_main_activity");
 
 
         timeStampthis= 0;
 
-        nameUser = "";
-        phoneUser = "";
+        nameUser = null;
+        phoneUser = null;
 
         floatButtonGetAction = findViewById(R.id.logn_Final_floatingActionButtonID);
 
@@ -112,7 +141,9 @@ public class FingerPrint_LogIn_Final_Activity extends AppCompatActivity implemen
         textView.setText("click button below to log in");
         backColor = findViewById(R.id.backLayoutColourID);
 
+        // here we set next day to zero.
 
+        getServerTimeNow(onServerTime_interface);
 
         presenter = new FingerPrintFinal_Presenter(this);
 
@@ -128,6 +159,79 @@ public class FingerPrint_LogIn_Final_Activity extends AppCompatActivity implemen
 
                 Log.i("checkFinalFlow : ", " 2 backstackFragment() fingerprint_main_activity");
 
+                //this probably still null
+
+                if(nameUser!=null && phoneUser!=null && globalAdminPhoneHere!=null && globalAdminNameHere!=null ){
+
+                    //this still can fail. go to admin document.
+                DocumentReference documentReference = FirebaseFirestore.getInstance().collection("all_admin_doc_collections")
+                        .document(globalAdminNameHere+globalAdminPhoneHere+"doc");
+
+                documentReference.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+
+                        if(task.isSuccessful()){
+
+                            Map<String, Object> remap;
+
+                            remap = Objects.requireNonNull(task.getResult()).getData();
+                            //assume same,
+                            if(remap!=null) {
+                                for (Map.Entry<String, Object> kk : remap.entrySet()) {
+
+                                    //here we gonna set constraint, so before map, we check all these condition
+
+                                    if(kk.getKey().equals("location")){
+
+                                        locationConstraint = kk.getValue().toString();
+                                    }
+
+                                    if(kk.getKey().equals("latitude")){
+
+                                        latitudeConstraint = kk.getValue().toString();
+                                    }
+
+                                    if(kk.getKey().equals("longitude")){
+
+                                        longitudeConstraint = kk.getValue().toString();
+                                    }
+
+                                    if(kk.getKey().equals("bssid")){
+
+                                        bssidConstraint = kk.getValue().toString();
+                                    }
+
+                                    if(kk.getKey().equals("ssid")){
+
+                                        ssidConstraint = kk.getValue().toString();
+                                    }
+
+                                    if(kk.getKey().equals("morning_constraint")){
+
+                                        morningConstraint = kk.getValue().toString();
+                                    }
+
+                                    if(kk.getKey().equals("evening_constraint")){
+                                        eveningConstraint = kk.getValue().toString();
+                                    }
+
+
+
+                                }
+
+                            }
+
+                        }else {
+
+
+
+                        }
+
+                    }
+                });
+
+                }
                 if(nameUser!=null) {
 
                     if(nameUser!="") {
@@ -157,16 +261,83 @@ public class FingerPrint_LogIn_Final_Activity extends AppCompatActivity implemen
 
                                     //check in with time stamp.
                                     //getServerTimeNow(this);
-                                    getServerTimeNow(onServerTime_interface);
+                                   // getServerTimeNow(onServerTime_interface);
 
                                     Log.i("checkFinalFlow : ", " 5 backFragment(), success verified, AFTER server time ");
 
-//
-                                    Intent intent = new Intent(FingerPrint_LogIn_Final_Activity.this, Main_BottomNav_Activity.class);
-                                    startActivity(intent);
+                                    //sometime getServerTime return later
 
-                                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
-                                    finish();
+                                    if(dayNow==null){
+                                        getServerTimeNow(onServerTime_interface); //problem if still empty.
+                                    }
+
+                                    if(dayNow!=null){
+
+                                        // https://firebase.google.com/docs/firestore/manage-data/delete-data#fields
+                                        // https://stackoverflow.com/questions/53836195/firebase-functions-update-all-documents-inside-a-collection
+                                        //  https://github.com/firebase/snippets-node/blob/e709ef93b8d7c6f538d1b4143ffe8ec2e2741d2e/firestore/main/index.js#L916-L956
+
+                                        String timeCurrent = dateAndTimeNow.substring(11,13);
+                                        String timeCurrent2 = dateAndTimeNow.substring(14,16);
+                                        timeCurrent = timeCurrent+"."+timeCurrent2;
+                                        String dateCurrent = dateAndTimeNow.substring(4,10);
+
+                                       // getServerTimeNow(onServerTime_interface);
+                                        //check time constraint set by admin.
+                                        //push data into database
+                                        //for today, is this first time writing to database?
+                                        //if first time, check as morning frame.
+
+                                        //one way to know, go to today time stamp in database,
+
+                                        // https://github.com/firebase/functions-samples/blob/master/delete-old-child-nodes/functions/.eslintrc.json
+                                        // https://stackoverflow.com/questions/32004582/delete-firebase-data-older-than-2-hours
+                                        // https://firebase.google.com/docs/firestore/extend-with-functionsx
+
+                                        //if we delete from firebase function automatically, we can just check with null.
+
+                                        //go to time stamp? if not, just viewing.
+
+                                        //check with bssid first.
+
+
+
+
+                                        Float timeCurrent_Float = Float.valueOf(timeCurrent);
+
+                                        if(timeCurrent_Float<14f){ //assume morning constraint, before 14pm
+
+                                            Float morning_constraint = Float.valueOf(morningConstraint);
+//
+//
+
+
+//
+//                                             if(timeCurrent_Float<morning_constraint){
+//
+//
+//                                            }
+//
+                                        }
+
+
+
+
+
+
+                                       // if(timeAdmin)
+//                                        Intent intent = new Intent(FingerPrint_LogIn_Final_Activity.this, Main_BottomNav_Activity.class);
+//                                        startActivity(intent);
+
+                                        //intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+                                       // finish();
+
+
+
+                                    }
+
+
+
 
                                 }else if(s.toString().equals("waiting")){
 
@@ -225,9 +396,11 @@ public class FingerPrint_LogIn_Final_Activity extends AppCompatActivity implemen
 
                             onServerTime_interface.onSuccess(timm);
 
-                            Date date = new Date(timm);
+                            Date date = new Date(timm); //if in wrong timezone, need to setup
 
                             dayNow  = (date.toString()).substring(0,3);
+
+                            dateAndTimeNow = date.toString();
 
                             Log.i("checkFinalFlow : ", " 11v1 getServerTimeNow(), getting the time: "+ date);
 
@@ -255,7 +428,7 @@ public class FingerPrint_LogIn_Final_Activity extends AppCompatActivity implemen
 
                             if(dayNow==null){
 
-                                getBackupTimeFromUser();
+                                //getBackupTimeFromUser(); ,, need to request again.
                             }
 
                     }
@@ -318,11 +491,14 @@ public class FingerPrint_LogIn_Final_Activity extends AppCompatActivity implemen
     public void onFailed() {
 
         if(dayNow==null) {
-            getBackupTimeFromUser();
+            //getBackupTimeFromUser(); , still ask user to make sure, have internet connection
 
         return;
         }
     }
+
+    // we cant afford to get data from user, since user can offline,
+    //and reset next day data.
 
     private void getBackupTimeFromUser() {
 
