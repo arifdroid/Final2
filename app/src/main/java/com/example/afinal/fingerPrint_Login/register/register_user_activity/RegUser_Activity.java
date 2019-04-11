@@ -446,7 +446,7 @@ public class RegUser_Activity extends AppCompatActivity implements View.OnClickL
 
             if(mImageuri!=null) {
 
-                storageReference = FirebaseStorage.getInstance().getReference("" + adminName + adminPhone+"doc").child("" + userPhone + userName +"image");
+                storageReference = FirebaseStorage.getInstance().getReference("" + adminName + adminPhone+"doc").child("" + userName + userPhone +"image");
 
 
                 storageReference.putFile(mImageuri).addOnCompleteListener(new OnCompleteListener<UploadTask.TaskSnapshot>() {
@@ -457,10 +457,14 @@ public class RegUser_Activity extends AppCompatActivity implements View.OnClickL
 
                             Log.i("checkImageUploaded", "1");
 
+                            Log.i("checkSharedPreferences ", "before image upload success");
+
                         }else {
                             //task not successful
 
                             Log.i("checkImageUploaded", "2");
+
+                            Log.i("checkSharedPreferences ", "before image upload task fail");
 
                         }
 
@@ -479,7 +483,7 @@ public class RegUser_Activity extends AppCompatActivity implements View.OnClickL
 
             //here we saved all in sharedpreferences //create 4 pin id.
 
-            SharedPreferences prefs = this.getSharedPreferences(
+            SharedPreferences prefs = getSharedPreferences(
                     "com.example.finalV8_punchCard", Context.MODE_PRIVATE);
 
             SharedPreferences.Editor editor = prefs.edit();
@@ -491,11 +495,18 @@ public class RegUser_Activity extends AppCompatActivity implements View.OnClickL
 
             editor.putString("final_User_Picture", documentReference.toString());
 
+            Log.i("checkSharedPreferences ", "before 1");
+
+
+            editor.commit();
+
             Toast.makeText(this,"user succesfully created", Toast.LENGTH_SHORT).show();
 
             Intent intent = new Intent(RegUser_Activity.this, Setup_Pin_Activity.class);
 
             startActivity(intent);
+
+            //intent.addFlags()
 
             finish();
 

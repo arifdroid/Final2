@@ -9,6 +9,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -22,8 +23,12 @@ import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.squareup.picasso.Picasso;
+
+import java.util.Timer;
+import java.util.TimerTask;
 
 public class Setup_Pin_Activity extends AppCompatActivity {
 
@@ -37,6 +42,8 @@ public class Setup_Pin_Activity extends AppCompatActivity {
     private DocumentReference documentReference;
     private StorageReference storageReference;
 
+    Timer timer;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,6 +54,8 @@ public class Setup_Pin_Activity extends AppCompatActivity {
         editText2 = findViewById(R.id.regUser_editNumber_2_iD);
         editText3 = findViewById(R.id.regUser_editNumber_3_iD);
         editText4 = findViewById(R.id.regUser_editNumber_4_iD);
+
+        //storageReference =
 
 
 
@@ -59,37 +68,69 @@ public class Setup_Pin_Activity extends AppCompatActivity {
         textView.setText("enter 4 pin password you prefer");
 
 
-        SharedPreferences prefs = this.getSharedPreferences(
-                "com.example.finalV8_punchCard", Context.MODE_PRIVATE);
+        SharedPreferences prefs = getSharedPreferences("com.example.finalV8_punchCard", Context.MODE_PRIVATE);
 
         final String nameHere = prefs.getString("final_User_Name","");
         final String phoneHere = prefs.getString("final_User_Phone","");
+        String adminName = prefs.getString("final_Admin_Name","");
+        String adminPhone = prefs.getString("final_Admin_Phone","");
 
+        Log.i("checkSharedPreferences ", "1");
 
-        storageReference.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+        // storageReference
+        storageReference = FirebaseStorage.getInstance().getReference().child(""+adminName+adminPhone+"doc").child(""+nameHere+phoneHere+"image");
+        //FirebaseStorage.getInstance().getReference("" + adminName + adminPhone+"doc").child("" + userPhone + userName +"image")
+
+        textViewName.setText(nameHere);
+        textViewPhone.setText(phoneHere);
+
+        timer = new Timer();
+
+        timer.schedule(new TimerTask() {
             @Override
-            public void onSuccess(Uri uri) {
+            public void run() {
 
-                Picasso.with(Setup_Pin_Activity.this).load(uri.toString()).into(circleImageView);
-                if(nameHere!=null){
-                    textViewName.setText(nameHere);
+                if(storageReference!=null) {
+                    storageReference.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+                        @Override
+                        public void onSuccess(Uri uri) {
 
-                }if(phoneHere!=null){
+                            Log.i("checkSharedPreferences ", ", name: "+ nameHere + ", phone: "+ phoneHere );
 
-                    textViewPhone.setText(phoneHere);
+                            Picasso.with(Setup_Pin_Activity.this).load(uri.toString()).into(circleImageView);
+                            if (nameHere != null) {
+                                textViewName.setText(nameHere +"updated");
+
+                            }
+                            if (phoneHere != null) {
+
+
+                                textViewName.setText(nameHere +"updated");
+                            }
+
+                            timer.cancel();
+                        }
+                    }).addOnCanceledListener(new OnCanceledListener() {
+                        @Override
+                        public void onCanceled() {
+
+                            Log.i("checkSharedPreferences ", "canceled "+", name: "+ nameHere + ", phone: "+ phoneHere );
+
+                        }
+                    }).addOnFailureListener(new OnFailureListener() {
+                        @Override
+                        public void onFailure(@NonNull Exception e) {
+
+                            Log.i("checkSharedPreferences ", "onfailure "+ e.getMessage());
+
+                        }
+                    });
+
+
                 }
-            }
-        }).addOnCanceledListener(new OnCanceledListener() {
-            @Override
-            public void onCanceled() {
 
             }
-        }).addOnFailureListener(new OnFailureListener() {
-            @Override
-            public void onFailure(@NonNull Exception e) {
-
-            }
-        });
+        },0,3000);
 
 
         button = findViewById(R.id.regUser_pinCode_buttoniD);
@@ -98,15 +139,11 @@ public class Setup_Pin_Activity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
 
-                if(editText1!=null ){
-
-                    if(editText2!=null){
-
-                        if(editText3!=null){
-
-                            if(editText4!=null){
+                if(editText1!=null && editText2!=null && editText3!=null && editText4!=null){
 
                                 //then can start intent here,
+                                //if(timer.)
+                                timer.cancel();
 
                                 String number1 = editText1.getText().toString();
                                 String number2 = editText2.getText().toString();
@@ -128,18 +165,17 @@ public class Setup_Pin_Activity extends AppCompatActivity {
 
 
 
-                            }else {
-
-                                Toast.makeText(Setup_Pin_Activity.this,"please enter 4 pin prefered password number", Toast.LENGTH_SHORT).show();
                             }
+                else {
+                    Toast.makeText(Setup_Pin_Activity.this, "please enter 4 pin prefered password number", Toast.LENGTH_SHORT).show();
 
-
-                        }
-
-
-                    }
                 }
             }
         });
+
+        Log.i("checkSharedPreferences ", "1");
+
+        Log.i("checkSharedPreferences ", ", name: "+ nameHere + ", phone: "+ phoneHere + ", name admin: "+ adminName+ ", phone admin: "+ adminPhone );
+
     }
 }
