@@ -1,28 +1,17 @@
 package com.example.afinal.fingerPrint_Login.fingerprint_login;
 
-import android.Manifest;
 import android.content.Context;
 
-import androidx.annotation.NonNull;
 import androidx.constraintlayout.widget.ConstraintLayout;
 
 
 import com.example.afinal.fingerPrint_Login.oop.OnServerTime_Interface;
 
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
-import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.FragmentManager;
 import androidx.appcompat.app.AppCompatActivity;
-import pub.devrel.easypermissions.AfterPermissionGranted;
-import pub.devrel.easypermissions.EasyPermissions;
 
-import android.content.pm.PackageManager;
-import android.location.Geocoder;
-import android.location.Location;
-import android.location.LocationListener;
 import android.location.LocationManager;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
@@ -37,17 +26,10 @@ import android.widget.Toast;
 
 import com.example.afinal.R;
 import com.google.firebase.firestore.CollectionReference;
-import com.google.firebase.firestore.DocumentReference;
-import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.functions.FirebaseFunctions;
-import com.google.firebase.functions.HttpsCallableResult;
 
-import java.io.IOException;
 import java.util.Date;
-import java.util.Locale;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Observable;
 import java.util.Observer;
 
@@ -126,6 +108,13 @@ public class FingerPrint_LogIn_Final_Activity extends AppCompatActivity implemen
 
     private static final int READ_REQUEST_CODE = 42;
 
+    //time here current.
+    private String timeCurrent;
+    private String timeCurrent2;
+    private String dateCurrent;
+
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -141,24 +130,29 @@ public class FingerPrint_LogIn_Final_Activity extends AppCompatActivity implemen
         user_StreetName =null;
 
         globalAdminPhoneHere =null;
-        globalAdminPhoneHere=null;
+        globalAdminNameHere=null;
+
+        presenter = new FingerPrintFinal_Presenter(this);
+
+        presenter.addObserver(this);
+
 
         //pull our data from phone. get bssid, ssid, location also.
 
         mLocationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
         //request location permission
 
-        requestLocationPermission();
+        presenter.requestLocationPermission(mLocationManager);
+
+        //get the time here
+
+        presenter.getServerTimeNow(onServerTime_interface); // this will be done, in back task
 
         wifiManager = (WifiManager) getApplicationContext().getSystemService(Context.WIFI_SERVICE);
         wifiInfo = wifiManager.getConnectionInfo();
 
         userSSID = wifiInfo.getSSID();
         userBSSID = wifiInfo.getBSSID();
-
-
-
-
 
         //pull constraint by admin, like, time constraint, location or bssid,, we do this below.
 
@@ -179,13 +173,6 @@ public class FingerPrint_LogIn_Final_Activity extends AppCompatActivity implemen
         textView.setText("click button below to log in");
         backColor = findViewById(R.id.backLayoutColourID);
 
-        // here we set next day to zero.
-
-        getServerTimeNow(onServerTime_interface);
-
-        presenter = new FingerPrintFinal_Presenter(this);
-
-        presenter.addObserver(this);
 
         fragment = new Login_Select_Action_Fragment();
 
@@ -199,81 +186,7 @@ public class FingerPrint_LogIn_Final_Activity extends AppCompatActivity implemen
 
                 //this probably still null
 
-                if(nameUser!=null && phoneUser!=null && globalAdminPhoneHere!=null && globalAdminNameHere!=null ){
 
-                    //this still can fail. go to admin document.
-                DocumentReference documentReference = FirebaseFirestore.getInstance().collection("all_admin_doc_collections")
-                        .document(globalAdminNameHere+globalAdminPhoneHere+"doc");
-
-                documentReference.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-                    @Override
-                    public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-
-                        if(task.isSuccessful()){
-
-                            Map<String, Object> remap;
-
-                            remap = Objects.requireNonNull(task.getResult()).getData();
-                            //assume same,
-                            if(remap!=null) {
-                                for (Map.Entry<String, Object> kk : remap.entrySet()) {
-
-                                    //here we gonna set constraint, so before map, we check all these condition
-
-                                    if(kk.getKey().equals("location")){
-
-                                        locationConstraint = kk.getValue().toString();
-                                    }
-
-                                    if(kk.getKey().equals("latitude")){
-
-                                        latitudeConstraint = kk.getValue().toString();
-                                    }
-
-                                    if(kk.getKey().equals("longitude")){
-
-                                        longitudeConstraint = kk.getValue().toString();
-                                    }
-
-                                    if(kk.getKey().equals("bssid")){
-
-                                        bssidConstraint = kk.getValue().toString();
-                                    }
-
-                                    if(kk.getKey().equals("ssid")){
-
-                                        ssidConstraint = kk.getValue().toString();
-                                    }
-
-                                    if(kk.getKey().equals("morning_constraint")){
-
-                                        morningConstraint = kk.getValue().toString();
-                                    }
-
-                                    if(kk.getKey().equals("evening_constraint")){
-                                        eveningConstraint = kk.getValue().toString();
-                                    }
-
-                                    if(kk.getKey().equals("admin_street_name")){
-                                        streetConstraint = kk.getValue().toString();
-                                    }
-
-
-
-                                }
-
-                            }
-
-                        }else {
-
-
-
-                        }
-
-                    }
-                });
-
-                }
                 if(nameUser!=null) {
 
                     if(nameUser!="") {
@@ -295,11 +208,28 @@ public class FingerPrint_LogIn_Final_Activity extends AppCompatActivity implemen
                             @Override
                             public void afterTextChanged(Editable s) {
 
+
+
+
                                 Log.i("checkFinalFlow : ", " 3 backfragment() aftertextchange");
 
                                 if(s.toString().equals("success verified")) {
 
+                                    // https://firebase.google.com/docs/firestore/manage-data/delete-data#fields
+                                    // https://stackoverflow.com/questions/53836195/firebase-functions-update-all-documents-inside-a-collection
+                                    //  https://github.com/firebase/snippets-node/blob/e709ef93b8d7c6f538d1b4143ffe8ec2e2741d2e/firestore/main/index.js#L916-L956
+
+                                    // https://github.com/firebase/functions-samples/blob/master/delete-old-child-nodes/functions/.eslintrc.json
+                                    // https://stackoverflow.com/questions/32004582/delete-firebase-data-older-than-2-hours
+                                    // https://firebase.google.com/docs/firestore/extend-with-functionsx
+
+
+                                    presenter.getCurrent_User_Admin_Server_Value(nameUser,phoneUser,globalAdminNameHere,globalAdminPhoneHere);
+
+
                                     Log.i("checkFinalFlow : ", " 4 backFragment(), success verified, before server time ");
+
+                                    // set in timer. wait if location from user not yet verified.
 
                                     //check in with time stamp.
                                     //getServerTimeNow(this);
@@ -308,81 +238,61 @@ public class FingerPrint_LogIn_Final_Activity extends AppCompatActivity implemen
                                     Log.i("checkFinalFlow : ", " 5 backFragment(), success verified, AFTER server time ");
 
                                     //sometime getServerTime return later
+//
+//                                    if(dayNow==null){
+//                                        getServerTimeNow(onServerTime_interface); //problem if still empty.
+//                                    }
 
-                                    if(dayNow==null){
-                                        getServerTimeNow(onServerTime_interface); //problem if still empty.
-                                    }
-
-                                    if(dayNow!=null){
-
-                                        // https://firebase.google.com/docs/firestore/manage-data/delete-data#fields
-                                        // https://stackoverflow.com/questions/53836195/firebase-functions-update-all-documents-inside-a-collection
-                                        //  https://github.com/firebase/snippets-node/blob/e709ef93b8d7c6f538d1b4143ffe8ec2e2741d2e/firestore/main/index.js#L916-L956
-
-
-                                        //we could do all this in separate task, for faster?
-
-                                        String timeCurrent = dateAndTimeNow.substring(11,13);
-                                        String timeCurrent2 = dateAndTimeNow.substring(14,16);
-                                        timeCurrent = timeCurrent+"."+timeCurrent2;
-                                        String dateCurrent = dateAndTimeNow.substring(4,10);
-
-                                       // getServerTimeNow(onServerTime_interface);
-                                        //check time constraint set by admin.
-                                        //push data into database
-                                        //for today, is this first time writing to database?
-                                        //if first time, check as morning frame.
-
-                                        //one way to know, go to today time stamp in database,
-
-                                        // https://github.com/firebase/functions-samples/blob/master/delete-old-child-nodes/functions/.eslintrc.json
-                                        // https://stackoverflow.com/questions/32004582/delete-firebase-data-older-than-2-hours
-                                        // https://firebase.google.com/docs/firestore/extend-with-functionsx
-
-                                        //if we delete from firebase function automatically, we can just check with null.
-
-                                        //go to time stamp? if not, just viewing.
-
-                                        //check with bssid first.
-
-
-
-
-                                        Float timeCurrent_Float = Float.valueOf(timeCurrent);
-
-                                        if(timeCurrent_Float<14f){ //assume morning constraint, before 14pm
-
-                                            Float morning_constraint = Float.valueOf(morningConstraint);
+//                                    if(dayNow!=null){       //double check.
 //
 //
-
-
+//                                        //we could do all this in separate task, for faster?
 //
-//                                             if(timeCurrent_Float<morning_constraint){
+//                                        timeCurrent = dateAndTimeNow.substring(11,13);
+//                                        timeCurrent2 = dateAndTimeNow.substring(14,16);
+//                                        timeCurrent = timeCurrent+"."+timeCurrent2;
+//                                        dateCurrent = dateAndTimeNow.substring(4,10);
+//
+//                                       // getServerTimeNow(onServerTime_interface);
+//                                        //check time constraint set by admin.
+//                                        //push data into database
+//                                        //for today, is this first time writing to database?
+//                                        //if first time, check as morning frame.
+//
+//                                        //one way to know, go to today time stamp in database,
 //
 //
-//                                            }
+//                                        //if we delete from firebase function automatically, we can just check with null.
 //
-                                        }
-
-
-
-
-
-
-                                       // if(timeAdmin)
-//                                        Intent intent = new Intent(FingerPrint_LogIn_Final_Activity.this, Main_BottomNav_Activity.class);
-//                                        startActivity(intent);
-
-                                        //intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
-                                       // finish();
-
-
-
-                                    }
-
-
-
+//                                        //go to time stamp? if not, just viewing.
+//
+//                                        //check with bssid first.
+//
+//
+//                                        if(bssidConstraint!=null&&ssidConstraint!=null&&eveningConstraint!=null&&latitudeConstraint!=null
+//                                        && longitudeConstraint!=null && locationConstraint!=null &&morningConstraint!=null && locationConstraint!=null){
+//                                           //this operation, if all back task finished.
+////
+////                                            Log.i("checkAllValue: ", "1. ssid Admin: "+ssidConstraint + ", 2.ssid user: "+userSSID
+////                                            + ", 3. bssid Admin: "+ bssidConstraint + ", 4. bssid User "+ userBSSID +
+////                                            ", 5.longitude admin: "+ longitudeConstraint + ", 6.longitude user: "+ userLongitude+
+////                                            ". 7.latitude admin"+ latitudeConstraint + ", 8.latitude user"+userLatitude+
+////                                            ". 9.morning admin"+ morningConstraint+ ", 10.morning user"+dateAndTimeNow.substring()+
+////                                            ". 11.evening admin"+ eveningConstraint+ ", 10.morning user"+morningConstraint);
+////
+//
+//                                        }
+//
+//                                       // if(timeAdmin)
+////                                        Intent intent = new Intent(FingerPrint_LogIn_Final_Activity.this, Main_BottomNav_Activity.class);
+////                                        startActivity(intent);
+//
+//                                        //intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+//                                       // finish();
+//
+//
+//
+//                                    }
 
                                 }else if(s.toString().equals("waiting")){
 
@@ -422,68 +332,160 @@ public class FingerPrint_LogIn_Final_Activity extends AppCompatActivity implemen
 
     }
 
-    public void getServerTimeNow(final OnServerTime_Interface onServerTime_interface){
+//    private void getCurrent_User_Admin_Server_Value() { // this probably finsih later
+//
+//        //assume shared preferences got value. pass from fragment.
+//        if(nameUser!=null && phoneUser!=null && globalAdminPhoneHere!=null && globalAdminNameHere!=null ){
+//
+//            //this still can fail. go to admin document.
+//            DocumentReference documentReference = FirebaseFirestore.getInstance().collection("all_admin_doc_collections")
+//                    .document(globalAdminNameHere+globalAdminPhoneHere+"doc");
+//
+//            documentReference.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+//                @Override
+//                public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+//
+//                    if(task.isSuccessful()){
+//
+//                        Map<String, Object> remap;
+//
+//                        remap = Objects.requireNonNull(task.getResult()).getData(); //problem with this, is this always run at the if we do other back stack change.
+//
+//                        //remap.size();
+//                        //assume same,
+//                        int j =0;
+//                        if(remap!=null) {
+//                            for (Map.Entry<String, Object> kk : remap.entrySet()) {
+//
+//                                j++;
+//                                //here we gonna set constraint, so before map, we check all these condition
+//
+//                                if(kk.getKey().equals("location")){
+//
+//                                    locationConstraint = kk.getValue().toString();
+//                                }
+//
+//                                if(kk.getKey().equals("latitude")){
+//
+//                                    latitudeConstraint = kk.getValue().toString();
+//                                }
+//
+//                                if(kk.getKey().equals("longitude")){
+//
+//                                    longitudeConstraint = kk.getValue().toString();
+//                                }
+//
+//                                if(kk.getKey().equals("bssid")){
+//
+//                                    bssidConstraint = kk.getValue().toString();
+//                                }
+//
+//                                if(kk.getKey().equals("ssid")){
+//
+//                                    ssidConstraint = kk.getValue().toString();
+//                                }
+//
+//                                if(kk.getKey().equals("morning_constraint")){
+//
+//                                    morningConstraint = kk.getValue().toString();
+//                                }
+//
+//                                if(kk.getKey().equals("evening_constraint")){
+//                                    eveningConstraint = kk.getValue().toString();
+//                                }
+//
+//                                if(kk.getKey().equals("admin_street_name")){
+//                                    streetConstraint = kk.getValue().toString();
+//                                }
+//
+//
+//
+//                            }
+//
+//                            int sizeConstraintFromServer = j; //how to know this is finish looping. or we just check all data.
+//
+//                        }
+//
+//                    }else {
+//
+//
+//
+//                    }
+//
+//                }
+//            });
+//
+//        }
+//
+//
+//
+//
+//        return;
+//
+//    }
 
-        FirebaseFunctions.getInstance().getHttpsCallable("getTimeNow")
-                .call()
-                .addOnCompleteListener(new OnCompleteListener<HttpsCallableResult>() {
-                    @Override
-                    public void onComplete(@NonNull Task<HttpsCallableResult> task) {
-
-                        Log.i("checkFinalFlow : ", " 11 getServerTimeNow(), before task");
-
-                        if(task.isSuccessful()){
-
-                        //long timm = (long) (task.getResult().getData())/1000;
-                        long timm = (long) (task.getResult().getData());
-
-                        if(onServerTime_interface!=null) {
-
-                            onServerTime_interface.onSuccess(timm);
-
-                            Date date = new Date(timm); //if in wrong timezone, need to setup
-
-                            dayNow  = (date.toString()).substring(0,3);
-
-                            dateAndTimeNow = date.toString();
-
-                            Log.i("checkFinalFlow : ", " 11v1 getServerTimeNow(), getting the time: "+ date);
-
-                            Log.i("checkFinalFlow : ", " 12 getServerTimeNow(), getting the time");
-
-                             Toast.makeText(FingerPrint_LogIn_Final_Activity.this,"time now is: "+ date +" day:"+dayNow, Toast.LENGTH_LONG).show();
-                        }else {
-
-                            //must handle this. in case server dont return time, how do we insert timestamp?
-                            Log.i("checkFinalFlow : ", " 13 getServerTimeNow(), no time recorded from server");
-
-                            //maybe we can get user timestamp,
-
-                           // getBackupTimeFromUser();
-
-                            onServerTime_interface.onFailed();
-                        }
-
-
-
-                        }else {
-
-                            Log.i("checkFinalFlow : ", " 14 getServerTimeNow(), task failed");
-
-
-                            if(dayNow==null){
-
-                                //getBackupTimeFromUser(); ,, need to request again.
-                            }
-
-                    }
-
-                    }
-                });
-
-        return;
-
-    }
+//    public void getServerTimeNow(final OnServerTime_Interface onServerTime_interface){
+//
+//        FirebaseFunctions.getInstance().getHttpsCallable("getTimeNow")
+//                .call()
+//                .addOnCompleteListener(new OnCompleteListener<HttpsCallableResult>() {
+//                    @Override
+//                    public void onComplete(@NonNull Task<HttpsCallableResult> task) {
+//
+//                        Log.i("checkFinalFlow : ", " 11 getServerTimeNow(), before task");
+//
+//                        if(task.isSuccessful()){
+//
+//                        //long timm = (long) (task.getResult().getData())/1000;
+//                        long timm = (long) (task.getResult().getData());
+//
+//                        if(onServerTime_interface!=null) {
+//
+//                            onServerTime_interface.onSuccess(timm);
+//
+//                            Date date = new Date(timm); //if in wrong timezone, need to setup
+//
+//                            dayNow  = (date.toString()).substring(0,3);
+//
+//                            dateAndTimeNow = date.toString();
+//
+//                            Log.i("checkFinalFlow : ", " 11v1 getServerTimeNow(), getting the time: "+ date);
+//
+//                            Log.i("checkFinalFlow : ", " 12 getServerTimeNow(), getting the time");
+//
+//                             Toast.makeText(FingerPrint_LogIn_Final_Activity.this,"time now is: "+ date +" day:"+dayNow, Toast.LENGTH_LONG).show();
+//                        }else {
+//
+//                            //must handle this. in case server dont return time, how do we insert timestamp?
+//                            Log.i("checkFinalFlow : ", " 13 getServerTimeNow(), no time recorded from server");
+//
+//                            //maybe we can get user timestamp,
+//
+//                           // getBackupTimeFromUser();
+//
+//                            onServerTime_interface.onFailed();
+//                        }
+//
+//
+//
+//                        }else {
+//
+//                            Log.i("checkFinalFlow : ", " 14 getServerTimeNow(), task failed");
+//
+//
+//                            if(dayNow==null){
+//
+//                                //getBackupTimeFromUser(); ,, need to request again.
+//                            }
+//
+//                    }
+//
+//                    }
+//                });
+//
+//        return;
+//
+//    }
 
 
 
@@ -511,8 +513,89 @@ public class FingerPrint_LogIn_Final_Activity extends AppCompatActivity implemen
 
         String s = ((FingerPrintFinal_Presenter) o).getFinalStringResult();
         textView.setText(s);
-    }
 
+        //getTime
+        String time = ((FingerPrintFinal_Presenter) o).getDateAndTimeNow(); //problem if, always updating,
+
+        dateAndTimeNow=time;
+
+        //getFireStore
+        Map<String, Object> remapAdminConstraint = ((FingerPrintFinal_Presenter) o).getReturnMap();
+
+        for(Map.Entry<String, Object> kk: remapAdminConstraint.entrySet()){
+
+            if(kk.getKey().equals("location")){
+
+                locationConstraint=kk.getValue().toString();
+            }
+            if(kk.getKey().equals("latitude")){
+                latitudeConstraint = kk.getValue().toString();
+            }
+
+            if(kk.getKey().equals("longitude")){
+
+                longitudeConstraint=kk.getValue().toString();
+            }
+            if(kk.getKey().equals("morning_constraint")){
+                morningConstraint = kk.getValue().toString();
+            }
+
+            if(kk.getKey().equals("evening_constraint")){
+
+                eveningConstraint=kk.getValue().toString();
+            }
+            if(kk.getKey().equals("admin_street_name")){
+                streetConstraint= kk.getValue().toString();
+            }
+
+            if(kk.getKey().equals("bssid")){
+
+                bssidConstraint=kk.getValue().toString();
+            }
+            if(kk.getKey().equals("ssid")){
+                ssidConstraint= kk.getValue().toString();
+            }
+
+        }
+
+        //getLocation
+
+        Map<String,Object> remapLocation = ((FingerPrintFinal_Presenter) o).getRemapLocation();
+
+
+        for(Map.Entry<String,Object> kk : remapLocation.entrySet()){
+
+            if(kk.getKey().equals("userLatitude")){
+                userLatitude = kk.getValue().toString();
+            }
+
+
+            if(kk.getKey().equals("userLongitude")){
+                userLongitude = kk.getValue().toString();
+            }
+
+        }
+
+        //here we process
+
+        if(morningConstraint!=null &&eveningConstraint!=null && dateAndTimeNow!=null && userLongitude!=null && userLatitude!=null
+        && latitudeConstraint!=null && longitudeConstraint!=null && userBSSID!=null && userSSID!=null
+        && ssidConstraint!=null && bssidConstraint!=null){
+
+            timeCurrent = dateAndTimeNow.substring(11,13);
+            timeCurrent2 = dateAndTimeNow.substring(14,16);
+            timeCurrent = timeCurrent+"."+timeCurrent2;
+
+         Log.i("checkAllValue: ", "1. ssid Admin: "+ssidConstraint + ", 2.ssid user: "+userSSID
+         + ", 3. bssid Admin: "+ bssidConstraint + ", 4. bssid User "+ userBSSID +
+        ", 5.longitude admin: "+ longitudeConstraint + ", 6.longitude user: "+ userLongitude+
+        ". 7.latitude admin"+ latitudeConstraint + ", 8.latitude user"+userLatitude+
+        ". 9.morning admin"+ morningConstraint+ ", 10.morning user"+ timeCurrent +
+        ". 11.evening admin"+ eveningConstraint+ ", 10.morning user"+timeCurrent);
+
+
+        }
+    }
 
     }
 
@@ -567,92 +650,94 @@ public class FingerPrint_LogIn_Final_Activity extends AppCompatActivity implemen
 
     // getting location section
 
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+//    @Override
+//    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+//        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+//
+//        EasyPermissions.onRequestPermissionsResult(requestCode, permissions, grantResults, this);
+//    }
+//
+//    @AfterPermissionGranted(REQUEST_LOCATION_PERMISSION)
+//    public void requestLocationPermission() {
+//        String[] perms = {Manifest.permission.ACCESS_FINE_LOCATION};
+//        if (EasyPermissions.hasPermissions(this, perms)) {
+//            //       Toast.makeText(this, "Permission already granted", Toast.LENGTH_SHORT).show();
+//
+//            if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+//                // TODO: Consider calling
+//                //    ActivityCompat#requestPermissions
+//                // here to request the missing permissions, and then overriding
+//                //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+//                //                                          int[] grantResults)
+//                // to handle the case where the user grants the permission. See the documentation
+//                // for ActivityCompat#requestPermissions for more details.
+//                return;
+//            }
+//            mLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 5000,
+//                    5, new LocationListener() {
+//                        @Override
+//                        public void onLocationChanged(Location location) {
+//
+//                            userLatitude = String.valueOf(location.getLatitude());
+//                            userLongitude = String.valueOf(location.getLongitude());
+//
+//                            Double lat = location.getLatitude();
+//                            Double longitude = location.getLongitude();
+//
+//                            Log.i("checkkLocation", "3");
+//
+//                            Geocoder geocoder = new Geocoder(FingerPrint_LogIn_Final_Activity.this, Locale.getDefault());
+//
+//                            try {
+//
+//                                Log.i("checkkLocation", "4");
+//
+//                                user_StreetName = geocoder.getFromLocation(lat, longitude, 1).get(0).getThoroughfare();
+//
+//                                Log.i("checkkLocation", "5 " + user_StreetName);
+//
+//
+//
+//                                if(user_StreetName !=null|| user_StreetName !=""){
+//
+//                                    mLocationManager.removeUpdates(this);
+//                                }
+//
+//                            } catch (IOException e) {
+//                                e.printStackTrace();
+//                            }
+//
+//                        }
+//
+//
+//
+//                        @Override
+//                        public void onStatusChanged(String provider, int status, Bundle extras) {
+//
+//                        }
+//
+//                        @Override
+//                        public void onProviderEnabled(String provider) {
+//
+//                        }
+//
+//                        @Override
+//                        public void onProviderDisabled(String provider) {
+//
+//                        }
+//                    });
+//
+//
+//
+//        } else {
+//
+//            Log.i("checkkLocation", "5");
+//
+//            EasyPermissions.requestPermissions(this, "Please grant the location permission", REQUEST_LOCATION_PERMISSION, perms);
+//        }
+//
+//        return;
+//    }
 
-        EasyPermissions.onRequestPermissionsResult(requestCode, permissions, grantResults, this);
-    }
 
-    @AfterPermissionGranted(REQUEST_LOCATION_PERMISSION)
-    public void requestLocationPermission() {
-        String[] perms = {Manifest.permission.ACCESS_FINE_LOCATION};
-        if (EasyPermissions.hasPermissions(this, perms)) {
-            //       Toast.makeText(this, "Permission already granted", Toast.LENGTH_SHORT).show();
-
-            if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-                // TODO: Consider calling
-                //    ActivityCompat#requestPermissions
-                // here to request the missing permissions, and then overriding
-                //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-                //                                          int[] grantResults)
-                // to handle the case where the user grants the permission. See the documentation
-                // for ActivityCompat#requestPermissions for more details.
-                return;
-            }
-            mLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 5000,
-                    5, new LocationListener() {
-                        @Override
-                        public void onLocationChanged(Location location) {
-
-                            userLatitude = String.valueOf(location.getLatitude());
-                            userLongitude = String.valueOf(location.getLongitude());
-
-                            Double lat = location.getLatitude();
-                            Double longitude = location.getLongitude();
-
-                            Log.i("checkkLocation", "3");
-
-                            Geocoder geocoder = new Geocoder(FingerPrint_LogIn_Final_Activity.this, Locale.getDefault());
-
-                            try {
-
-                                Log.i("checkkLocation", "4");
-
-                                user_StreetName = geocoder.getFromLocation(lat, longitude, 1).get(0).getThoroughfare();
-
-                                Log.i("checkkLocation", "5 " + user_StreetName);
-
-
-
-                                if(user_StreetName !=null|| user_StreetName !=""){
-
-                                    mLocationManager.removeUpdates(this);
-                                }
-
-                            } catch (IOException e) {
-                                e.printStackTrace();
-                            }
-
-                        }
-
-
-
-                        @Override
-                        public void onStatusChanged(String provider, int status, Bundle extras) {
-
-                        }
-
-                        @Override
-                        public void onProviderEnabled(String provider) {
-
-                        }
-
-                        @Override
-                        public void onProviderDisabled(String provider) {
-
-                        }
-                    });
-
-
-
-        } else {
-
-            Log.i("checkkLocation", "5");
-
-            EasyPermissions.requestPermissions(this, "Please grant the location permission", REQUEST_LOCATION_PERMISSION, perms);
-        }
-
-        return;
-    }
 }
