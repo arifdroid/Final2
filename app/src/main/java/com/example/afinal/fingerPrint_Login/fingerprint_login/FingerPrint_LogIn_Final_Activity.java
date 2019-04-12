@@ -1,20 +1,31 @@
 package com.example.afinal.fingerPrint_Login.fingerprint_login;
 
+import android.Manifest;
 import android.content.Context;
-import android.content.Intent;
 
 import androidx.annotation.NonNull;
 import androidx.constraintlayout.widget.ConstraintLayout;
 
 
 import com.example.afinal.fingerPrint_Login.oop.OnServerTime_Interface;
+
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+
+import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.FragmentManager;
 import androidx.appcompat.app.AppCompatActivity;
+import pub.devrel.easypermissions.AfterPermissionGranted;
+import pub.devrel.easypermissions.EasyPermissions;
 
-import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
+import android.location.Geocoder;
+import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
+import android.net.wifi.WifiInfo;
+import android.net.wifi.WifiManager;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -25,9 +36,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.afinal.R;
-import com.example.afinal.fingerPrint_Login.main_activity_fragment.Main_BottomNav_Activity;
-import com.google.firebase.FirebaseApp;
-import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
@@ -35,19 +43,13 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.functions.FirebaseFunctions;
 import com.google.firebase.functions.HttpsCallableResult;
 
-import java.text.SimpleDateFormat;
-import java.time.Instant;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.time.format.DateTimeFormatter;
-import java.util.Calendar;
+import java.io.IOException;
 import java.util.Date;
-import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Observable;
 import java.util.Observer;
-import java.util.TimeZone;
 
 //introduce fingerprint id here,
 //need observer to watch, if string pull from fragment(sharedpreferences) exist.
@@ -104,6 +106,26 @@ public class FingerPrint_LogIn_Final_Activity extends AppCompatActivity implemen
     private String ssidConstraint;
     private String latitudeConstraint;
     private String longitudeConstraint;
+    private String streetConstraint;
+
+    //this is data from current user.
+    private WifiManager wifiManager;
+    private WifiInfo wifiInfo;
+
+    private String userSSID;
+    private String userBSSID;
+
+    private String userLatitude;
+    private String userLongitude;
+    private LocationManager mLocationManager;
+
+    private String user_StreetName;
+
+    // location user.
+    private final int REQUEST_LOCATION_PERMISSION = 1;
+
+    private static final int READ_REQUEST_CODE = 42;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -116,11 +138,27 @@ public class FingerPrint_LogIn_Final_Activity extends AppCompatActivity implemen
         dayNow = null;
         dateAndTimeNow = null;
         dataPulled = false;
+        user_StreetName =null;
 
         globalAdminPhoneHere =null;
         globalAdminPhoneHere=null;
 
         //pull our data from phone. get bssid, ssid, location also.
+
+        mLocationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
+        //request location permission
+
+        requestLocationPermission();
+
+        wifiManager = (WifiManager) getApplicationContext().getSystemService(Context.WIFI_SERVICE);
+        wifiInfo = wifiManager.getConnectionInfo();
+
+        userSSID = wifiInfo.getSSID();
+        userBSSID = wifiInfo.getBSSID();
+
+
+
+
 
         //pull constraint by admin, like, time constraint, location or bssid,, we do this below.
 
@@ -216,6 +254,10 @@ public class FingerPrint_LogIn_Final_Activity extends AppCompatActivity implemen
                                         eveningConstraint = kk.getValue().toString();
                                     }
 
+                                    if(kk.getKey().equals("admin_street_name")){
+                                        streetConstraint = kk.getValue().toString();
+                                    }
+
 
 
                                 }
@@ -276,6 +318,9 @@ public class FingerPrint_LogIn_Final_Activity extends AppCompatActivity implemen
                                         // https://firebase.google.com/docs/firestore/manage-data/delete-data#fields
                                         // https://stackoverflow.com/questions/53836195/firebase-functions-update-all-documents-inside-a-collection
                                         //  https://github.com/firebase/snippets-node/blob/e709ef93b8d7c6f538d1b4143ffe8ec2e2741d2e/firestore/main/index.js#L916-L956
+
+
+                                        //we could do all this in separate task, for faster?
 
                                         String timeCurrent = dateAndTimeNow.substring(11,13);
                                         String timeCurrent2 = dateAndTimeNow.substring(14,16);
@@ -518,5 +563,96 @@ public class FingerPrint_LogIn_Final_Activity extends AppCompatActivity implemen
 
 
 
+    }
+
+    // getting location section
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+
+        EasyPermissions.onRequestPermissionsResult(requestCode, permissions, grantResults, this);
+    }
+
+    @AfterPermissionGranted(REQUEST_LOCATION_PERMISSION)
+    public void requestLocationPermission() {
+        String[] perms = {Manifest.permission.ACCESS_FINE_LOCATION};
+        if (EasyPermissions.hasPermissions(this, perms)) {
+            //       Toast.makeText(this, "Permission already granted", Toast.LENGTH_SHORT).show();
+
+            if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                // TODO: Consider calling
+                //    ActivityCompat#requestPermissions
+                // here to request the missing permissions, and then overriding
+                //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+                //                                          int[] grantResults)
+                // to handle the case where the user grants the permission. See the documentation
+                // for ActivityCompat#requestPermissions for more details.
+                return;
+            }
+            mLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 5000,
+                    5, new LocationListener() {
+                        @Override
+                        public void onLocationChanged(Location location) {
+
+                            userLatitude = String.valueOf(location.getLatitude());
+                            userLongitude = String.valueOf(location.getLongitude());
+
+                            Double lat = location.getLatitude();
+                            Double longitude = location.getLongitude();
+
+                            Log.i("checkkLocation", "3");
+
+                            Geocoder geocoder = new Geocoder(FingerPrint_LogIn_Final_Activity.this, Locale.getDefault());
+
+                            try {
+
+                                Log.i("checkkLocation", "4");
+
+                                user_StreetName = geocoder.getFromLocation(lat, longitude, 1).get(0).getThoroughfare();
+
+                                Log.i("checkkLocation", "5 " + user_StreetName);
+
+
+
+                                if(user_StreetName !=null|| user_StreetName !=""){
+
+                                    mLocationManager.removeUpdates(this);
+                                }
+
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
+
+                        }
+
+
+
+                        @Override
+                        public void onStatusChanged(String provider, int status, Bundle extras) {
+
+                        }
+
+                        @Override
+                        public void onProviderEnabled(String provider) {
+
+                        }
+
+                        @Override
+                        public void onProviderDisabled(String provider) {
+
+                        }
+                    });
+
+
+
+        } else {
+
+            Log.i("checkkLocation", "5");
+
+            EasyPermissions.requestPermissions(this, "Please grant the location permission", REQUEST_LOCATION_PERMISSION, perms);
+        }
+
+        return;
     }
 }
