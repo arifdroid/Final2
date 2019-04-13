@@ -52,6 +52,8 @@ class FingerPrintFinal_Presenter extends Observable {
 
     private Context mContext;
 
+    private Activity mActivity;
+
     private String dateAndTimeNow;
 
     private Map<String, Object> returnMap;
@@ -70,15 +72,16 @@ class FingerPrintFinal_Presenter extends Observable {
     private Map<String, Object> remapLocation;
 
 
+
     // private LocationManager mLocationManager;
 
 
-    public FingerPrintFinal_Presenter(FingerPrintFinal_View_Interface view_interface) {
+    public FingerPrintFinal_Presenter(FingerPrintFinal_View_Interface view_interface, Activity activity) {
+
+        mActivity =activity;
         returnMap = new HashMap<>();
         remapLocation = new HashMap<>();
-        remapLocation=null;
-        returnMap=null;
-        dateAndTimeNow=null;
+        dateAndTimeNow="";
         Log.i("checkFinalFlow : ", " 16 fingerprint presenter constructor() ");
 
         this.view_interface = view_interface;
@@ -165,6 +168,11 @@ class FingerPrintFinal_Presenter extends Observable {
 
 
 
+    }
+
+    public void stopListetingFingerprint(){
+
+        model_fingerPrint.stopListening();
     }
 
     private void returnToRequest(String result) {
@@ -262,7 +270,7 @@ class FingerPrintFinal_Presenter extends Observable {
 
 
     public String getDateAndTimeNow() {
-        if(dateAndTimeNow!=null) {
+        if(dateAndTimeNow!=null|| dateAndTimeNow!=""|| !dateAndTimeNow.equals("")) {
             return dateAndTimeNow;
         }else {
             return "";
@@ -286,7 +294,7 @@ class FingerPrintFinal_Presenter extends Observable {
 
                         Map<String, Object> remap;
 
-                        remap = Objects.requireNonNull(task.getResult()).getData(); //problem with this, is this always run at the if we do other back stack change.
+                        remap = task.getResult().getData(); //problem with this, is this always run at the if we do other back stack change.
 
                         //remap.size();
                         //assume same,
@@ -346,7 +354,7 @@ class FingerPrintFinal_Presenter extends Observable {
                                     streetConstraint = kk.getValue().toString();
                                 }
 
-
+                                Log.i("checkFirestoreDid","ssid:"+ssidConstraint);
 
                             }
 
@@ -423,14 +431,18 @@ class FingerPrintFinal_Presenter extends Observable {
                         @Override
                         public void onLocationChanged(Location location) {
 
-                            String userLatitude = String.valueOf(location.getLatitude());
-                            String userLongitude = String.valueOf(location.getLongitude());
+                            if(location!=null) {
+                                String userLatitude = String.valueOf(location.getLatitude());
+                                String userLongitude = String.valueOf(location.getLongitude());
 
-                            remapLocation.put("userLatitude", userLatitude);
-                            remapLocation.put("userLongitude", userLongitude);
+                                remapLocation.put("userLatitude", userLatitude);
+                                remapLocation.put("userLongitude", userLongitude);
 
-                            setChanged();
-                            notifyObservers();
+                                Log.i("locationListener","11");
+
+                                setChanged();
+                                notifyObservers();
+                            }
 //
 //                            Double lat = location.getLatitude();
 //                            Double longitude = location.getLongitude();
@@ -484,7 +496,8 @@ class FingerPrintFinal_Presenter extends Observable {
 
             Log.i("checkkLocation", "5");
 
-            EasyPermissions.requestPermissions((Activity) mContext, "Please grant the location permission", REQUEST_LOCATION_PERMISSION, perms);
+            //EasyPermissions.requestPermissions((Activity) mContext, "Please grant the location permission", REQUEST_LOCATION_PERMISSION, perms);
+            EasyPermissions.requestPermissions(mActivity , "Please grant the location permission", REQUEST_LOCATION_PERMISSION, perms);
         }
 
         return;

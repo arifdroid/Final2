@@ -442,78 +442,171 @@ public class RegUser_Activity extends AppCompatActivity implements View.OnClickL
             userprofile_data.put("image",documentReference.toString());
             //userprofile_data.put("");
 
+
             textViewMessage.setText("success.. setting up account");
 
-            documentReference.set(userprofile_data);
+            //documentReference
+
+            documentReference.set(userprofile_data).addOnCompleteListener(new OnCompleteListener<Void>() {
+                @Override
+                public void onComplete(@NonNull Task<Void> task) {
+                    if(task.isSuccessful()){
+
+                        Log.i("documentSet ", "1");
 
 
-            if(mImageuri!=null) {
+                        if(mImageuri!=null) {
 
-                storageReference = FirebaseStorage.getInstance().getReference("" + adminName + adminPhone+"doc").child("" + userName + userPhone +"image");
-                storageReference.putFile(mImageuri).addOnCompleteListener(new OnCompleteListener<UploadTask.TaskSnapshot>() {
-                    @Override
-                    public void onComplete(@NonNull Task<UploadTask.TaskSnapshot> task) {
+                            storageReference = FirebaseStorage.getInstance().getReference("" + adminName + adminPhone+"doc").child("" + userName + userPhone +"image");
+                            storageReference.putFile(mImageuri).addOnCompleteListener(new OnCompleteListener<UploadTask.TaskSnapshot>() {
+                                @Override
+                                public void onComplete(@NonNull Task<UploadTask.TaskSnapshot> task) {
 
-                        if(task.isSuccessful()){
+                                    if(task.isSuccessful()){
 
-                            Log.i("checkImageUploaded", "1");
+                                        Log.i("checkImageUploaded", "1");
 
-                            Log.i("checkSharedPreferences ", "before image upload success");
+                                        Log.i("checkSharedPreferences ", "before image upload success");
 
-                        }else {
-                            //task not successful
+                                    }else {
+                                        //task not successful
 
-                            Log.i("checkImageUploaded", "2");
+                                        Log.i("checkImageUploaded", "2");
 
-                            Log.i("checkSharedPreferences ", "before image upload task fail");
+                                        Log.i("checkSharedPreferences ", "before image upload task fail");
+
+                                    }
+
+                                }
+                            }).addOnCanceledListener(new OnCanceledListener() {
+                                @Override
+                                public void onCanceled() {
+
+                                    Log.i("checkImageUploaded", "3");
+                                }
+                            });
 
                         }
 
+                        //should we check,
+
+                        //here we saved all in sharedpreferences //create 4 pin id.
+
+                        SharedPreferences prefs = getSharedPreferences(
+                                "com.example.finalV8_punchCard", Context.MODE_PRIVATE);
+
+                        SharedPreferences.Editor editor = prefs.edit(); // we need to know, which preferences belong to which admin,
+                        //if user registered to another admin.
+
+
+                        editor.putString("final_User_Name",userName);
+                        editor.putString("final_User_Phone",userPhone);
+                        editor.putString("final_Admin_Phone",adminPhone);
+                        editor.putString("final_Admin_Name", adminName);
+
+                        editor.putString("final_User_Picture", storageReference.toString());
+
+                        Log.i("checkSharedPreferences ", "before 1");
+
+
+                        //FingerPrint_LogIn_Final_Activity.userCount++;
+
+                        editor.commit();
+
+                        //we skipped this?
+
+                        Toast.makeText(RegUser_Activity.this,"user succesfully created", Toast.LENGTH_SHORT).show();
+
+//                        Intent intent = new Intent(RegUser_Activity.this, Setup_Pin_Activity.class);
+//
+//                        startActivity(intent);
+
+                        //intent.addFlags()
+
+                     //   finish();
+
+
+                    }else {
+
+                        Log.i("documentSet ", "2, task failed");
+
+
                     }
-                }).addOnCanceledListener(new OnCanceledListener() {
-                    @Override
-                    public void onCanceled() {
-
-                        Log.i("checkImageUploaded", "3");
-                    }
-                });
-
-            }
-
-            //should we check,
-
-            //here we saved all in sharedpreferences //create 4 pin id.
-
-            SharedPreferences prefs = getSharedPreferences(
-                    "com.example.finalV8_punchCard", Context.MODE_PRIVATE);
-
-            SharedPreferences.Editor editor = prefs.edit(); // we need to know, which preferences belong to which admin,
-            //if user registered to another admin.
+                }
 
 
-            editor.putString("final_User_Name",userName);
-            editor.putString("final_User_Phone",userPhone);
-            editor.putString("final_Admin_Phone",adminPhone);
-            editor.putString("final_Admin_Name", adminName);
-
-            editor.putString("final_User_Picture", storageReference.toString());
-
-            Log.i("checkSharedPreferences ", "before 1");
+            });
 
 
-            //FingerPrint_LogIn_Final_Activity.userCount++;
-
-            editor.commit();
-
-            Toast.makeText(this,"user succesfully created", Toast.LENGTH_SHORT).show();
-
-            Intent intent = new Intent(RegUser_Activity.this, Setup_Pin_Activity.class);
-
-            startActivity(intent);
-
-            //intent.addFlags()
-
-            finish();
+//            if(mImageuri!=null) {
+//
+//                storageReference = FirebaseStorage.getInstance().getReference("" + adminName + adminPhone+"doc").child("" + userName + userPhone +"image");
+//                storageReference.putFile(mImageuri).addOnCompleteListener(new OnCompleteListener<UploadTask.TaskSnapshot>() {
+//                    @Override
+//                    public void onComplete(@NonNull Task<UploadTask.TaskSnapshot> task) {
+//
+//                        if(task.isSuccessful()){
+//
+//                            Log.i("checkImageUploaded", "1");
+//
+//                            Log.i("checkSharedPreferences ", "before image upload success");
+//
+//                        }else {
+//                            //task not successful
+//
+//                            Log.i("checkImageUploaded", "2");
+//
+//                            Log.i("checkSharedPreferences ", "before image upload task fail");
+//
+//                        }
+//
+//                    }
+//                }).addOnCanceledListener(new OnCanceledListener() {
+//                    @Override
+//                    public void onCanceled() {
+//
+//                        Log.i("checkImageUploaded", "3");
+//                    }
+//                });
+//
+//            }
+//
+//            //should we check,
+//
+//            //here we saved all in sharedpreferences //create 4 pin id.
+//
+//            SharedPreferences prefs = getSharedPreferences(
+//                    "com.example.finalV8_punchCard", Context.MODE_PRIVATE);
+//
+//            SharedPreferences.Editor editor = prefs.edit(); // we need to know, which preferences belong to which admin,
+//            //if user registered to another admin.
+//
+//
+//            editor.putString("final_User_Name",userName);
+//            editor.putString("final_User_Phone",userPhone);
+//            editor.putString("final_Admin_Phone",adminPhone);
+//            editor.putString("final_Admin_Name", adminName);
+//
+//            editor.putString("final_User_Picture", storageReference.toString());
+//
+//            Log.i("checkSharedPreferences ", "before 1");
+//
+//
+//            //FingerPrint_LogIn_Final_Activity.userCount++;
+//
+//            editor.commit();
+//
+//            //we skipped this?
+//
+//            Toast.makeText(this,"user succesfully created", Toast.LENGTH_SHORT).show();
+//
+//            Intent intent = new Intent(RegUser_Activity.this, Setup_Pin_Activity.class);
+//
+//            startActivity(intent);
+//
+//            //intent.addFlags()
+//
+//            finish();
 
         }
 

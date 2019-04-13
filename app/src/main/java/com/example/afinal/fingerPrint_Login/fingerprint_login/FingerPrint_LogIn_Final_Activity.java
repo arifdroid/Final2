@@ -1,5 +1,6 @@
 package com.example.afinal.fingerPrint_Login.fingerprint_login;
 
+import android.app.Activity;
 import android.content.Context;
 
 import androidx.constraintlayout.widget.ConstraintLayout;
@@ -112,8 +113,8 @@ public class FingerPrint_LogIn_Final_Activity extends AppCompatActivity implemen
     private String timeCurrent;
     private String timeCurrent2;
     private String dateCurrent;
-
-
+    private boolean checkLocationProcess;
+    private boolean checkAdminConstraintProcess;
 
 
     @Override
@@ -122,6 +123,9 @@ public class FingerPrint_LogIn_Final_Activity extends AppCompatActivity implemen
         setContentView(R.layout.activity_finger_print__log_in__final_);
 
     //    userCount =0//;
+
+        Log.i("checkFinalFlow : ", " 1 oncreate() fingerprint_main_activity");
+
         onServerTime_interface = new FingerPrint_LogIn_Final_Activity();
 
         dayNow = null;
@@ -132,7 +136,8 @@ public class FingerPrint_LogIn_Final_Activity extends AppCompatActivity implemen
         globalAdminPhoneHere =null;
         globalAdminNameHere=null;
 
-        presenter = new FingerPrintFinal_Presenter(this);
+        presenter = new FingerPrintFinal_Presenter(this, (Activity)FingerPrint_LogIn_Final_Activity.this);
+        Log.i("checkFinalFlow : ", " 2 oncreate() fingerprint_main_activity, after presenter Constructor()");
 
         presenter.addObserver(this);
 
@@ -140,13 +145,17 @@ public class FingerPrint_LogIn_Final_Activity extends AppCompatActivity implemen
         //pull our data from phone. get bssid, ssid, location also.
 
         mLocationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
-        //request location permission
 
+        //request location permission
+        Log.i("checkFinalFlow : ", " 3 oncreate() activity, before request location ");
         presenter.requestLocationPermission(mLocationManager);
+        Log.i("checkFinalFlow : ", " 4 oncreate() activity, after request location ");
 
         //get the time here
+        Log.i("checkFinalFlow : ", " 5 oncreate() activity, before request time ");
 
         presenter.getServerTimeNow(onServerTime_interface); // this will be done, in back task
+        Log.i("checkFinalFlow : ", " 6 oncreate() activity, after request time ");
 
         wifiManager = (WifiManager) getApplicationContext().getSystemService(Context.WIFI_SERVICE);
         wifiInfo = wifiManager.getConnectionInfo();
@@ -182,17 +191,21 @@ public class FingerPrint_LogIn_Final_Activity extends AppCompatActivity implemen
             @Override
             public void onBackStackChanged() {
 
-                Log.i("checkFinalFlow : ", " 2 backstackFragment() fingerprint_main_activity");
+                Log.i("checkFinalFlow : ", " 6 backstackFragment() fingerprint_main_activity");
 
                 //this probably still null
 
 
                 if(nameUser!=null) {
 
+                    Log.i("checkFinalFlow : ", " 7 backstackFragment() activity, nameUser :"+nameUser +" success");
+
                     if(nameUser!="") {
                         textView.setText("admin detected, fingerprint checkin now with server..");
 
+                        Log.i("checkFinalFlow : ", " 8 backstackFragment() activity, before fingerprint");
                         presenter.checkSupportedDevice();
+                        Log.i("checkFinalFlow : ", " 8 backstackFragment() activity, after fingerprint");
 
                         textView.addTextChangedListener(new TextWatcher() {
                             @Override
@@ -307,6 +320,8 @@ public class FingerPrint_LogIn_Final_Activity extends AppCompatActivity implemen
 
                                 }else {
 
+
+                                    presenter.stopListetingFingerprint(); //cannot stop here
                                     Log.i("checkFinalFlow : ", " 8 backFragment(), fingerprint need try again");
 
                                     Toast.makeText(FingerPrint_LogIn_Final_Activity.this,"try fingerprint" ,Toast.LENGTH_SHORT).show();
@@ -509,91 +524,107 @@ public class FingerPrint_LogIn_Final_Activity extends AppCompatActivity implemen
     @Override
     public void update(Observable o, Object arg) {
 
+        Log.i("checkUpdateFinal","1");
+
     if(o instanceof FingerPrintFinal_Presenter){
 
         String s = ((FingerPrintFinal_Presenter) o).getFinalStringResult();
         textView.setText(s);
 
+        Log.i("checkUpdateFinal","2 fingerprint :"+s);
         //getTime
         String time = ((FingerPrintFinal_Presenter) o).getDateAndTimeNow(); //problem if, always updating,
 
         dateAndTimeNow=time;
 
+        Log.i("checkUpdateFinal"," time :"+time);
         //getFireStore
         Map<String, Object> remapAdminConstraint = ((FingerPrintFinal_Presenter) o).getReturnMap();
+        Log.i("checkUpdateFinal","3 remapAdminConstraint :"+ remapAdminConstraint);
+        if(remapAdminConstraint!=null) {
 
-        for(Map.Entry<String, Object> kk: remapAdminConstraint.entrySet()){
+            for (Map.Entry<String, Object> kk : remapAdminConstraint.entrySet()) {
 
-            if(kk.getKey().equals("location")){
+                if (kk.getKey().equals("location")) {
 
-                locationConstraint=kk.getValue().toString();
+                    locationConstraint = kk.getValue().toString();
+                }
+                if (kk.getKey().equals("latitude")) {
+                    latitudeConstraint = kk.getValue().toString();
+                }
+
+                if (kk.getKey().equals("longitude")) {
+
+                    longitudeConstraint = kk.getValue().toString();
+                }
+                if (kk.getKey().equals("morning_constraint")) {
+                    morningConstraint = kk.getValue().toString();
+                }
+
+                if (kk.getKey().equals("evening_constraint")) {
+
+                    eveningConstraint = kk.getValue().toString();
+                }
+                if (kk.getKey().equals("admin_street_name")) {
+                    streetConstraint = kk.getValue().toString();
+                }
+
+                if (kk.getKey().equals("bssid")) {
+
+                    bssidConstraint = kk.getValue().toString();
+                }
+                if (kk.getKey().equals("ssid")) {
+                    ssidConstraint = kk.getValue().toString();
+                }
+
             }
-            if(kk.getKey().equals("latitude")){
-                latitudeConstraint = kk.getValue().toString();
-            }
 
-            if(kk.getKey().equals("longitude")){
-
-                longitudeConstraint=kk.getValue().toString();
-            }
-            if(kk.getKey().equals("morning_constraint")){
-                morningConstraint = kk.getValue().toString();
-            }
-
-            if(kk.getKey().equals("evening_constraint")){
-
-                eveningConstraint=kk.getValue().toString();
-            }
-            if(kk.getKey().equals("admin_street_name")){
-                streetConstraint= kk.getValue().toString();
-            }
-
-            if(kk.getKey().equals("bssid")){
-
-                bssidConstraint=kk.getValue().toString();
-            }
-            if(kk.getKey().equals("ssid")){
-                ssidConstraint= kk.getValue().toString();
-            }
+            Log.i("checkUpdateFinal","4 remapAdminConstraint :"+ remapAdminConstraint + ", ssid constraint :"+ssidConstraint);
+            checkAdminConstraintProcess = true;
 
         }
-
         //getLocation
 
         Map<String,Object> remapLocation = ((FingerPrintFinal_Presenter) o).getRemapLocation();
+        Log.i("checkUpdateFinal","5 remapLocation :"+ remapLocation );
+        if(remapLocation!=null) {
+            for (Map.Entry<String, Object> kk : remapLocation.entrySet()) {
+
+                if (kk.getKey().equals("userLatitude")) {
+                    userLatitude = kk.getValue().toString();
+                }
 
 
-        for(Map.Entry<String,Object> kk : remapLocation.entrySet()){
+                if (kk.getKey().equals("userLongitude")) {
+                    userLongitude = kk.getValue().toString();
+                }
 
-            if(kk.getKey().equals("userLatitude")){
-                userLatitude = kk.getValue().toString();
             }
 
+            Log.i("checkUpdateFinal","6 remapLocation :"+ remapLocation + " latite :"+ userLatitude );
 
-            if(kk.getKey().equals("userLongitude")){
-                userLongitude = kk.getValue().toString();
-            }
-
+            checkLocationProcess= true;
         }
-
         //here we process
 
-        if(morningConstraint!=null &&eveningConstraint!=null && dateAndTimeNow!=null && userLongitude!=null && userLatitude!=null
-        && latitudeConstraint!=null && longitudeConstraint!=null && userBSSID!=null && userSSID!=null
-        && ssidConstraint!=null && bssidConstraint!=null){
+        if(checkAdminConstraintProcess ==true && checkAdminConstraintProcess ==true && dateAndTimeNow!=null && s!=null){
 
-            timeCurrent = dateAndTimeNow.substring(11,13);
-            timeCurrent2 = dateAndTimeNow.substring(14,16);
-            timeCurrent = timeCurrent+"."+timeCurrent2;
+//            if(morningConstraint!=null &&eveningConstraint!=null && dateAndTimeNow!=null && userLongitude!=null && userLatitude!=null
+//        && latitudeConstraint!=null && longitudeConstraint!=null && userBSSID!=null && userSSID!=null
+//        && ssidConstraint!=null && bssidConstraint!=null) {
 
-         Log.i("checkAllValue: ", "1. ssid Admin: "+ssidConstraint + ", 2.ssid user: "+userSSID
-         + ", 3. bssid Admin: "+ bssidConstraint + ", 4. bssid User "+ userBSSID +
-        ", 5.longitude admin: "+ longitudeConstraint + ", 6.longitude user: "+ userLongitude+
-        ". 7.latitude admin"+ latitudeConstraint + ", 8.latitude user"+userLatitude+
-        ". 9.morning admin"+ morningConstraint+ ", 10.morning user"+ timeCurrent +
-        ". 11.evening admin"+ eveningConstraint+ ", 10.morning user"+timeCurrent);
+            timeCurrent = dateAndTimeNow.substring(11, 13);
+            timeCurrent2 = dateAndTimeNow.substring(14, 16);
+            timeCurrent = timeCurrent + "." + timeCurrent2;
 
+            Log.i("checkAllValue: ", "1. ssid Admin: " + ssidConstraint + ", 2.ssid user: " + userSSID
+                    + ", 3. bssid Admin: " + bssidConstraint + ", 4. bssid User " + userBSSID +
+                    ", 5.longitude admin: " + longitudeConstraint + ", 6.longitude user: " + userLongitude +
+                    ". 7.latitude admin" + latitudeConstraint + ", 8.latitude user" + userLatitude +
+                    ". 9.morning admin" + morningConstraint + ", 10.morning user" + timeCurrent +
+                    ". 11.evening admin" + eveningConstraint + ", 10.morning user" + timeCurrent);
 
+ //       }
         }
     }
 
