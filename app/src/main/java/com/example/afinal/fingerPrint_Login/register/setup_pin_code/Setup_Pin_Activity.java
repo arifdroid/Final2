@@ -23,7 +23,11 @@ import com.google.android.gms.tasks.OnCanceledListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.FirebaseFirestoreException;
+import com.google.firebase.firestore.SetOptions;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.squareup.picasso.Picasso;
@@ -32,6 +36,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
+
+import javax.annotation.Nullable;
 
 public class Setup_Pin_Activity extends AppCompatActivity {
 
@@ -46,6 +52,14 @@ public class Setup_Pin_Activity extends AppCompatActivity {
     private StorageReference storageReference;
 
     Timer timer;
+
+    //for automated move forward
+    private Timer timer2;
+    private boolean autoNext;
+
+    private int countFlow;
+
+
     private String nameHere;
     private String phoneHere;
     private String adminName;
@@ -56,7 +70,8 @@ public class Setup_Pin_Activity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_setup__pin_);
-
+        autoNext = false;
+        countFlow=0;
         editText1 = findViewById(R.id.regUser_editNumber_1_iD);
         editText2 = findViewById(R.id.regUser_editNumber_2_iD);
         editText3 = findViewById(R.id.regUser_editNumber_3_iD);
@@ -83,7 +98,7 @@ public class Setup_Pin_Activity extends AppCompatActivity {
 //        String adminPhone = prefs.getString("final_Admin_Phone","");
       //  String ref = prefs.getString("final_pth_user","");
 
-            Intent intent = getIntent();
+            final Intent intent = getIntent();
             nameHere = intent.getStringExtra("sentUserName");
             phoneHere= intent.getStringExtra("sentUserPhone");
             adminName = intent.getStringExtra("sentAdminName");
@@ -106,53 +121,153 @@ public class Setup_Pin_Activity extends AppCompatActivity {
         textViewPhone.setText(phoneHere);
 
         timer = new Timer();
+        timer2 = new Timer();
 
-        timer.schedule(new TimerTask() {
+
+        timer2.scheduleAtFixedRate(new TimerTask() {
             @Override
             public void run() {
 
-                if(storageReference!=null) {
-                    storageReference.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
-                        @Override
-                        public void onSuccess(Uri uri) {
+                //every 1.5s check if data loaded,
 
-                            Log.i("checkSharedPreferences ", ", name: "+ nameHere + ", phone: "+ phoneHere );
+                if(autoNext&& countFlow==1) {
 
-                            Picasso.with(Setup_Pin_Activity.this).load(uri.toString()).into(circleImageView);
-                            if (nameHere != null) {
-                                textViewName.setText(nameHere +"updated");
+                    Intent intent3 = new Intent(Setup_Pin_Activity.this,FingerPrint_LogIn_Final_Activity.class);
+                    startActivity(intent3);
+
+                   intent3.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                    //intent3.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP|intent.TASK);
+                    finish();
+
+                    timer2.cancel();
+                }
+            }
+        },500,1750);
+
+        documentReference.addSnapshotListener(new EventListener<DocumentSnapshot>() {
+            @Override
+            public void onEvent(@Nullable DocumentSnapshot documentSnapshot, @Nullable FirebaseFirestoreException e) {
+
+                //if document updated, get the data.
+                //
+
+                if(documentSnapshot.exists()) {
+                    Map<String, Object> remap = documentSnapshot.getData();
+
+                    if(remap!=null) {
+                        for (Map.Entry<String, Object> kk: remap.entrySet()) {
+
+                            if(kk.getKey().equals("custom_pin")){
+
+                                //assume is created, all data.
+                                countFlow++;
+                                //put delay a bit. then move intent automatically
+                                autoNext=true;
 
                             }
-                            if (phoneHere != null) {
 
-
-                                textViewName.setText(nameHere +"updated");
-                            }
-
-                            timer.cancel();
-                        }
-                    }).addOnCanceledListener(new OnCanceledListener() {
-                        @Override
-                        public void onCanceled() {
-
-                            Log.i("checkSharedPreferences ", "canceled "+", name: "+ nameHere + ", phone: "+ phoneHere );
 
                         }
-                    }).addOnFailureListener(new OnFailureListener() {
-                        @Override
-                        public void onFailure(@NonNull Exception e) {
 
-                            Log.i("checkSharedPreferences ", "onfailure "+ e.getMessage());
-
-                        }
-                    });
-
-
+                    }
                 }
 
             }
-        },0,3000);
+        });
 
+
+
+
+//        timer.scheduleAtFixedRate(new TimerTask() {
+//            @Override
+//            public void run() {
+//
+//                if(storageReference!=null) {
+//                    storageReference.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+//                        @Override
+//                        public void onSuccess(Uri uri) {
+//
+//                            Log.i("checkSharedPreferences ", ", name: "+ nameHere + ", phone: "+ phoneHere );
+//
+//                            Picasso.with(Setup_Pin_Activity.this).load(uri.toString()).into(circleImageView);
+//                            if (nameHere != null) {
+//                                //textViewName.setText(nameHere +"updated");
+//
+//                            }
+//                            if (phoneHere != null) {
+//
+//
+//                               // textViewName.setText(nameHere +"updated");
+//                            }
+//                            textView.setText("please wait..automatica..l.");
+//                            Toast.makeText(Setup_Pin_Activity.this,"your image uploaded", Toast.LENGTH_SHORT).show();
+//                            //documentReference.addSnapshotListener()
+//
+//                            //timer.cancel();
+//                        }
+//                    }).addOnCanceledListener(new OnCanceledListener() {
+//                        @Override
+//                        public void onCanceled() {
+//
+//                            Log.i("checkSharedPreferences ", "canceled "+", name: "+ nameHere + ", phone: "+ phoneHere );
+//
+//                        }
+//                    }).addOnFailureListener(new OnFailureListener() {
+//                        @Override
+//                        public void onFailure(@NonNull Exception e) {
+//
+//                            Log.i("checkSharedPreferences ", "onfailure "+ e.getMessage());
+//
+//                        }
+//                    });
+//
+//
+//                }
+//
+//            }
+//        },0,2000);
+
+//        if(storageReference!=null) {
+//            storageReference.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+//                @Override
+//                public void onSuccess(Uri uri) {
+//
+//                    Log.i("checkSharedPreferences ", ", name: "+ nameHere + ", phone: "+ phoneHere );
+//
+//                    Picasso.with(Setup_Pin_Activity.this).load(uri.toString()).into(circleImageView);
+//                    if (nameHere != null) {
+//                        //textViewName.setText(nameHere +"updated");
+//
+//                    }
+//                    if (phoneHere != null) {
+//
+//
+//                        // textViewName.setText(nameHere +"updated");
+//                    }
+//                    textView.setText("please wait..automatica..l.");
+//                    Toast.makeText(Setup_Pin_Activity.this,"your image uploaded", Toast.LENGTH_SHORT).show();
+//                    //documentReference.addSnapshotListener()
+//
+//                    //timer.cancel();
+//                }
+//            }).addOnCanceledListener(new OnCanceledListener() {
+//                @Override
+//                public void onCanceled() {
+//
+//                    Log.i("checkSharedPreferences ", "canceled "+", name: "+ nameHere + ", phone: "+ phoneHere );
+//
+//                }
+//            }).addOnFailureListener(new OnFailureListener() {
+//                @Override
+//                public void onFailure(@NonNull Exception e) {
+//
+//                    Log.i("checkSharedPreferences ", "onfailure "+ e.getMessage());
+//
+//                }
+//            });
+//
+//
+//        }
 
         button = findViewById(R.id.regUser_pinCode_buttoniD);
 
@@ -190,7 +305,7 @@ public class Setup_Pin_Activity extends AppCompatActivity {
 
                                     map.put("custom_pin",number);
 
-                                    documentReference.set(map).addOnSuccessListener(new OnSuccessListener<Void>() {
+                                    documentReference.set(map, SetOptions.merge()).addOnSuccessListener(new OnSuccessListener<Void>() {
                                         @Override
                                         public void onSuccess(Void aVoid) {
 
@@ -210,10 +325,10 @@ public class Setup_Pin_Activity extends AppCompatActivity {
 
 
                                 Toast.makeText(Setup_Pin_Activity.this,"pin : "+number+ " , is saved", Toast.LENGTH_LONG).show();
-
-                                Intent intent = new Intent(Setup_Pin_Activity.this, FingerPrint_LogIn_Final_Activity.class);
-                                startActivity(intent);
-                                finish();
+//
+//                                Intent intent2= new Intent(Setup_Pin_Activity.this, FingerPrint_LogIn_Final_Activity.class);
+//                                startActivity(intent2);
+//                                finish();
 
 
 
@@ -230,4 +345,11 @@ public class Setup_Pin_Activity extends AppCompatActivity {
         Log.i("checkSharedPreferences ", ", name: "+ nameHere + ", phone: "+ phoneHere + ", name admin: "+ adminName+ ", phone admin: "+ adminPhone );
 
     }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+
+    }
+
 }

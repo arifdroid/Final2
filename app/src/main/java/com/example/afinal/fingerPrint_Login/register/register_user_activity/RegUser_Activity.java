@@ -358,7 +358,7 @@ public class RegUser_Activity extends AppCompatActivity implements View.OnClickL
         //onStart();
 
         Intent intent = new Intent(RegUser_Activity.this, RegAdmin_Activity.class);
-        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+        //intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
         startActivity(intent);
         finish();
     }
@@ -634,6 +634,7 @@ public class RegUser_Activity extends AppCompatActivity implements View.OnClickL
                             intent1.putExtra("sentAdminPhone", adminPhone);
 
                             startActivity(intent1);
+
                             finish();
                         }
 

@@ -70,7 +70,8 @@ class FingerPrintFinal_Presenter extends Observable {
 
     private String user_StreetName;
     private Map<String, Object> remapLocation;
-
+    private LocationListener locationLister;
+    private LocationManager mLocationManager;
 
 
     // private LocationManager mLocationManager;
@@ -325,6 +326,7 @@ class FingerPrintFinal_Presenter extends Observable {
                             String morningConstraint="";
                             String eveningConstraint="";
                             String streetConstraint="";
+                            String adminPhoneConstraint = "";
 
 
                             if(remap!=null) {
@@ -393,6 +395,13 @@ class FingerPrintFinal_Presenter extends Observable {
                                     if(kk.getKey().equals("admin_street_name")){
                                         streetConstraint = kk.getValue().toString();
                                         returnMap.put("admin_street_name",streetConstraint);
+
+                                    }
+
+
+                                    if(kk.getKey().equals("phone")){
+                                        adminPhoneConstraint = kk.getValue().toString();
+                                        returnMap.put("phone",adminPhoneConstraint);
 
                                     }
 
@@ -568,8 +577,20 @@ class FingerPrintFinal_Presenter extends Observable {
         return remapLocation;
     }
 
+    public void removeLocationNow(){
+        if(mLocationManager!=null) {
+            mLocationManager.removeUpdates(locationLister);
+
+
+        }
+
+        return;
+    }
+
     @AfterPermissionGranted(REQUEST_LOCATION_PERMISSION)
-    public void requestLocationPermission(final LocationManager mLocationManager) {
+    public void requestLocationPermission(LocationManager mLocationManager2) {
+
+        this.mLocationManager = mLocationManager2;
 
         String[] perms = {Manifest.permission.ACCESS_FINE_LOCATION};
         if (EasyPermissions.hasPermissions(mContext, perms)) {
@@ -586,7 +607,7 @@ class FingerPrintFinal_Presenter extends Observable {
                 return;
             }
             mLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 5000,
-                    5, new LocationListener() {
+                    5,locationLister = new LocationListener() {
                         @Override
                         public void onLocationChanged(Location location) {
 
@@ -648,6 +669,9 @@ class FingerPrintFinal_Presenter extends Observable {
 
                         }
                     });
+
+
+
 
 
 
