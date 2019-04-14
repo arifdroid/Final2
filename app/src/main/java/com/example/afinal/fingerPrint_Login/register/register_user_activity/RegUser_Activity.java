@@ -38,7 +38,10 @@ import com.google.firebase.auth.PhoneAuthCredential;
 import com.google.firebase.auth.PhoneAuthProvider;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
@@ -94,6 +97,7 @@ public class RegUser_Activity extends AppCompatActivity implements View.OnClickL
 
     private StorageReference storageReference;
     private Uri mImageuri;
+    private Timer timer2;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -129,7 +133,7 @@ public class RegUser_Activity extends AppCompatActivity implements View.OnClickL
 
         Log.i("checkUserReg Flow: ", "[Activity] , 1 ");
 
-        Intent intent =getIntent();
+        final Intent intent =getIntent();
 
         adminName = intent.getStringExtra("admin_name"); //pulling data
         adminPhone = intent.getStringExtra("admin_phone");
@@ -173,7 +177,62 @@ public class RegUser_Activity extends AppCompatActivity implements View.OnClickL
             }
         };
 
+        timer2 = new Timer();
+
+//        timer2.schedule(new TimerTask() { .. no need timer if use snapshot listener
+//            @Override
+//            public void run() {
+
+//                if(adminName!=null && adminPhone!=null && userName!=null && userPhone!=null) {
+//                    DocumentReference documentReference = FirebaseFirestore.getInstance().collection("all_admin_doc_collections")
+//                            .document(adminName + adminPhone + "doc").collection("all_employee_thisAdmin_collection")
+//                            .document(userName + userPhone + "doc");
+
+//                    CollectionReference collectionReference = FirebaseFirestore.getInstance().collection("all_admin_doc_collections").
+//                            document(adminName + adminPhone + "doc").collection("all_employee_thisAdmin_collection");
+//
+//                    Query query1 = collectionReference.whereEqualTo("name",userName);   //check if it is written.
+//
+//                    query1.addSnapshotListener(new EventListener<QuerySnapshot>() {
+//
+//                        @Override
+//                        public void onEvent(@javax.annotation.Nullable QuerySnapshot queryDocumentSnapshots, @javax.annotation.Nullable FirebaseFirestoreException e) {
+//
+//                            Log.i("checkSnapShotListener", "1 start");
+//                            if(e!=null){
+//
+//                                return;
+//                            }
+//
+//                            if(queryDocumentSnapshots!=null ){
+//                               int size =  queryDocumentSnapshots.size();
+//                                  Log.i("checkSnapShotListener", "2 not null");
+////                                for(DocumentSnapshot documentSnapshot: queryDocumentSnapshots){
+////
+////                                }
+////
+//                                if (size>=1){
+//
+//                                    //move to next activity?
+//
+//                                    Log.i("checkSnapShotListener", " 3 exist");
+//
+//                                    Intent intent1 = new Intent(RegUser_Activity.this,Setup_Pin_Activity.class);
+//                                    startActivity(intent1);
+//                                    finish();
+//                                }
+//
+//                            }
+//                        }
+//                    });
+// //               }
+
+//            }
+//        },0,1500);  //every 1.5 seconds check doc created or not.
+
     }
+
+
 
     //handle image
 
@@ -442,7 +501,6 @@ public class RegUser_Activity extends AppCompatActivity implements View.OnClickL
             userprofile_data.put("image",documentReference.toString());
             //userprofile_data.put("");
 
-
             textViewMessage.setText("success.. setting up account");
 
             //documentReference
@@ -506,7 +564,8 @@ public class RegUser_Activity extends AppCompatActivity implements View.OnClickL
 
                         editor.putString("final_User_Picture", storageReference.toString());
 
-                        Log.i("checkSharedPreferences ", "before 1");
+                        Log.i("finalSharePreDataCheck","Reg_User_Activity 1,name: "+ userName+ ", phone: "+userPhone + ", adminName:"
+                        +adminName+" , adminPhone: "+adminPhone);
 
 
                         //FingerPrint_LogIn_Final_Activity.userCount++;
@@ -536,6 +595,52 @@ public class RegUser_Activity extends AppCompatActivity implements View.OnClickL
 
 
             });
+
+           //add listener
+
+            CollectionReference collectionReference = FirebaseFirestore.getInstance().collection("all_admin_doc_collections").
+                    document(adminName + adminPhone + "doc").collection("all_employee_thisAdmin_collection");
+
+            Query query1 = collectionReference.whereEqualTo("name",userName);   //check if it is written.
+
+            query1.addSnapshotListener(new EventListener<QuerySnapshot>() {
+
+                @Override
+                public void onEvent(@javax.annotation.Nullable QuerySnapshot queryDocumentSnapshots, @javax.annotation.Nullable FirebaseFirestoreException e) {
+
+                    Log.i("checkSnapShotListener", "1 start");
+                    if(e!=null){
+
+                        return;
+                    }
+
+                    if(queryDocumentSnapshots!=null ){
+                        int size =  queryDocumentSnapshots.size();
+                        Log.i("checkSnapShotListener", "2 not null");
+//                                for(DocumentSnapshot documentSnapshot: queryDocumentSnapshots){
+//
+//                                }
+//
+                        if (size>=1){
+
+                            //move to next activity?
+
+                            Log.i("checkSnapShotListener", " 3 exist");
+
+                            Intent intent1 = new Intent(RegUser_Activity.this,Setup_Pin_Activity.class);
+                            intent1.putExtra("sentUserName", userName);
+                            intent1.putExtra("sentUserPhone", userPhone);
+                            intent1.putExtra("sentAdminName", adminName);
+                            intent1.putExtra("sentAdminPhone", adminPhone);
+
+                            startActivity(intent1);
+                            finish();
+                        }
+
+                    }
+                }
+            });
+            //               }
 
 
 //            if(mImageuri!=null) {

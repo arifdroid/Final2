@@ -236,7 +236,13 @@ public class FingerPrint_LogIn_Final_Activity extends AppCompatActivity implemen
                                     // https://stackoverflow.com/questions/32004582/delete-firebase-data-older-than-2-hours
                                     // https://firebase.google.com/docs/firestore/extend-with-functionsx
 
+                                    // problem, this do not return anything.
 
+                                    Log.i("finalSharePreDataCheck","FingerPrintLogin_Final_Activity 6 , before return,name: "
+                                            + nameUser+ ", phone: "+phoneUser+ ", adminName:"
+                                            +globalAdminNameHere+" , adminPhone: "+globalAdminPhoneHere);
+
+                                    //right data, but we dont retrieve data.
                                     presenter.getCurrent_User_Admin_Server_Value(nameUser,phoneUser,globalAdminNameHere,globalAdminPhoneHere);
 
 
@@ -626,6 +632,13 @@ public class FingerPrint_LogIn_Final_Activity extends AppCompatActivity implemen
 
  //       }
         }
+
+        Log.i("checkAllValue: ", "[CHECK] 1. ssid Admin: " + ssidConstraint + ", 2.ssid user: " + userSSID
+                + ", 3. bssid Admin: " + bssidConstraint + ", 4. bssid User " + userBSSID +
+                ", 5.longitude admin: " + longitudeConstraint + ", 6.longitude user: " + userLongitude +
+                ". 7.latitude admin" + latitudeConstraint + ", 8.latitude user" + userLatitude +
+                ". 9.morning admin" + morningConstraint + ", 10.morning user" + timeCurrent +
+                ". 11.evening admin" + eveningConstraint + ", 10.morning user" + timeCurrent);
     }
 
     }

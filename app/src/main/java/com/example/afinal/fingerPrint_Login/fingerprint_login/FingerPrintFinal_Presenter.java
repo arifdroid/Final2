@@ -277,14 +277,24 @@ class FingerPrintFinal_Presenter extends Observable {
         }
     }
 
-   public void getCurrent_User_Admin_Server_Value(String nameUser, String phoneUser, String globalAdminPhoneHere, String globalAdminNameHere) { // this probably finsih later
+   public void getCurrent_User_Admin_Server_Value(String nameUser, String phoneUser, String globalAdminNameHere, String globalAdminPhoneHere) { // this probably finsih later
 
+       Log.i("finalSharePreDataCheck","FingerPrintLogin_Final_Activity [PRESENTER] 7 , before return,name: "
+               + nameUser+ ", phone: "+phoneUser+ ", adminName:"
+               +globalAdminNameHere+" , adminPhone: "+globalAdminPhoneHere);
+
+        Log.i("getCurrentConstraint: ", "1");
         //assume shared preferences got value. pass from fragment.
         if(nameUser!=null && phoneUser!=null && globalAdminPhoneHere!=null && globalAdminNameHere!=null ){
-
+            Log.i("getCurrentConstraint: ", "2");
             //this still can fail. go to admin document.
             DocumentReference documentReference = FirebaseFirestore.getInstance().collection("all_admin_doc_collections")
                     .document(globalAdminNameHere+globalAdminPhoneHere+"doc");
+
+            Log.i("getCurrentConstraint: ", "2.2, document reference" + documentReference.toString());
+
+
+            //Log.i("getCurrentConstraint: ", "3.1, task check" + );
 
             documentReference.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
                 @Override
@@ -292,99 +302,248 @@ class FingerPrintFinal_Presenter extends Observable {
 
                     if(task.isSuccessful()){
 
-                        Map<String, Object> remap;
+                        Log.i("checkDownloadDoc", "1 Presenter Task succesfull");
 
-                        remap = task.getResult().getData(); //problem with this, is this always run at the if we do other back stack change.
+
+                        Map<String, Object> remap;
+                        //task.getResult().getData()
+
+                        DocumentSnapshot documentSnapshot = task.getResult();
+
+                        if(documentSnapshot.exists()){
+                            Log.i("checkDownloadDoc", "2 Presenter, exist");
+
+                            remap = documentSnapshot.getData();
+
+                            int j =0;
+
+                            String locationConstraint ="";
+                            String latitudeConstraint = "";
+                            String longitudeConstraint = "";
+                            String bssidConstraint ="";
+                            String ssidConstraint ="";
+                            String morningConstraint="";
+                            String eveningConstraint="";
+                            String streetConstraint="";
+
+
+                            if(remap!=null) {
+                                //Log.i("getCurrentConstraint: ", "5, is remap null: "+ remap);
+                                Log.i("checkDownloadDoc", "3 Presenter, remap: not null");
+
+                                for (Map.Entry<String, Object> kk : remap.entrySet()) {
+
+                                    j++;
+                                    Log.i("checkDownloadDoc: ", " DOWNLOADING DATA "+j );
+
+                                    //here we gonna set constraint, so before map, we check all these condition
+
+                                    if(kk.getKey().equals("location")){
+
+                                        locationConstraint = kk.getValue().toString();
+                                        Log.i("checkDownloadDoc: ", "DOWNLOADING DATA, location: "+ locationConstraint );
+                                        returnMap.put("location", locationConstraint);
+                                    }
+
+                                    if(kk.getKey().equals("latitude")){
+
+                                        latitudeConstraint = kk.getValue().toString();
+
+                                        Log.i("checkDownloadDoc: ", "DOWNLOADING DATA, latitude: "+ latitudeConstraint );
+                                        returnMap.put("latitude", latitudeConstraint);
+                                    }
+
+                                    if(kk.getKey().equals("longitude")){
+
+                                        longitudeConstraint = kk.getValue().toString();
+                                        Log.i("checkDownloadDoc: ", "DOWNLOADING DATA, longitude: "+ longitudeConstraint );
+                                        returnMap.put("longitude", longitudeConstraint);
+                                    }
+
+                                    if(kk.getKey().equals("bssid")){
+
+                                        bssidConstraint = kk.getValue().toString();
+                                        Log.i("checkDownloadDoc: ", "DOWNLOADING DATA, bssid: "+ bssidConstraint );
+                                        returnMap.put("bssid",bssidConstraint);
+
+
+                                    }
+
+                                    if(kk.getKey().equals("ssid")){
+
+                                        ssidConstraint = kk.getValue().toString();
+                                        Log.i("checkDownloadDoc: ", "DOWNLOADING DATA, ssid: "+ ssidConstraint );
+                                        returnMap.put("ssid",ssidConstraint);
+
+                                    }
+
+                                    if(kk.getKey().equals("morning_constraint")){
+
+                                        morningConstraint = kk.getValue().toString();
+                                        returnMap.put("morning_constraint",morningConstraint);
+
+                                    }
+
+                                    if(kk.getKey().equals("evening_constraint")){
+                                        eveningConstraint = kk.getValue().toString();
+                                        returnMap.put("evening_constraint", eveningConstraint);
+
+                                    }
+
+                                    if(kk.getKey().equals("admin_street_name")){
+                                        streetConstraint = kk.getValue().toString();
+                                        returnMap.put("admin_street_name",streetConstraint);
+
+                                    }
+
+                                    Log.i("checkFirestoreDid","ssid:"+ssidConstraint);
+
+
+
+                                }
+
+                                int sizeConstraintFromServer = j; //how to know this is finish looping. or we just check all data.
+
+                                if(returnMap.size()>2){
+
+
+                                    setChanged();
+                                    notifyObservers();
+                                }
+
+                            }else {
+                                //here remap null
+
+                                Log.i("checkDownloadDoc", "4 Presenter, remap null");
+                            }
+
+
+                        }else {
+
+                            Log.i("checkDownloadDoc", "5 Presenter, document not exist");
+
+
+                        }
+
+                        Log.i("checkDownloadDoc", "6 Presenter, task successful finish");
+
+                        //remap = new HashMap<>();
+                       // remap = task.getResult().getData(); //problem with this, is this always run at the if we do other back stack change.
+
+                       // int sizehere = task.getResult().getData().size();
+
+                        //Log.i("getCurrentConstraint: ", "4, size check: "+ sizehere);
 
                         //remap.size();
                         //assume same,
-                        int j =0;
-
-                        String locationConstraint ="";
-                        String latitudeConstraint = "";
-                        String longitudeConstraint = "";
-                        String bssidConstraint ="";
-                        String ssidConstraint ="";
-                        String morningConstraint="";
-                        String eveningConstraint="";
-                        String streetConstraint="";
-
-
-                        if(remap!=null) {
-                            for (Map.Entry<String, Object> kk : remap.entrySet()) {
-
-                                j++;
-                                //here we gonna set constraint, so before map, we check all these condition
-
-                                if(kk.getKey().equals("location")){
-
-                                    locationConstraint = kk.getValue().toString();
-                                }
-
-                                if(kk.getKey().equals("latitude")){
-
-                                    latitudeConstraint = kk.getValue().toString();
-                                }
-
-                                if(kk.getKey().equals("longitude")){
-
-                                    longitudeConstraint = kk.getValue().toString();
-                                }
-
-                                if(kk.getKey().equals("bssid")){
-
-                                    bssidConstraint = kk.getValue().toString();
-                                }
-
-                                if(kk.getKey().equals("ssid")){
-
-                                    ssidConstraint = kk.getValue().toString();
-                                }
-
-                                if(kk.getKey().equals("morning_constraint")){
-
-                                    morningConstraint = kk.getValue().toString();
-                                }
-
-                                if(kk.getKey().equals("evening_constraint")){
-                                    eveningConstraint = kk.getValue().toString();
-                                }
-
-                                if(kk.getKey().equals("admin_street_name")){
-                                    streetConstraint = kk.getValue().toString();
-                                }
-
-                                Log.i("checkFirestoreDid","ssid:"+ssidConstraint);
-
-                            }
-
-                            int sizeConstraintFromServer = j; //how to know this is finish looping. or we just check all data.
-
-                            returnMap.put("location", locationConstraint);
-                            returnMap.put("latitude", latitudeConstraint);
-                            returnMap.put("longitude", longitudeConstraint);
-                            returnMap.put("morning_constraint",morningConstraint);
-                            returnMap.put("evening_constraint", eveningConstraint);
-                            returnMap.put("admin_street_name",streetConstraint);
-                            returnMap.put("bssid",bssidConstraint);
-                            returnMap.put("ssid",ssidConstraint);
-
-                            setChanged();
-                            notifyObservers();
-                        }
+//                        int j =0;
+//
+//                        String locationConstraint ="";
+//                        String latitudeConstraint = "";
+//                        String longitudeConstraint = "";
+//                        String bssidConstraint ="";
+//                        String ssidConstraint ="";
+//                        String morningConstraint="";
+//                        String eveningConstraint="";
+//                        String streetConstraint="";
+//
+//
+//                        if(remap!=null) {
+//                            Log.i("getCurrentConstraint: ", "5, is remap null: "+ remap);
+//
+//                            for (Map.Entry<String, Object> kk : remap.entrySet()) {
+//
+//                                j++;
+//                                Log.i("getCurrentConstraint: ", "6, for loop: "+j );
+//
+//                                //here we gonna set constraint, so before map, we check all these condition
+//
+//                                if(kk.getKey().equals("location")){
+//
+//                                    locationConstraint = kk.getValue().toString();
+//                                    Log.i("getCurrentConstraint: ", "6, for loop: "+ locationConstraint );
+//                                }
+//
+//                                if(kk.getKey().equals("latitude")){
+//
+//                                    latitudeConstraint = kk.getValue().toString();
+//
+//                                    Log.i("getCurrentConstraint: ", "7, latitude: "+ latitudeConstraint );
+//
+//                                }
+//
+//                                if(kk.getKey().equals("longitude")){
+//
+//                                    longitudeConstraint = kk.getValue().toString();
+//                                }
+//
+//                                if(kk.getKey().equals("bssid")){
+//
+//                                    bssidConstraint = kk.getValue().toString();
+//                                    Log.i("getCurrentConstraint: ", "8, bssid: "+ bssidConstraint );
+//
+//
+//                                }
+//
+//                                if(kk.getKey().equals("ssid")){
+//
+//                                    ssidConstraint = kk.getValue().toString();
+//                                    Log.i("getCurrentConstraint: ", "9, ssid: "+ ssidConstraint );
+//
+//                                }
+//
+//                                if(kk.getKey().equals("morning_constraint")){
+//
+//                                    morningConstraint = kk.getValue().toString();
+//                                }
+//
+//                                if(kk.getKey().equals("evening_constraint")){
+//                                    eveningConstraint = kk.getValue().toString();
+//                                }
+//
+//                                if(kk.getKey().equals("admin_street_name")){
+//                                    streetConstraint = kk.getValue().toString();
+//                                }
+//
+//                                Log.i("checkFirestoreDid","ssid:"+ssidConstraint);
+//                                returnMap.put("location", locationConstraint);
+//                                returnMap.put("latitude", latitudeConstraint);
+//                                returnMap.put("longitude", longitudeConstraint);
+//                                returnMap.put("morning_constraint",morningConstraint);
+//                                returnMap.put("evening_constraint", eveningConstraint);
+//                                returnMap.put("admin_street_name",streetConstraint);
+//                                returnMap.put("bssid",bssidConstraint);
+//                                returnMap.put("ssid",ssidConstraint);
+//                            }
+//
+//                            int sizeConstraintFromServer = j; //how to know this is finish looping. or we just check all data.
+//
+//                            if(returnMap.size()>2){
+//
+//
+//                                setChanged();
+//                                notifyObservers();
+//                            }
+//
+//                        }
 
                     }else {
 
 
 
+                        Log.i("checkDownloadDoc", "7 Presenter, task not successful, error " + task.getException().getMessage());
+                        //Log.i("checkDownloadDoc", "3 Presenter not succesfull");
+
                     }
 
+                    Log.i("checkDownloadDoc", "8 Presenter, outside task succesful and verse");
                 }
             });
 
+            Log.i("checkDownloadDoc", "9 Presenter, passing task, down");
         }
 
-
+       Log.i("checkDownloadDoc", "10 Presenter, before return call method checkDoc");
 
 
         return;

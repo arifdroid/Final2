@@ -8,6 +8,8 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import androidx.fragment.app.Fragment;
+
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -65,6 +67,9 @@ public class Login_Select_Action_Fragment extends Fragment implements View.OnCli
         phoneHere = prefs.getString("final_User_Phone","");
         adminName = prefs.getString("final_Admin_Name","");
         adminPhone = prefs.getString("final_Admin_Phone","");
+
+        Log.i("finalSharePreDataCheck","Login_Select_Fragment 3,name: "+ nameHere+ ", phone: "+phoneHere + ", adminName:"
+                +adminName+" , adminPhone: "+adminPhone);
 
 
 
@@ -124,6 +129,10 @@ public class Login_Select_Action_Fragment extends Fragment implements View.OnCli
                     ((FingerPrint_LogIn_Final_Activity) getActivity()).phoneUser = phoneHere; //
                     ((FingerPrint_LogIn_Final_Activity) getActivity()).globalAdminNameHere = adminName; //
                     ((FingerPrint_LogIn_Final_Activity) getActivity()).globalAdminPhoneHere = adminPhone; //
+
+                    Log.i("finalSharePreDataCheck","Login_Select_Fragment 4, before return,name: "
+                            + nameHere+ ", phone: "+phoneHere+ ", adminName:"
+                            +adminName+" , adminPhone: "+adminPhone);
                 }
 
                 //this is we setup shared prefe

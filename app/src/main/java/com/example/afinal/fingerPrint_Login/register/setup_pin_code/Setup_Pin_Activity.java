@@ -46,6 +46,10 @@ public class Setup_Pin_Activity extends AppCompatActivity {
     private StorageReference storageReference;
 
     Timer timer;
+    private String nameHere;
+    private String phoneHere;
+    private String adminName;
+    private String adminPhone;
 
 
     @Override
@@ -71,13 +75,22 @@ public class Setup_Pin_Activity extends AppCompatActivity {
         textView.setText("enter 4 pin password you prefer");
 
 
-        SharedPreferences prefs = getSharedPreferences("com.example.finalV8_punchCard", Context.MODE_PRIVATE);
-
-        final String nameHere = prefs.getString("final_User_Name","");
-        final String phoneHere = prefs.getString("final_User_Phone","");
-        String adminName = prefs.getString("final_Admin_Name","");
-        String adminPhone = prefs.getString("final_Admin_Phone","");
+//        SharedPreferences prefs = getSharedPreferences("com.example.finalV8_punchCard", Context.MODE_PRIVATE);
+//
+//        final String nameHere = prefs.getString("final_User_Name","");
+//        final String phoneHere = prefs.getString("final_User_Phone","");
+//        String adminName = prefs.getString("final_Admin_Name","");
+//        String adminPhone = prefs.getString("final_Admin_Phone","");
       //  String ref = prefs.getString("final_pth_user","");
+
+            Intent intent = getIntent();
+            nameHere = intent.getStringExtra("sentUserName");
+            phoneHere= intent.getStringExtra("sentUserPhone");
+            adminName = intent.getStringExtra("sentAdminName");
+            adminPhone = intent.getStringExtra("sentAdminPhone");
+
+        Log.i("finalSharePreDataCheck","Setup_Pin_Activity 2,name: "+ nameHere+ ", phone: "+phoneHere+ ", adminName:"
+                +adminName+" , adminPhone: "+adminPhone);
 
         documentReference = FirebaseFirestore.getInstance().collection("all_admin_doc_collections")
                 .document(adminName+adminPhone+"doc").collection("all_employee_thisAdmin_collection")
