@@ -219,12 +219,17 @@ public class FingerPrint_LogIn_Final_Activity extends AppCompatActivity implemen
 
 
         getSupportFragmentManager().addOnBackStackChangedListener(new FragmentManager.OnBackStackChangedListener() {
+
             @Override
             public void onBackStackChanged() {
+
+                presenter.addObserver(FingerPrint_LogIn_Final_Activity.this);
 
                 Log.i("checkFinalFlow : ", " 6 backstackFragment() fingerprint_main_activity");
 
                 //this probably still null
+
+
 
                 countFinalFlow2++; //this triggered two times,
 
@@ -241,76 +246,76 @@ public class FingerPrint_LogIn_Final_Activity extends AppCompatActivity implemen
                         presenter.checkSupportedDevice();
                         Log.i("checkFinalFlow : ", " 8 backstackFragment() activity, after fingerprint");
 
-                        textView.addTextChangedListener(new TextWatcher() {
-                            @Override
-                            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-
-                            }
-
-                            @Override
-                            public void onTextChanged(CharSequence s, int start, int before, int count) {
-
-                            }
-
-                            @Override
-                            public void afterTextChanged(Editable s) { //being triggered everytime, this is the problem.
-
-
-                                countFinalFlow++;
-                                textViewFinalData.setText("trigerred textchange :"+ countFinalFlow);
-
-                                Log.i("checkFinalFlow : ", " 3 backfragment() aftertextchange");
-
-                                if(s.toString().equals("success verified")) {
-
-                                    // https://firebase.google.com/docs/firestore/manage-data/delete-data#fields
-                                    // https://stackoverflow.com/questions/53836195/firebase-functions-update-all-documents-inside-a-collection
-                                    //  https://github.com/firebase/snippets-node/blob/e709ef93b8d7c6f538d1b4143ffe8ec2e2741d2e/firestore/main/index.js#L916-L956
-
-                                    // https://github.com/firebase/functions-samples/blob/master/delete-old-child-nodes/functions/.eslintrc.json
-                                    // https://stackoverflow.com/questions/32004582/delete-firebase-data-older-than-2-hours
-                                    // https://firebase.google.com/docs/firestore/extend-with-functionsx
-
-                                    // problem, this do not return anything.
-
-                                    Log.i("finalSharePreDataCheck","FingerPrintLogin_Final_Activity 6 , before return,name: "
-                                            + nameUser+ ", phone: "+phoneUser+ ", adminName:"
-                                            +globalAdminNameHere+" , adminPhone: "+globalAdminPhoneHere);
-
-                                    //right data, but we dont retrieve data.
-                                    presenter.getCurrent_User_Admin_Server_Value(nameUser,phoneUser,globalAdminNameHere,globalAdminPhoneHere);
-
-
-                                    Log.i("checkFinalFlow : ", " 4 backFragment(), success verified, before server time ");
-
-                                    Log.i("checkFinalFlow : ", " 5 backFragment(), success verified, AFTER server time ");
-
-
-
-                                }else if(s.toString().equals("waiting")){
-
-                                    Log.i("checkFinalFlow : ", " 6 backFragment(), do nothing waiting for fingerprint ");
-
-                                }else if(s.toString().equals("try again")){
-
-                                    Log.i("checkFinalFlow : ", " 7 backFragment(), try again fingerprint ");
-
-                                    Toast.makeText(FingerPrint_LogIn_Final_Activity.this,"please select admin, try finger again" ,Toast.LENGTH_SHORT).show();
-
-
-                                }
-//                                else {
+//                        textView.addTextChangedListener(new TextWatcher() {
+//                            @Override
+//                            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
 //
-////handle here, if return nothing
-//                                    //update(this,"");
-//                                    presenter.stopListetingFingerprint(); //cannot stop here
-//                                    Log.i("checkFinalFlow : ", " 8 backFragment(), fingerprint need try again");
+//                            }
 //
-//                                    Toast.makeText(FingerPrint_LogIn_Final_Activity.this,"try fingerprint" ,Toast.LENGTH_SHORT).show();
+//                            @Override
+//                            public void onTextChanged(CharSequence s, int start, int before, int count) {
+//
+//                            }
+//
+//                            @Override
+//                            public void afterTextChanged(Editable s) { //being triggered everytime, this is the problem.
+//
+//
+//                                countFinalFlow++;
+//                                textViewFinalData.setText("trigerred textchange :"+ countFinalFlow);
+//
+//                                Log.i("checkFinalFlow : ", " 3 backfragment() aftertextchange");
+//
+//                                if(s.toString().equals("success verified")) {
+//
+//                                    // https://firebase.google.com/docs/firestore/manage-data/delete-data#fields
+//                                    // https://stackoverflow.com/questions/53836195/firebase-functions-update-all-documents-inside-a-collection
+//                                    //  https://github.com/firebase/snippets-node/blob/e709ef93b8d7c6f538d1b4143ffe8ec2e2741d2e/firestore/main/index.js#L916-L956
+//
+//                                    // https://github.com/firebase/functions-samples/blob/master/delete-old-child-nodes/functions/.eslintrc.json
+//                                    // https://stackoverflow.com/questions/32004582/delete-firebase-data-older-than-2-hours
+//                                    // https://firebase.google.com/docs/firestore/extend-with-functionsx
+//
+//                                    // problem, this do not return anything.
+//
+//                                    Log.i("finalSharePreDataCheck","FingerPrintLogin_Final_Activity 6 , before return,name: "
+//                                            + nameUser+ ", phone: "+phoneUser+ ", adminName:"
+//                                            +globalAdminNameHere+" , adminPhone: "+globalAdminPhoneHere);
+//
+//                                    //right data, but we dont retrieve data.
+//                                    presenter.getCurrent_User_Admin_Server_Value(nameUser,phoneUser,globalAdminNameHere,globalAdminPhoneHere);
+//
+//
+//                                    Log.i("checkFinalFlow : ", " 4 backFragment(), success verified, before server time ");
+//
+//                                    Log.i("checkFinalFlow : ", " 5 backFragment(), success verified, AFTER server time ");
+//
+//
+//
+//                                }else if(s.toString().equals("waiting")){
+//
+//                                    Log.i("checkFinalFlow : ", " 6 backFragment(), do nothing waiting for fingerprint ");
+//
+//                                }else if(s.toString().equals("try again")){
+//
+//                                    Log.i("checkFinalFlow : ", " 7 backFragment(), try again fingerprint ");
+//
+//                                    Toast.makeText(FingerPrint_LogIn_Final_Activity.this,"please select admin, try finger again" ,Toast.LENGTH_SHORT).show();
+//
+//
 //                                }
-
-                            }
-                        });
+////                                else {
+////
+//////handle here, if return nothing
+////                                    //update(this,"");
+////                                    presenter.stopListetingFingerprint(); //cannot stop here
+////                                    Log.i("checkFinalFlow : ", " 8 backFragment(), fingerprint need try again");
+////
+////                                    Toast.makeText(FingerPrint_LogIn_Final_Activity.this,"try fingerprint" ,Toast.LENGTH_SHORT).show();
+////                                }
+//
+//                            }
+//                        });
                     }
                 }else {
 
@@ -358,6 +363,19 @@ public class FingerPrint_LogIn_Final_Activity extends AppCompatActivity implemen
 
         String s = ((FingerPrintFinal_Presenter) o).getFinalStringResult();
         textView.setText(s); //textview is null, since fingerprint do not return result, update always running.
+
+        if(s.equals("success verified")) {
+
+            presenter.getCurrent_User_Admin_Server_Value(nameUser,phoneUser,globalAdminNameHere,globalAdminPhoneHere);
+
+        }else if(s.equals("try again")){
+
+                                    Log.i("checkFinalFlow : ", " 7 backFragment(), try again fingerprint ");
+
+                                    Toast.makeText(FingerPrint_LogIn_Final_Activity.this,"please select admin, try finger again" ,Toast.LENGTH_SHORT).show();
+
+                presenter.stopListetingFingerprint();
+        }
 
         Log.i("checkUpdateFinal","2 fingerprint :"+s);
         //getTime
@@ -456,6 +474,8 @@ public class FingerPrint_LogIn_Final_Activity extends AppCompatActivity implemen
                 timeCurrent2 = dateAndTimeNow.substring(14, 16);
                 timeCurrent = timeCurrent + "." + timeCurrent2;
 
+
+
                 //first check if within network.
                 if(userSSID==ssidConstraint){
 
@@ -463,7 +483,7 @@ public class FingerPrint_LogIn_Final_Activity extends AppCompatActivity implemen
 
                     //Toast.makeText(this,"bssid different" ,Toast.LENGTH_LONG).show();
 
-                    presenter.deleteObserver(this);
+                 //   presenter.deleteObserver(this); //here fingerprint wont work anymore
 
                     if(userBSSID==bssidConstraint){
 
@@ -491,6 +511,7 @@ public class FingerPrint_LogIn_Final_Activity extends AppCompatActivity implemen
 
                     if((userLatitude==null || userLongitude==null) || (latitudeConstraint==null || longitudeConstraint==null)){
 
+                        counterFlowHere2++;
                         Log.i("finalCheckFlowHere", "4, ssid different, location NULL, latitude admin:"
                                 + latitudeConstraint+" , user latitude"+ userLatitude);
                         textViewDataLocation.setText("basic flow:"+ counterFlowHere+ " , turn on GPS:"+counterFlowHere2+" , GPS ON:"+ counterFlowHere3);
@@ -500,7 +521,7 @@ public class FingerPrint_LogIn_Final_Activity extends AppCompatActivity implemen
                         //else cannot log in.
                         //
 
-                        counterFlowHere2++;
+
 
                         //statusBarWeSet=false;
 
@@ -508,7 +529,7 @@ public class FingerPrint_LogIn_Final_Activity extends AppCompatActivity implemen
 
 
 
-                            presenter.deleteObserver(this);
+                            //presenter.deleteObserver(this);
 
                             @SuppressLint("WrongConstant") Object sbservice = getSystemService("statusbar");
                             Class<?> statusbarManager = null;
@@ -547,6 +568,10 @@ public class FingerPrint_LogIn_Final_Activity extends AppCompatActivity implemen
 
                     }else {
 
+                        counterFlowHere3++;
+
+                        textViewDataLocation.setText("basic flow:"+ counterFlowHere+ " , turn on GPS:"+counterFlowHere2+" , GPS ON:"+ counterFlowHere3);
+
                         Log.i("finalCheckFlowHere", "5, ssid different, location CHECK, latitude admin:"
                                 + latitudeConstraint+" , user latitude"+ userLatitude);
 
@@ -581,7 +606,7 @@ public class FingerPrint_LogIn_Final_Activity extends AppCompatActivity implemen
 
                             Toast.makeText(this,"distance within provided, distance: "+ distanceOffset,Toast.LENGTH_LONG).show();
 
-                            presenter.deleteObserver(this);
+                           // presenter.deleteObserver(this);
                         }else { //means more than 50 meter.
 
                             Log.i("finalCheckFlowHere", "8, ssid different, location CHECK, OFFSET OUT");
@@ -596,8 +621,10 @@ public class FingerPrint_LogIn_Final_Activity extends AppCompatActivity implemen
 
                             //can apply machine learning for timestamp process.
 
-                            presenter.deleteObserver(this);
+                           // presenter.deleteObserver(this);
                         }
+
+                        presenter.deleteObserver(this);
 
                     }
 
@@ -635,9 +662,10 @@ public class FingerPrint_LogIn_Final_Activity extends AppCompatActivity implemen
 
     @Override
     protected void onResume() {
-        presenter.addObserver(this);
-        statusBarWeSet =true;
+
+   //     statusBarWeSet =true;
         super.onResume();
+        statusBarWeSet=true;
 
 
 
