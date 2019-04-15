@@ -19,6 +19,9 @@ import pub.devrel.easypermissions.AfterPermissionGranted;
 import pub.devrel.easypermissions.EasyPermissions;
 
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.HandlerThread;
+import android.os.Looper;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -174,6 +177,7 @@ class FingerPrintFinal_Presenter extends Observable {
     public void stopListetingFingerprint(){
 
         model_fingerPrint.stopListening();
+        return;
     }
 
     private void returnToRequest(String result) {
@@ -590,6 +594,16 @@ class FingerPrintFinal_Presenter extends Observable {
     @AfterPermissionGranted(REQUEST_LOCATION_PERMISSION)
     public void requestLocationPermission(LocationManager mLocationManager2) {
 
+//        HandlerThread handlerThread = new HandlerThread("myHandlerLocationThread");
+//
+//        handlerThread.start();
+//
+//        Looper looper = handlerThread.getLooper();
+//
+//
+
+
+
         this.mLocationManager = mLocationManager2;
 
         String[] perms = {Manifest.permission.ACCESS_FINE_LOCATION};
@@ -606,7 +620,7 @@ class FingerPrintFinal_Presenter extends Observable {
                 // for ActivityCompat#requestPermissions for more details.
                 return;
             }
-            mLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 5000,
+            mLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 50,
                     5,locationLister = new LocationListener() {
                         @Override
                         public void onLocationChanged(Location location) {
@@ -619,6 +633,8 @@ class FingerPrintFinal_Presenter extends Observable {
                                 remapLocation.put("userLongitude", userLongitude);
 
                                 Log.i("locationListener","11");
+
+
 
                                 setChanged();
                                 notifyObservers();

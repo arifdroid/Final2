@@ -359,8 +359,9 @@ public class RegUser_Activity extends AppCompatActivity implements View.OnClickL
 
         Intent intent = new Intent(RegUser_Activity.this, RegAdmin_Activity.class);
         //intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP); // clear other activity on top of old instance of the activity,
         startActivity(intent);
-        finish();
+        //finish();
     }
 
     private void logOutNow() {
@@ -633,9 +634,11 @@ public class RegUser_Activity extends AppCompatActivity implements View.OnClickL
                             intent1.putExtra("sentAdminName", adminName);
                             intent1.putExtra("sentAdminPhone", adminPhone);
 
+                            //intent1.addFlags(Intent.)
                             startActivity(intent1);
+                            //finish();
 
-                            finish();
+                            //need to disable back button manually.
                         }
 
                     }

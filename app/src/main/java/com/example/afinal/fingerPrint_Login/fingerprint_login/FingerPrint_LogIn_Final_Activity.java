@@ -40,6 +40,8 @@ import java.util.Map;
 import java.util.Observable;
 import java.util.Observer;
 
+// https://stackoverflow.com/questions/8077728/how-to-prevent-the-activity-from-loading-twice-on-pressing-the-button
+
 //introduce fingerprint id here,
 //need observer to watch, if string pull from fragment(sharedpreferences) exist.
 //first instantiate to null
@@ -119,15 +121,41 @@ public class FingerPrint_LogIn_Final_Activity extends AppCompatActivity implemen
     private boolean checkLocationProcess;
     private boolean checkAdminConstraintProcess;
     Method showsb;
+    private boolean statusBarWeSet;
+    private int counterFlowHere;
+    private int counterFlowHere2;
+    private int counterFlowHere3;
+
+    //test program flow.
+
+    private TextView textViewFinalData;
+    private int countFinalFlow;
+
+    private TextView textViewFinalData2;
+    private int countFinalFlow2;
+
+    private TextView textViewDataLocation;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_finger_print__log_in__final_);
 
-    //    userCount =0//;
+        textViewFinalData = findViewById(R.id.textViewFINALDATAID);
+        countFinalFlow=0;
+        textViewFinalData2 = findViewById(R.id.textViewFinalDataID2);
+        countFinalFlow2=0;
 
+        textViewDataLocation = findViewById(R.id.textViewFinalDataLocationiD);
+
+
+    //    userCount =0//;
+        counterFlowHere =0;
+        counterFlowHere2=0;
+        counterFlowHere3=0;
         Log.i("checkFinalFlow : ", " 1 oncreate() fingerprint_main_activity");
+
+        statusBarWeSet = false;
 
         onServerTime_interface = new FingerPrint_LogIn_Final_Activity();
 
@@ -198,6 +226,9 @@ public class FingerPrint_LogIn_Final_Activity extends AppCompatActivity implemen
 
                 //this probably still null
 
+                countFinalFlow2++; //this triggered two times,
+
+                textViewFinalData2.setText("backStackChange: "+countFinalFlow2);
 
                 if(nameUser!=null) {
 
@@ -222,10 +253,11 @@ public class FingerPrint_LogIn_Final_Activity extends AppCompatActivity implemen
                             }
 
                             @Override
-                            public void afterTextChanged(Editable s) {
+                            public void afterTextChanged(Editable s) { //being triggered everytime, this is the problem.
 
 
-
+                                countFinalFlow++;
+                                textViewFinalData.setText("trigerred textchange :"+ countFinalFlow);
 
                                 Log.i("checkFinalFlow : ", " 3 backfragment() aftertextchange");
 
@@ -266,14 +298,16 @@ public class FingerPrint_LogIn_Final_Activity extends AppCompatActivity implemen
                                     Toast.makeText(FingerPrint_LogIn_Final_Activity.this,"please select admin, try finger again" ,Toast.LENGTH_SHORT).show();
 
 
-                                }else {
-
-
-                                    presenter.stopListetingFingerprint(); //cannot stop here
-                                    Log.i("checkFinalFlow : ", " 8 backFragment(), fingerprint need try again");
-
-                                    Toast.makeText(FingerPrint_LogIn_Final_Activity.this,"try fingerprint" ,Toast.LENGTH_SHORT).show();
                                 }
+//                                else {
+//
+////handle here, if return nothing
+//                                    //update(this,"");
+//                                    presenter.stopListetingFingerprint(); //cannot stop here
+//                                    Log.i("checkFinalFlow : ", " 8 backFragment(), fingerprint need try again");
+//
+//                                    Toast.makeText(FingerPrint_LogIn_Final_Activity.this,"try fingerprint" ,Toast.LENGTH_SHORT).show();
+//                                }
 
                             }
                         });
@@ -317,6 +351,7 @@ public class FingerPrint_LogIn_Final_Activity extends AppCompatActivity implemen
     @Override
     public void update(Observable o, Object arg) {
 
+     counterFlowHere++;
         Log.i("checkUpdateFinal","1");
 
     if(o instanceof FingerPrintFinal_Presenter){
@@ -405,7 +440,7 @@ public class FingerPrint_LogIn_Final_Activity extends AppCompatActivity implemen
         }
         //here we process
 
-        if(checkAdminConstraintProcess ==true && checkLocationProcess ==true && dateAndTimeNow!=null && s!=null){ //meaning all data being fetch
+        if(checkAdminConstraintProcess ==true && checkLocationProcess ==true && dateAndTimeNow!=null && s!=null && !s.equals("")){ //meaning all data being fetch
 
 //            if(morningConstraint!=null &&eveningConstraint!=null && dateAndTimeNow!=null && userLongitude!=null && userLatitude!=null
 //        && latitudeConstraint!=null && longitudeConstraint!=null && userBSSID!=null && userSSID!=null
@@ -458,46 +493,57 @@ public class FingerPrint_LogIn_Final_Activity extends AppCompatActivity implemen
 
                         Log.i("finalCheckFlowHere", "4, ssid different, location NULL, latitude admin:"
                                 + latitudeConstraint+" , user latitude"+ userLatitude);
-
-                        Toast.makeText(this,"please turn on GPS",Toast.LENGTH_LONG).show();
+                        textViewDataLocation.setText("basic flow:"+ counterFlowHere+ " , turn on GPS:"+counterFlowHere2+" , GPS ON:"+ counterFlowHere3);
+                       // Toast.makeText(this,"please turn on GPS",Toast.LENGTH_LONG).show();
                         //this is always excuted.
                         //ask user to provide location, turn on GPS.
                         //else cannot log in.
                         //
 
-                        @SuppressLint("WrongConstant") Object sbservice = getSystemService( "statusbar" );
-                        Class<?> statusbarManager = null;
-                        try {
-                            statusbarManager = Class.forName( "android.app.StatusBarManager" );
-                        } catch (ClassNotFoundException e) {
-                            e.printStackTrace();
-                        }
+                        counterFlowHere2++;
 
-                        if (Build.VERSION.SDK_INT >= 17) {
+                        //statusBarWeSet=false;
+
+                        if(statusBarWeSet==false) {
+
+
+
+                            presenter.deleteObserver(this);
+
+                            @SuppressLint("WrongConstant") Object sbservice = getSystemService("statusbar");
+                            Class<?> statusbarManager = null;
                             try {
-                                showsb = statusbarManager.getMethod("expandNotificationsPanel");
-                            } catch (NoSuchMethodException e) {
+                                statusbarManager = Class.forName("android.app.StatusBarManager");
+                            } catch (ClassNotFoundException e) {
                                 e.printStackTrace();
                             }
-                        }
-                        else {
+
+                            if (Build.VERSION.SDK_INT >= 17) {
+                                try {
+                                    showsb = statusbarManager.getMethod("expandNotificationsPanel");
+                                } catch (NoSuchMethodException e) {
+                                    e.printStackTrace();
+                                }
+                            } else {
+                                try {
+                                    showsb = statusbarManager.getMethod("expand");
+                                } catch (NoSuchMethodException e) {
+                                    e.printStackTrace();
+                                }
+                            }
                             try {
-                                showsb = statusbarManager.getMethod("expand");
-                            } catch (NoSuchMethodException e) {
+                                showsb.invoke(sbservice);
+                            } catch (IllegalAccessException e) {
+                                e.printStackTrace();
+                            } catch (InvocationTargetException e) {
                                 e.printStackTrace();
                             }
-                        }
-                        try {
-                            showsb.invoke( sbservice );
-                        } catch (IllegalAccessException e) {
-                            e.printStackTrace();
-                        } catch (InvocationTargetException e) {
-                            e.printStackTrace();
+
                         }
 //                        Intent openIntent = new Intent(Intent)
 
-                        presenter.deleteObserver(this);
-                        onResume(); // restart process?
+                       // presenter.deleteObserver(this);
+                       // onResume(); // restart process?
 
                     }else {
 
@@ -539,6 +585,8 @@ public class FingerPrint_LogIn_Final_Activity extends AppCompatActivity implemen
                         }else { //means more than 50 meter.
 
                             Log.i("finalCheckFlowHere", "8, ssid different, location CHECK, OFFSET OUT");
+
+                            counterFlowHere3++;
 
                             Toast.makeText(this,"distance outside provided "+ distanceOffset,Toast.LENGTH_LONG).show();
 
@@ -587,8 +635,12 @@ public class FingerPrint_LogIn_Final_Activity extends AppCompatActivity implemen
 
     @Override
     protected void onResume() {
-        super.onResume();
         presenter.addObserver(this);
+        statusBarWeSet =true;
+        super.onResume();
+
+
+
     }
 
     @Override

@@ -150,8 +150,10 @@ public class Login_Select_Action_Fragment extends Fragment implements View.OnCli
             case R.id.select_fragment_FloatButton_RegisterUseriD:
 
                 Intent intent = new Intent(getActivity(), RegAdmin_Activity.class);
+
+                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK); //creating new task for registering,
+                //but we dont want user to be able to back.
                 startActivity(intent);
-                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP|Intent.FLAG_ACTIVITY_NEW_TASK);
 
 
 
@@ -162,7 +164,8 @@ public class Login_Select_Action_Fragment extends Fragment implements View.OnCli
 
             Intent intent2 = new Intent(getActivity(), RegAdmin_AsAdmin_Activity.class);
             startActivity(intent2);
-            intent2.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP|Intent.FLAG_ACTIVITY_NEW_TASK);
+            intent2.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK); //creating new task for registering,
+                //but we dont want user to be able to back.
 
 
                 break;

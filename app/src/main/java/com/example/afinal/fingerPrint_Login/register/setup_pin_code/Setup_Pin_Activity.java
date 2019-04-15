@@ -133,11 +133,15 @@ public class Setup_Pin_Activity extends AppCompatActivity {
                 if(autoNext&& countFlow==1) {
 
                     Intent intent3 = new Intent(Setup_Pin_Activity.this,FingerPrint_LogIn_Final_Activity.class);
+
+                    intent3.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP); // clear ac
                     startActivity(intent3);
 
-                   intent3.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                    //we can still go back? after
+
+                   //intent3.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                     //intent3.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP|intent.TASK);
-                    finish();
+                    //finish();
 
                     timer2.cancel();
                 }
