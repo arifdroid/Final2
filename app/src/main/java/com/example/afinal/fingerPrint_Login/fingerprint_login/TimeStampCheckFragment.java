@@ -53,7 +53,7 @@ public class TimeStampCheckFragment extends DialogFragment {
 
         String question = getArguments().getString("question", "Enter Name?");
         getDialog().setTitle(question);
-
+//a
         textViewAsk.requestFocus(); //what is this?
 
         getDialog().getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE);
