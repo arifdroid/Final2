@@ -1,5 +1,6 @@
 package com.example.afinal.fingerPrint_Login.fingerprint_login;
 
+import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
@@ -15,6 +16,7 @@ import androidx.fragment.app.FragmentManager;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationManager;
 import android.net.wifi.WifiInfo;
@@ -69,14 +71,14 @@ public class FingerPrint_LogIn_Final_Activity extends AppCompatActivity implemen
 
     //after log in register user data timestamp directly.
 
-    public String globalAdminNameHere ; //"ariff";
+    public String globalAdminNameHere; //"ariff";
     public String globalAdminPhoneHere;//"+60190";
 
     private FirebaseFirestore instance = FirebaseFirestore.getInstance();
 
     private CollectionReference collectionReferenceRating
             = instance.collection("all_admin_doc_collections")
-            .document(globalAdminNameHere+globalAdminPhoneHere+"_doc").collection("all_employee_thisAdmin_collection");
+            .document(globalAdminNameHere + globalAdminPhoneHere + "_doc").collection("all_employee_thisAdmin_collection");
 
 
     //cloud function with time value
@@ -137,24 +139,26 @@ public class FingerPrint_LogIn_Final_Activity extends AppCompatActivity implemen
 
     private TextView textViewDataLocation;
     private DocumentReference documentReference;
+    private int countUserverified;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_finger_print__log_in__final_);
 
+        countUserverified = 0;
         textViewFinalData = findViewById(R.id.textViewFINALDATAID);
-        countFinalFlow=0;
+        countFinalFlow = 0;
         textViewFinalData2 = findViewById(R.id.textViewFinalDataID2);
-        countFinalFlow2=0;
+        countFinalFlow2 = 0;
 
         textViewDataLocation = findViewById(R.id.textViewFinalDataLocationiD);
 
 
-    //    userCount =0//;
-        counterFlowHere =0;
-        counterFlowHere2=0;
-        counterFlowHere3=0;
+        //    userCount =0//;
+        counterFlowHere = 0;
+        counterFlowHere2 = 0;
+        counterFlowHere3 = 0;
         Log.i("checkFinalFlow : ", " 1 oncreate() fingerprint_main_activity");
 
         statusBarWeSet = 0;
@@ -164,12 +168,12 @@ public class FingerPrint_LogIn_Final_Activity extends AppCompatActivity implemen
         dayNow = null;
         dateAndTimeNow = null;
         dataPulled = false;
-        user_StreetName =null;
+        user_StreetName = null;
 
-        globalAdminPhoneHere =null;
-        globalAdminNameHere=null;
+        globalAdminPhoneHere = null;
+        globalAdminNameHere = null;
 
-        presenter = new FingerPrintFinal_Presenter(this, (Activity)FingerPrint_LogIn_Final_Activity.this);
+        presenter = new FingerPrintFinal_Presenter(this, (Activity) FingerPrint_LogIn_Final_Activity.this);
         Log.i("checkFinalFlow : ", " 2 oncreate() fingerprint_main_activity, after presenter Constructor()");
 
         presenter.addObserver(this);
@@ -201,7 +205,7 @@ public class FingerPrint_LogIn_Final_Activity extends AppCompatActivity implemen
         Log.i("checkFinalFlow : ", " 1 oncreate() fingerprint_main_activity");
 
 
-        timeStampthis= 0;
+        timeStampthis = 0;
 
         nameUser = null;
         phoneUser = null;
@@ -219,7 +223,6 @@ public class FingerPrint_LogIn_Final_Activity extends AppCompatActivity implemen
         fragment = new Login_Select_Action_Fragment();
 
 
-
         getSupportFragmentManager().addOnBackStackChangedListener(new FragmentManager.OnBackStackChangedListener() {
 
             @Override
@@ -232,16 +235,15 @@ public class FingerPrint_LogIn_Final_Activity extends AppCompatActivity implemen
                 //this probably still null
 
 
-
                 countFinalFlow2++; //this triggered two times,
 
-                textViewFinalData2.setText("backStackChange: "+countFinalFlow2);
+                textViewFinalData2.setText("backStackChange: " + countFinalFlow2);
 
-                if(nameUser!=null) {
+                if (nameUser != null) {
 
-                    Log.i("checkFinalFlow : ", " 7 backstackFragment() activity, nameUser :"+nameUser +" success");
+                    Log.i("checkFinalFlow : ", " 7 backstackFragment() activity, nameUser :" + nameUser + " success");
 
-                    if(nameUser!="") {
+                    if (nameUser != "") {
                         textView.setText("admin detected, fingerprint checkin now with server..");
 
                         Log.i("checkFinalFlow : ", " 8 backstackFragment() activity, before fingerprint");
@@ -319,7 +321,7 @@ public class FingerPrint_LogIn_Final_Activity extends AppCompatActivity implemen
 //                            }
 //                        });
                     }
-                }else {
+                } else {
 
                     Log.i("checkFinalFlow : ", " 9 backFragment(), waiting for fingerprint ");
 
@@ -332,25 +334,24 @@ public class FingerPrint_LogIn_Final_Activity extends AppCompatActivity implemen
         });
 
 
-
-
     }
-
 
 
     @Override
     public void onClick(View v) {
 
         //reset back status
-       // nameUser="";
-        nameUser=null;
+        // nameUser="";
+        nameUser = null;
+        checkLocationProcess = false;
 
+        //phoneAdminConstraint=null;
         backColor.setAlpha(0.05f);
 
         getSupportFragmentManager().beginTransaction()
-        .replace(R.id.frameID,fragment)
-        .addToBackStack("")
-        .commit();
+                .replace(R.id.frameID, fragment)
+                .addToBackStack("")
+                .commit();
 
 
     }
@@ -358,93 +359,126 @@ public class FingerPrint_LogIn_Final_Activity extends AppCompatActivity implemen
     @Override
     public void update(Observable o, Object arg) {
 
-     counterFlowHere++;
-        Log.i("checkUpdateFinal","1");
+        counterFlowHere++;
+        Log.i("checkUpdateFinal", "1");
 
-    if(o instanceof FingerPrintFinal_Presenter){
+        if (o instanceof FingerPrintFinal_Presenter) {
 
-        String s = ((FingerPrintFinal_Presenter) o).getFinalStringResult();
-        textView.setText(s); //textview is null, since fingerprint do not return result, update always running.
+            String s = ((FingerPrintFinal_Presenter) o).getFinalStringResult();
+            textView.setText(s); //textview is null, since fingerprint do not return result, update always running.
 
-        if(s.equals("success verified")) {
+            if (s.equals("success verified")) {
 
-            presenter.getCurrent_User_Admin_Server_Value(nameUser,phoneUser,globalAdminNameHere,globalAdminPhoneHere);
+                countUserverified++;
 
-        }else if(s.equals("try again")){
+                Log.i("wherelocationRegister :", "FLOW 1, countVerified:" + countUserverified + " , userLatitude: " + userLatitude);
 
-                                    Log.i("checkFinalFlow : ", " 7 backFragment(), try again fingerprint ");
+                presenter.getCurrent_User_Admin_Server_Value(nameUser, phoneUser, globalAdminNameHere, globalAdminPhoneHere);
 
-                                    Toast.makeText(FingerPrint_LogIn_Final_Activity.this,"please select admin, try finger again" ,Toast.LENGTH_SHORT).show();
+            } else if (s.equals("try again")) {
+                // userLongitude=null;
+
+                Log.i("checkFinalFlow : ", " 7 backFragment(), try again fingerprint ");
+
+                Toast.makeText(FingerPrint_LogIn_Final_Activity.this, "please select admin, try finger again", Toast.LENGTH_SHORT).show();
                 presenter.removeLocationNow();
                 presenter.stopListetingFingerprint();
-        }
-
-        Log.i("checkUpdateFinal","2 fingerprint :"+s);
-        //getTime
-        String time = ((FingerPrintFinal_Presenter) o).getDateAndTimeNow(); //problem if, always updating,
-
-        dateAndTimeNow=time;
-
-        Log.i("checkUpdateFinal"," time :"+time);
-        //getFireStore
-        Map<String, Object> remapAdminConstraint = ((FingerPrintFinal_Presenter) o).getReturnMap();
-        Log.i("checkUpdateFinal","3 remapAdminConstraint :"+ remapAdminConstraint);
-        if(remapAdminConstraint!=null) {
-
-            for (Map.Entry<String, Object> kk : remapAdminConstraint.entrySet()) {
-
-                if (kk.getKey().equals("location")) {
-
-                    locationConstraint = kk.getValue().toString();
-                }
-                if (kk.getKey().equals("latitude")) {
-                    latitudeConstraint = kk.getValue().toString();
-                }
-
-                if (kk.getKey().equals("longitude")) {
-
-                    longitudeConstraint = kk.getValue().toString();
-                }
-                if (kk.getKey().equals("morning_constraint")) {
-                    morningConstraint = kk.getValue().toString();
-                }
-
-                if (kk.getKey().equals("evening_constraint")) {
-
-                    eveningConstraint = kk.getValue().toString();
-                }
-                if (kk.getKey().equals("admin_street_name")) {
-                    streetConstraint = kk.getValue().toString();
-                }
-
-                if (kk.getKey().equals("bssid")) {
-
-                    bssidConstraint = kk.getValue().toString();
-                }
-                if (kk.getKey().equals("ssid")) {
-                    ssidConstraint = kk.getValue().toString();
-                }
-                if (kk.getKey().equals("phone")) {
-                    phoneAdminConstraint = kk.getValue().toString();
-                }
-
-
-
             }
 
-            Log.i("checkUpdateFinal","4 remapAdminConstraint :"+ remapAdminConstraint + ", ssid constraint :"+ssidConstraint);
-            checkAdminConstraintProcess = true;
+            Log.i("checkUpdateFinal", "2 fingerprint :" + s);
+            //getTime
+            String time = ((FingerPrintFinal_Presenter) o).getDateAndTimeNow(); //problem if, always updating,
 
-        }
-        //getLocation
+            dateAndTimeNow = time;
 
-        Map<String,Object> remapLocation = ((FingerPrintFinal_Presenter) o).getRemapLocation();
-        Log.i("checkUpdateFinal","5 remapLocation :"+ remapLocation );
-        if(remapLocation!=null) {
-            for (Map.Entry<String, Object> kk : remapLocation.entrySet()) {
+            Log.i("checkUpdateFinal", " time :" + time);
+            //getFireStore
+            Map<String, Object> remapAdminConstraint = ((FingerPrintFinal_Presenter) o).getReturnMap();
+            Log.i("checkUpdateFinal", "3 remapAdminConstraint :" + remapAdminConstraint);
 
-                if (kk.getKey().equals("userLatitude")) {
+            Log.i("wherelocationRegister :", "FLOW 2, countVerified:" + countUserverified + " , userLatitude: " + userLatitude);
+            if (remapAdminConstraint != null) {
+
+                for (Map.Entry<String, Object> kk : remapAdminConstraint.entrySet()) {
+
+                    if (kk.getKey().equals("location")) {
+
+                        locationConstraint = kk.getValue().toString();
+                    }
+                    if (kk.getKey().equals("latitude")) {
+                        latitudeConstraint = kk.getValue().toString();
+                    }
+
+                    if (kk.getKey().equals("longitude")) {
+
+                        longitudeConstraint = kk.getValue().toString();
+                    }
+                    if (kk.getKey().equals("morning_constraint")) {
+                        morningConstraint = kk.getValue().toString();
+                    }
+
+                    if (kk.getKey().equals("evening_constraint")) {
+
+                        eveningConstraint = kk.getValue().toString();
+                    }
+                    if (kk.getKey().equals("admin_street_name")) {
+                        streetConstraint = kk.getValue().toString();
+                    }
+
+                    if (kk.getKey().equals("bssid")) {
+
+
+                        bssidConstraint = kk.getValue().toString();
+                    }
+                    if (kk.getKey().equals("ssid")) {
+                        ssidConstraint = kk.getValue().toString();
+                    }
+                    if (kk.getKey().equals("phone")) {
+                        phoneAdminConstraint = kk.getValue().toString();
+                    }
+
+                    Log.i("wherelocationRegister :", "FLOW 3, countVerified:" + countUserverified + " , userLatitude: " + userLatitude);
+
+                }
+
+                Log.i("checkUpdateFinal", "4 remapAdminConstraint :" + remapAdminConstraint + ", ssid constraint :" + ssidConstraint);
+                checkAdminConstraintProcess = true;
+
+            }
+            //getLocation
+
+            Map<String, Object> remapLocation = ((FingerPrintFinal_Presenter) o).getRemapLocation();
+            Log.i("checkUpdateFinal", "5 remapLocation :" + remapLocation);
+            if (remapLocation != null) {
+
+                Log.i("wherelocationRegister :", "FLOW 4, countVerified:" + countUserverified + " , userLatitude: " + userLatitude);
+
+                for (Map.Entry<String, Object> kk : remapLocation.entrySet()) {
+
+                    if (kk.getKey().equals("userLatitude")) {
+
+                        String lastLatitude = "";
+                        if (mLocationManager != null) {
+                            if (checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                                // TODO: Consider calling
+                                //    Activity#requestPermissions
+                                // here to request the missing permissions, and then overriding
+                                //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+                                //                                          int[] grantResults)
+                                // to handle the case where the user grants the permission. See the documentation
+                                // for Activity#requestPermissions for more details.
+                                return;
+                            }
+                            lastLatitude = String.valueOf(mLocationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER).getLatitude());
+
+                    }
+                    //if(mLocationManager.getLastKnownLocation())
                     userLatitude = kk.getValue().toString();
+
+                   if(userLatitude.equals(lastLatitude)){
+
+                       userLatitude="0";
+                   }
                 }
 
 
@@ -456,11 +490,12 @@ public class FingerPrint_LogIn_Final_Activity extends AppCompatActivity implemen
 
             Log.i("c","6 remapLocation :"+ remapLocation + " latite :"+ userLatitude );
 
+            Log.i("wherelocationRegister :","FLOW 6, countVerified:"+countUserverified+" , userLatitude: "+userLatitude);
             checkLocationProcess= true;
         }
         //here we process
 
-        if(checkAdminConstraintProcess ==true && checkLocationProcess ==true && dateAndTimeNow!=null && !dateAndTimeNow.equals("") && s!=null && !s.equals("")){ //meaning all data being fetch
+        if(checkAdminConstraintProcess ==true && checkLocationProcess ==true && dateAndTimeNow!=null && !dateAndTimeNow.equals("") && s.equals("success verified")){ //meaning all data being fetch
 
 //            if(morningConstraint!=null &&eveningConstraint!=null && dateAndTimeNow!=null && userLongitude!=null && userLatitude!=null
 //        && latitudeConstraint!=null && longitudeConstraint!=null && userBSSID!=null && userSSID!=null
@@ -468,12 +503,16 @@ public class FingerPrint_LogIn_Final_Activity extends AppCompatActivity implemen
 
             Log.i("finalCheckFlowHere", "1");
 
+            Log.i("wherelocationRegister :","FLOW 6, countVerified:"+countUserverified+" , userLatitude: "+userLatitude);
+
             if(phoneAdminConstraint!=null&& !phoneAdminConstraint.equals("")){ //means the right admin have finish downloaded, but might some case, phone data retrieve, but not others?
                                             //MAYBE
                 Log.i("finalCheckFlowHere", "2, phone admin pull:" + phoneAdminConstraint);
 
                 //first check if within network.
                 if(userSSID.equals(ssidConstraint)){
+
+                    Log.i("wherelocationRegister :","FLOW 7, countVerified:"+countUserverified+" , userLatitude: "+userLatitude);
 
                     Log.i("finalCheckFlowHere", "2, admin ssid:" + ssidConstraint+" , user ssid"+ userSSID);
 
@@ -491,11 +530,15 @@ public class FingerPrint_LogIn_Final_Activity extends AppCompatActivity implemen
 
                        // Toast.makeText(this,"bssid different, bssid "+userBSSID ,Toast.LENGTH_LONG).show();
                        // presenter.deleteObserver(this);
+
+                        Log.i("wherelocationRegister :","FLOW 8, countVerified:"+countUserverified+" , userLatitude: "+userLatitude);
                         loginWithLocation();
 
                     }
 
                 }else { //if outside wifi network. use location instead
+
+                    Log.i("wherelocationRegister :","FLOW 9, countVerified:"+countUserverified+" , userLatitude: "+userLatitude);
 
 
                     Log.i("finalCheckFlowHere", "3, ssid different, location check, latitude admin:"
@@ -532,8 +575,11 @@ public class FingerPrint_LogIn_Final_Activity extends AppCompatActivity implemen
 
     private void loginWithLocation(){
 
+        Log.i("wherelocationRegister :","FLOW 9, countVerified:"+countUserverified+" , userLatitude: "+userLatitude);
+
         if(userLatitude==null || userLongitude==null||latitudeConstraint==null || longitudeConstraint==null
-                ||userLatitude.equals("")||userLongitude.equals("")||latitudeConstraint.equals("")||longitudeConstraint.equals("")){
+                ||userLatitude.equals("")||userLongitude.equals("")||latitudeConstraint.equals("")||longitudeConstraint.equals("")||userLatitude.equals("0"))
+        {
 
             counterFlowHere2++;
             Log.i("finalCheckFlowHere", "4, ssid different, location NULL, latitude admin:"
@@ -544,6 +590,8 @@ public class FingerPrint_LogIn_Final_Activity extends AppCompatActivity implemen
             //ask user to provide location, turn on GPS.
             //else cannot log in.
             //
+
+            Log.i("wherelocationRegister :","FLOW 10, countVerified:"+countUserverified+" , userLatitude: "+userLatitude);
 
             if(counterFlowHere2==50){
                 Toast.makeText(this,"GPS do not work under building, please find better spot, near window",Toast.LENGTH_LONG).show();
@@ -603,6 +651,8 @@ public class FingerPrint_LogIn_Final_Activity extends AppCompatActivity implemen
 
             counterFlowHere3++;
 
+            Log.i("wherelocationRegister :","FLOW 10, countVerified:"+countUserverified+" , userLatitude: "+userLatitude);
+
             textViewDataLocation.setText("basic flow:"+ counterFlowHere+ " , turn on GPS:"+counterFlowHere2+" , GPS ON:"+ counterFlowHere3);
 
             Log.i("finalCheckFlowHere", "5, ssid different, location CHECK, latitude admin:"
@@ -611,36 +661,52 @@ public class FingerPrint_LogIn_Final_Activity extends AppCompatActivity implemen
             presenter.removeLocationNow(); //need check here, if location got zero updated before process
 
             //if location provided, process, and check with admin
-
-            Double userLatitudeDouble = Double.valueOf(userLatitude);
-            Double userLongitudeDouble = Double.valueOf(userLongitude);
-
-            Double adminLatitude = Double.valueOf(latitudeConstraint);
-            Double adminLongitude = Double.valueOf(longitudeConstraint);
-
-            Location user = new Location("point User");
-
-            user.setLatitude(userLatitudeDouble);
-            user.setLongitude(userLongitudeDouble);
-
+            Location  user= new Location("point User");
             Location admin = new Location("point Admin");
-            admin.setLongitude(adminLongitude);
-            admin.setLatitude(adminLatitude);
+            if(userLatitude!=null) {
+
+                Log.i("wherelocationRegister :","FLOW 11, countVerified:"+countUserverified+" , userLatitude: "+userLatitude);
+
+                Double userLatitudeDouble = Double.valueOf(userLatitude);
+                Double userLongitudeDouble = Double.valueOf(userLongitude);
+
+                Double adminLatitude = Double.valueOf(latitudeConstraint);
+                Double adminLongitude = Double.valueOf(longitudeConstraint);
+
+
+
+                user.setLatitude(userLatitudeDouble);
+                user.setLongitude(userLongitudeDouble);
+
+
+                admin.setLongitude(adminLongitude);
+                admin.setLatitude(adminLatitude);
+            }
 
             Log.i("finalCheckFlowHere", "6, ssid different, location CHECK, latitude admin:"
                     + latitudeConstraint+" , user latitude"+ userLatitude);
 
             float distanceOffset = user.distanceTo(admin);
 
-            if(distanceOffset<=50){  //assume 50 is 50 meter.
+            if(distanceOffset<=150){  //assume 50 is 50 meter.
                 //here can process ask to stamp.
+
+                Log.i("wherelocationRegister :","FLOW 12, countVerified:"+countUserverified+" , userLatitude: "+userLatitude);
 
                 Log.i("finalCheckFlowHere", "7, ssid different, location CHECK, OFFSET RIGHT");
 
                 Toast.makeText(this,"distance within provided, distance: "+ distanceOffset,Toast.LENGTH_LONG).show();
 
+                setUserTimeStamp(globalAdminNameHere,globalAdminPhoneHere,nameUser,phoneUser,dateAndTimeNow,userLatitude,userLongitude);
+
+                userLatitude=null;
+
+                presenter.removeLocationNow();
+
                 // presenter.deleteObserver(this);
             }else { //means more than 50 meter.
+
+                Log.i("wherelocationRegister :","FLOW 13, countVerified:"+countUserverified+" , userLatitude: "+userLatitude);
 
                 Log.i("finalCheckFlowHere", "8, ssid different, location CHECK, OFFSET OUT");
 
@@ -657,7 +723,16 @@ public class FingerPrint_LogIn_Final_Activity extends AppCompatActivity implemen
                 // presenter.deleteObserver(this);
             }
 
+            Log.i("wherelocationRegister :","FLOW 14, countVerified:"+countUserverified+" , userLatitude: "+userLatitude);
+
             presenter.deleteObserver(this);
+            //after delete,
+            nameUser=null;
+            userLatitude=null;
+            phoneAdminConstraint=null;
+            locationConstraint=null;
+           // presenter.setRemapLocation(null);
+
 
         }
 
@@ -665,26 +740,32 @@ public class FingerPrint_LogIn_Final_Activity extends AppCompatActivity implemen
 
     }
 
-    private boolean setUserTimeStamp(){
+    private void setUserTimeStamp(String adminName,String adminPhone,String userName,String userPhone,String dateAndTimeNow2, String userLatitude2,String userLongitude2){
 
         //need to check morning constraint.
         //with fragment?
 
+        //we passed all data, then reset all back to null. to avoid manipulation.
+
+        Log.i("wherelocationRegister :","FLOW 15, countVerified:"+countUserverified+" , userLatitude: "+userLatitude);
+
         documentReference = FirebaseFirestore.getInstance().collection("all_admin_doc_collections")
-                .document(globalAdminNameHere+globalAdminPhoneHere+"doc").collection("all_employee_thisAdmin_collection")
-                .document(nameUser+phoneUser+"doc");
+                .document(adminName+adminPhone+"doc").collection("all_employee_thisAdmin_collection")
+                .document(userName+userPhone+"doc");
 
-
-        timeCurrent = dateAndTimeNow.substring(11, 13);      //process time current first, by server
-        timeCurrent2 = dateAndTimeNow.substring(14, 16);
-        timeCurrent = timeCurrent + "." + timeCurrent2;
-
-
+        dayNow = dateAndTimeNow2.substring(0,3);
+        timeCurrent = dateAndTimeNow2.substring(11, 13);      //process time current first, by server
+        timeCurrent2 = dateAndTimeNow2.substring(14, 16);
+        timeCurrent = timeCurrent + "." + timeCurrent2; //this output current time.
 
 
 
 
-        return false;
+        userLatitude=null;
+        userLongitude=null;
+
+
+        return;
     }
 
     @Override

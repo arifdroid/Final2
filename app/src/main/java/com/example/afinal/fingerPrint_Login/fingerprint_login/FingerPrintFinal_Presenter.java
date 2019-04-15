@@ -577,6 +577,10 @@ class FingerPrintFinal_Presenter extends Observable {
         return returnMap;
     }
 
+    public void setRemapLocation(Map<String,Object> kk){
+        this.remapLocation=kk;
+    }
+
     public Map<String, Object> getRemapLocation() {
         Log.i("checkLocOur","2 return" + remapLocation);
         return remapLocation;
@@ -621,12 +625,19 @@ class FingerPrintFinal_Presenter extends Observable {
                 // for ActivityCompat#requestPermissions for more details.
                 return;
             }
+
+            //mLocationManager.requestSing
             mLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 50,
-                    5,locationLister = new LocationListener() {
+                    1,locationLister = new LocationListener() {
                         @Override
                         public void onLocationChanged(Location location) {
+                            //we want to avoid pulling old data.
 
+                           // Log.i("wherelocationRegister :","FLOW 99,"+ ", latitude listener: "+location.getLatitude());
                             if(location!=null) {
+
+                                Log.i("wherelocationRegister :","FLOW 88,"+ ", latitude listener: "+location.getLatitude());
+
                                 String userLatitude = String.valueOf(location.getLatitude());
                                 String userLongitude = String.valueOf(location.getLongitude());
 
