@@ -578,6 +578,7 @@ class FingerPrintFinal_Presenter extends Observable {
     }
 
     public Map<String, Object> getRemapLocation() {
+        Log.i("checkLocOur","2 return" + remapLocation);
         return remapLocation;
     }
 

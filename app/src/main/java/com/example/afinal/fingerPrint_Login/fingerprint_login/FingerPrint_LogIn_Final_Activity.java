@@ -31,6 +31,7 @@ import android.widget.Toast;
 
 import com.example.afinal.R;
 import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.lang.reflect.InvocationTargetException;
@@ -121,7 +122,7 @@ public class FingerPrint_LogIn_Final_Activity extends AppCompatActivity implemen
     private boolean checkLocationProcess;
     private boolean checkAdminConstraintProcess;
     Method showsb;
-    private boolean statusBarWeSet;
+    private int statusBarWeSet;
     private int counterFlowHere;
     private int counterFlowHere2;
     private int counterFlowHere3;
@@ -135,6 +136,7 @@ public class FingerPrint_LogIn_Final_Activity extends AppCompatActivity implemen
     private int countFinalFlow2;
 
     private TextView textViewDataLocation;
+    private DocumentReference documentReference;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -155,7 +157,7 @@ public class FingerPrint_LogIn_Final_Activity extends AppCompatActivity implemen
         counterFlowHere3=0;
         Log.i("checkFinalFlow : ", " 1 oncreate() fingerprint_main_activity");
 
-        statusBarWeSet = false;
+        statusBarWeSet = 0;
 
         onServerTime_interface = new FingerPrint_LogIn_Final_Activity();
 
@@ -373,7 +375,7 @@ public class FingerPrint_LogIn_Final_Activity extends AppCompatActivity implemen
                                     Log.i("checkFinalFlow : ", " 7 backFragment(), try again fingerprint ");
 
                                     Toast.makeText(FingerPrint_LogIn_Final_Activity.this,"please select admin, try finger again" ,Toast.LENGTH_SHORT).show();
-
+                presenter.removeLocationNow();
                 presenter.stopListetingFingerprint();
         }
 
@@ -452,13 +454,13 @@ public class FingerPrint_LogIn_Final_Activity extends AppCompatActivity implemen
 
             }
 
-            Log.i("checkUpdateFinal","6 remapLocation :"+ remapLocation + " latite :"+ userLatitude );
+            Log.i("c","6 remapLocation :"+ remapLocation + " latite :"+ userLatitude );
 
             checkLocationProcess= true;
         }
         //here we process
 
-        if(checkAdminConstraintProcess ==true && checkLocationProcess ==true && dateAndTimeNow!=null && s!=null && !s.equals("")){ //meaning all data being fetch
+        if(checkAdminConstraintProcess ==true && checkLocationProcess ==true && dateAndTimeNow!=null && !dateAndTimeNow.equals("") && s!=null && !s.equals("")){ //meaning all data being fetch
 
 //            if(morningConstraint!=null &&eveningConstraint!=null && dateAndTimeNow!=null && userLongitude!=null && userLatitude!=null
 //        && latitudeConstraint!=null && longitudeConstraint!=null && userBSSID!=null && userSSID!=null
@@ -466,18 +468,12 @@ public class FingerPrint_LogIn_Final_Activity extends AppCompatActivity implemen
 
             Log.i("finalCheckFlowHere", "1");
 
-            if(phoneAdminConstraint!=null){ //means the right admin have finish downloaded, but might some case, phone data retrieve, but not others?
+            if(phoneAdminConstraint!=null&& !phoneAdminConstraint.equals("")){ //means the right admin have finish downloaded, but might some case, phone data retrieve, but not others?
                                             //MAYBE
                 Log.i("finalCheckFlowHere", "2, phone admin pull:" + phoneAdminConstraint);
 
-                timeCurrent = dateAndTimeNow.substring(11, 13);      //process time current first, by server
-                timeCurrent2 = dateAndTimeNow.substring(14, 16);
-                timeCurrent = timeCurrent + "." + timeCurrent2;
-
-
-
                 //first check if within network.
-                if(userSSID==ssidConstraint){
+                if(userSSID.equals(ssidConstraint)){
 
                     Log.i("finalCheckFlowHere", "2, admin ssid:" + ssidConstraint+" , user ssid"+ userSSID);
 
@@ -485,17 +481,17 @@ public class FingerPrint_LogIn_Final_Activity extends AppCompatActivity implemen
 
                  //   presenter.deleteObserver(this); //here fingerprint wont work anymore
 
-                    if(userBSSID==bssidConstraint){
+                    if(userBSSID.equals(bssidConstraint)){
 
                         Toast.makeText(this,"bssid same, ssid :"+ userSSID ,Toast.LENGTH_LONG).show();
 
-
+                        presenter.deleteObserver(this);
 
                     }else { //if bssid different might need to check other bssid available by admin.
 
-                        Toast.makeText(this,"bssid different, bssid "+userBSSID ,Toast.LENGTH_LONG).show();
-
-
+                       // Toast.makeText(this,"bssid different, bssid "+userBSSID ,Toast.LENGTH_LONG).show();
+                       // presenter.deleteObserver(this);
+                        loginWithLocation();
 
                     }
 
@@ -505,130 +501,19 @@ public class FingerPrint_LogIn_Final_Activity extends AppCompatActivity implemen
                     Log.i("finalCheckFlowHere", "3, ssid different, location check, latitude admin:"
                             + latitudeConstraint+" , user latitude"+ userLatitude);
 
+                    Log.i("finalCheckNetwork", "2, ssid different, ssidUser:"
+                            + userSSID+" , ssidAdmin: "+ ssidConstraint);
+
+                    Log.i("finalCheckNetwork", "3, ssid different, bssidUser:"
+                            + userBSSID+" , bssidConstraint: "+ bssidConstraint);
+
+
                     //presenter.
 
                     //so process location., //if user dont provide location, ask user to provide.
 
-                    if((userLatitude==null || userLongitude==null) || (latitudeConstraint==null || longitudeConstraint==null)){
+                    loginWithLocation();
 
-                        counterFlowHere2++;
-                        Log.i("finalCheckFlowHere", "4, ssid different, location NULL, latitude admin:"
-                                + latitudeConstraint+" , user latitude"+ userLatitude);
-                        textViewDataLocation.setText("basic flow:"+ counterFlowHere+ " , turn on GPS:"+counterFlowHere2+" , GPS ON:"+ counterFlowHere3);
-                       // Toast.makeText(this,"please turn on GPS",Toast.LENGTH_LONG).show();
-                        //this is always excuted.
-                        //ask user to provide location, turn on GPS.
-                        //else cannot log in.
-                        //
-
-
-
-                        //statusBarWeSet=false;
-
-                        if(statusBarWeSet==false) {
-
-
-
-                            //presenter.deleteObserver(this);
-
-                            @SuppressLint("WrongConstant") Object sbservice = getSystemService("statusbar");
-                            Class<?> statusbarManager = null;
-                            try {
-                                statusbarManager = Class.forName("android.app.StatusBarManager");
-                            } catch (ClassNotFoundException e) {
-                                e.printStackTrace();
-                            }
-
-                            if (Build.VERSION.SDK_INT >= 17) {
-                                try {
-                                    showsb = statusbarManager.getMethod("expandNotificationsPanel");
-                                } catch (NoSuchMethodException e) {
-                                    e.printStackTrace();
-                                }
-                            } else {
-                                try {
-                                    showsb = statusbarManager.getMethod("expand");
-                                } catch (NoSuchMethodException e) {
-                                    e.printStackTrace();
-                                }
-                            }
-                            try {
-                                showsb.invoke(sbservice);
-                            } catch (IllegalAccessException e) {
-                                e.printStackTrace();
-                            } catch (InvocationTargetException e) {
-                                e.printStackTrace();
-                            }
-
-                        }
-//                        Intent openIntent = new Intent(Intent)
-
-                       // presenter.deleteObserver(this);
-                       // onResume(); // restart process?
-
-                    }else {
-
-                        counterFlowHere3++;
-
-                        textViewDataLocation.setText("basic flow:"+ counterFlowHere+ " , turn on GPS:"+counterFlowHere2+" , GPS ON:"+ counterFlowHere3);
-
-                        Log.i("finalCheckFlowHere", "5, ssid different, location CHECK, latitude admin:"
-                                + latitudeConstraint+" , user latitude"+ userLatitude);
-
-                        presenter.removeLocationNow(); //need check here, if location got zero updated before process
-
-                        //if location provided, process, and check with admin
-
-                        Double userLatitudeDouble = Double.valueOf(userLatitude);
-                        Double userLongitudeDouble = Double.valueOf(userLongitude);
-
-                        Double adminLatitude = Double.valueOf(latitudeConstraint);
-                        Double adminLongitude = Double.valueOf(longitudeConstraint);
-
-                        Location user = new Location("point User");
-
-                        user.setLatitude(userLatitudeDouble);
-                        user.setLongitude(userLongitudeDouble);
-
-                        Location admin = new Location("point Admin");
-                        admin.setLongitude(adminLongitude);
-                        admin.setLatitude(adminLatitude);
-
-                        Log.i("finalCheckFlowHere", "6, ssid different, location CHECK, latitude admin:"
-                                + latitudeConstraint+" , user latitude"+ userLatitude);
-
-                        float distanceOffset = user.distanceTo(admin);
-
-                        if(distanceOffset<=50){  //assume 50 is 50 meter.
-                            //here can process ask to stamp.
-
-                            Log.i("finalCheckFlowHere", "7, ssid different, location CHECK, OFFSET RIGHT");
-
-                            Toast.makeText(this,"distance within provided, distance: "+ distanceOffset,Toast.LENGTH_LONG).show();
-
-                           // presenter.deleteObserver(this);
-                        }else { //means more than 50 meter.
-
-                            Log.i("finalCheckFlowHere", "8, ssid different, location CHECK, OFFSET OUT");
-
-                            counterFlowHere3++;
-
-                            Toast.makeText(this,"distance outside provided "+ distanceOffset,Toast.LENGTH_LONG).show();
-
-                            //recorded location to admin, and send notification to admin.
-                            //after that ask to time stamp
-                            //can apply machine learning. //detect location manipulation.
-
-                            //can apply machine learning for timestamp process.
-
-                           // presenter.deleteObserver(this);
-                        }
-
-                        presenter.deleteObserver(this);
-
-                    }
-
-                    //if(lo)
 
 
                 }
@@ -640,24 +525,166 @@ public class FingerPrint_LogIn_Final_Activity extends AppCompatActivity implemen
  //       }
         }
 
-
-
-        Log.i("checkAllValue: ", "[CHECK] 1. ssid Admin: " + ssidConstraint + ", 2.ssid user: " + userSSID
-                + ", 3. bssid Admin: " + bssidConstraint + ", 4. bssid User " + userBSSID +
-                ", 5.longitude admin: " + longitudeConstraint + ", 6.longitude user: " + userLongitude +
-                ". 7.latitude admin" + latitudeConstraint + ", 8.latitude user" + userLatitude +
-                ". 9.morning admin" + morningConstraint + ", 10.morning user" + timeCurrent +
-                ". 11.evening admin" + eveningConstraint + ", 10.morning user" + timeCurrent);
-
-
-        //we can process data here ,
-
-        //need to stop listening at some point.
-
-        //check within network admin provided.
-        //if not, check location admin provided.
     }
 
+
+    }
+
+    private void loginWithLocation(){
+
+        if(userLatitude==null || userLongitude==null||latitudeConstraint==null || longitudeConstraint==null
+                ||userLatitude.equals("")||userLongitude.equals("")||latitudeConstraint.equals("")||longitudeConstraint.equals("")){
+
+            counterFlowHere2++;
+            Log.i("finalCheckFlowHere", "4, ssid different, location NULL, latitude admin:"
+                    + latitudeConstraint+" , user latitude"+ userLatitude);
+            textViewDataLocation.setText("basic flow:"+ counterFlowHere+ " , turn on GPS:"+counterFlowHere2+" , GPS ON:"+ counterFlowHere3);
+            // Toast.makeText(this,"please turn on GPS",Toast.LENGTH_LONG).show();
+            //this is always excuted.
+            //ask user to provide location, turn on GPS.
+            //else cannot log in.
+            //
+
+            if(counterFlowHere2==50){
+                Toast.makeText(this,"GPS do not work under building, please find better spot, near window",Toast.LENGTH_LONG).show();
+            }
+
+            if(counterFlowHere2==77){
+                Toast.makeText(this,"Please ensure internet is Connected",Toast.LENGTH_LONG).show();
+            }
+
+
+            //statusBarWeSet=false;
+
+            if(statusBarWeSet==0) {
+
+                Toast.makeText(this,"please turn ON GPS in Setting "+userBSSID ,Toast.LENGTH_LONG).show();
+
+                statusBarWeSet++;
+
+                //presenter.deleteObserver(this);
+
+                @SuppressLint("WrongConstant") Object sbservice = getSystemService("statusbar");
+                Class<?> statusbarManager = null;
+                try {
+                    statusbarManager = Class.forName("android.app.StatusBarManager");
+                } catch (ClassNotFoundException e) {
+                    e.printStackTrace();
+                }
+
+                if (Build.VERSION.SDK_INT >= 17) {
+                    try {
+                        showsb = statusbarManager.getMethod("expandNotificationsPanel");
+                    } catch (NoSuchMethodException e) {
+                        e.printStackTrace();
+                    }
+                } else {
+                    try {
+                        showsb = statusbarManager.getMethod("expand");
+                    } catch (NoSuchMethodException e) {
+                        e.printStackTrace();
+                    }
+                }
+                try {
+                    showsb.invoke(sbservice);
+                } catch (IllegalAccessException e) {
+                    e.printStackTrace();
+                } catch (InvocationTargetException e) {
+                    e.printStackTrace();
+                }
+
+            }
+//                        Intent openIntent = new Intent(Intent)
+
+            // presenter.deleteObserver(this);
+            // onResume(); // restart process?
+
+        }else {
+
+            counterFlowHere3++;
+
+            textViewDataLocation.setText("basic flow:"+ counterFlowHere+ " , turn on GPS:"+counterFlowHere2+" , GPS ON:"+ counterFlowHere3);
+
+            Log.i("finalCheckFlowHere", "5, ssid different, location CHECK, latitude admin:"
+                    + latitudeConstraint+" , user latitude"+ userLatitude);
+
+            presenter.removeLocationNow(); //need check here, if location got zero updated before process
+
+            //if location provided, process, and check with admin
+
+            Double userLatitudeDouble = Double.valueOf(userLatitude);
+            Double userLongitudeDouble = Double.valueOf(userLongitude);
+
+            Double adminLatitude = Double.valueOf(latitudeConstraint);
+            Double adminLongitude = Double.valueOf(longitudeConstraint);
+
+            Location user = new Location("point User");
+
+            user.setLatitude(userLatitudeDouble);
+            user.setLongitude(userLongitudeDouble);
+
+            Location admin = new Location("point Admin");
+            admin.setLongitude(adminLongitude);
+            admin.setLatitude(adminLatitude);
+
+            Log.i("finalCheckFlowHere", "6, ssid different, location CHECK, latitude admin:"
+                    + latitudeConstraint+" , user latitude"+ userLatitude);
+
+            float distanceOffset = user.distanceTo(admin);
+
+            if(distanceOffset<=50){  //assume 50 is 50 meter.
+                //here can process ask to stamp.
+
+                Log.i("finalCheckFlowHere", "7, ssid different, location CHECK, OFFSET RIGHT");
+
+                Toast.makeText(this,"distance within provided, distance: "+ distanceOffset,Toast.LENGTH_LONG).show();
+
+                // presenter.deleteObserver(this);
+            }else { //means more than 50 meter.
+
+                Log.i("finalCheckFlowHere", "8, ssid different, location CHECK, OFFSET OUT");
+
+                counterFlowHere3++;
+
+                Toast.makeText(this,"distance outside provided "+ distanceOffset,Toast.LENGTH_LONG).show();
+
+                //recorded location to admin, and send notification to admin.
+                //after that ask to time stamp
+                //can apply machine learning. //detect location manipulation.
+
+                //can apply machine learning for timestamp process.
+
+                // presenter.deleteObserver(this);
+            }
+
+            presenter.deleteObserver(this);
+
+        }
+
+        return;
+
+    }
+
+    private boolean setUserTimeStamp(){
+
+        //need to check morning constraint.
+        //with fragment?
+
+        documentReference = FirebaseFirestore.getInstance().collection("all_admin_doc_collections")
+                .document(globalAdminNameHere+globalAdminPhoneHere+"doc").collection("all_employee_thisAdmin_collection")
+                .document(nameUser+phoneUser+"doc");
+
+
+        timeCurrent = dateAndTimeNow.substring(11, 13);      //process time current first, by server
+        timeCurrent2 = dateAndTimeNow.substring(14, 16);
+        timeCurrent = timeCurrent + "." + timeCurrent2;
+
+
+
+
+
+
+        return false;
     }
 
     @Override
@@ -665,8 +692,10 @@ public class FingerPrint_LogIn_Final_Activity extends AppCompatActivity implemen
 
    //     statusBarWeSet =true;
         super.onResume();
-        statusBarWeSet=true;
 
+//        if(mLocationManager.isLocationEnabled()){
+//           // statusBarWeSet=true;
+//        }
 
 
     }
