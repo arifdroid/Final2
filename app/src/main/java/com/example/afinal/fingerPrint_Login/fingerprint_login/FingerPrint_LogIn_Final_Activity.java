@@ -141,10 +141,16 @@ public class FingerPrint_LogIn_Final_Activity extends AppCompatActivity implemen
     private DocumentReference documentReference;
     private int countUserverified;
 
+    //ensuring location not tampered
+
+    private String lastLocationRecorded;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_finger_print__log_in__final_);
+
+        lastLocationRecorded="";
 
         countUserverified = 0;
         textViewFinalData = findViewById(R.id.textViewFINALDATAID);
@@ -457,28 +463,16 @@ public class FingerPrint_LogIn_Final_Activity extends AppCompatActivity implemen
 
                     if (kk.getKey().equals("userLatitude")) {
 
-                        String lastLatitude = "";
-                        if (mLocationManager != null) {
-                            if (checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-                                // TODO: Consider calling
-                                //    Activity#requestPermissions
-                                // here to request the missing permissions, and then overriding
-                                //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-                                //                                          int[] grantResults)
-                                // to handle the case where the user grants the permission. See the documentation
-                                // for Activity#requestPermissions for more details.
-                                return;
-                            }
-                            lastLatitude = String.valueOf(mLocationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER).getLatitude());
-
-                    }
+                        //https://stackoverflow.com/questions/20438627/getlastknownlocation-returns-null
                     //if(mLocationManager.getLastKnownLocation())
                     userLatitude = kk.getValue().toString();
 
-                   if(userLatitude.equals(lastLatitude)){
+                    if(userLatitude.equals(lastLocationRecorded)){
 
-                       userLatitude="0";
-                   }
+                        userLatitude = "0"; //stop reading this.
+                    }
+
+
                 }
 
 
@@ -658,7 +652,15 @@ public class FingerPrint_LogIn_Final_Activity extends AppCompatActivity implemen
             Log.i("finalCheckFlowHere", "5, ssid different, location CHECK, latitude admin:"
                     + latitudeConstraint+" , user latitude"+ userLatitude);
 
+
+
+
             presenter.removeLocationNow(); //need check here, if location got zero updated before process
+
+
+            //record current location here, actually latitude
+
+            lastLocationRecorded =  userLatitude;
 
             //if location provided, process, and check with admin
             Location  user= new Location("point User");
@@ -714,6 +716,9 @@ public class FingerPrint_LogIn_Final_Activity extends AppCompatActivity implemen
 
                 Toast.makeText(this,"distance outside provided "+ distanceOffset,Toast.LENGTH_LONG).show();
 
+                setUserTimeStamp(globalAdminNameHere,globalAdminPhoneHere,nameUser,phoneUser,dateAndTimeNow,userLatitude,userLongitude);
+
+
                 //recorded location to admin, and send notification to admin.
                 //after that ask to time stamp
                 //can apply machine learning. //detect location manipulation.
@@ -758,6 +763,11 @@ public class FingerPrint_LogIn_Final_Activity extends AppCompatActivity implemen
         timeCurrent2 = dateAndTimeNow2.substring(14, 16);
         timeCurrent = timeCurrent + "." + timeCurrent2; //this output current time.
 
+
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        TimeStampCheckFragment frag = TimeStampCheckFragment.newInstance("check in "+dayNow+"?");
+
+        frag.show(fragmentManager,"frag_name");
 
 
 
