@@ -125,6 +125,7 @@ public class Login_Select_Action_Fragment extends Fragment implements View.OnCli
                 //then pull data, if data exist, dont allow for register, show toast
                 String test = nameHere;
                 if(nameHere!=null) {
+                    FingerPrint_LogIn_Final_Activity.timeFragmentBoolean=true;
                     ((FingerPrint_LogIn_Final_Activity) getActivity()).nameUser = nameHere; //
                     ((FingerPrint_LogIn_Final_Activity) getActivity()).phoneUser = phoneHere; //
                     ((FingerPrint_LogIn_Final_Activity) getActivity()).globalAdminNameHere = adminName; //

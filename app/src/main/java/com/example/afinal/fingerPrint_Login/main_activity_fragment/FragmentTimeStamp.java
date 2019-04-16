@@ -1463,7 +1463,7 @@ public class FragmentTimeStamp extends Fragment implements Observer, View.OnClic
         recyclerView_frag_adapter.notifyDataSetChanged();
         recyclerView.setAdapter(recyclerView_frag_adapter);
 
-        int sizepointer=finalPointerArrayList.size();
+
     }
 
 

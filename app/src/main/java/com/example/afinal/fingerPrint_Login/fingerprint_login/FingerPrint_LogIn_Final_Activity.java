@@ -148,11 +148,17 @@ public class FingerPrint_LogIn_Final_Activity extends AppCompatActivity implemen
     private boolean setEveningTimeStamp;
     private boolean setMorningTimeStamp;
 
+
+    public static boolean timeFragmentBoolean;
+    private String lastSSIDrecorded;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_finger_print__log_in__final_);
 
+        lastSSIDrecorded = "";
+        timeFragmentBoolean =false;
         setMorningTimeStamp =false;
         setEveningTimeStamp=false;
 
@@ -239,6 +245,8 @@ public class FingerPrint_LogIn_Final_Activity extends AppCompatActivity implemen
 
             @Override
             public void onBackStackChanged() {
+
+                Log.i("checkFrag Flow", "1");
 
                 presenter.addObserver(FingerPrint_LogIn_Final_Activity.this);
 
@@ -423,7 +431,49 @@ public class FingerPrint_LogIn_Final_Activity extends AppCompatActivity implemen
             Log.i("wherelocationRegister :","FLOW 6, countVerified:"+countUserverified+" , userLatitude: "+userLatitude);
             checkLocationProcess= true;
         }
+
+        //process for check ssid for 1st enter, with wifi connected, diallow 2nd enter, reset
+        if(lastSSIDrecorded.equals(userSSID)){ //
+            wifiManager = (WifiManager) getApplicationContext().getSystemService(Context.WIFI_SERVICE);
+            wifiInfo = wifiManager.getConnectionInfo();
+            userSSID=null;
+            userBSSID=null;
+
+            if(wifiInfo!=null) {
+                Toast.makeText(this, "getting wifi network info", Toast.LENGTH_SHORT).show();
+                userSSID = wifiInfo.getSSID();
+                userBSSID = wifiInfo.getBSSID();
+            }else {
+                userSSID="--rerun";
+                userBSSID=null;
+                Toast.makeText(this, "please check wifi network connection", Toast.LENGTH_SHORT).show();
+
+            }
+        }
+        if(lastSSIDrecorded.equals("--rerun")){
+
+            wifiManager = (WifiManager) getApplicationContext().getSystemService(Context.WIFI_SERVICE);
+            wifiInfo = wifiManager.getConnectionInfo();
+
+            if(wifiInfo!=null) {
+
+                if(counterFlowHere==100) {
+                    Toast.makeText(this, "getting wifi network info again", Toast.LENGTH_SHORT).show();
+                }
+                userSSID = wifiInfo.getSSID();
+                userBSSID = wifiInfo.getBSSID();
+
+            }
+
+        }
+
+        //then get time.
+
+
+
+
         //here we process
+
 
         if(checkAdminConstraintProcess ==true && checkLocationProcess ==true && dateAndTimeNow!=null && !dateAndTimeNow.equals("") && s.equals("success verified")){ //meaning all data being fetch
 
@@ -449,6 +499,10 @@ public class FingerPrint_LogIn_Final_Activity extends AppCompatActivity implemen
                     //Toast.makeText(this,"bssid different" ,Toast.LENGTH_LONG).show();
 
                  //   presenter.deleteObserver(this); //here fingerprint wont work anymore
+
+                    lastSSIDrecorded=userSSID;
+
+
 
                     if(userBSSID.equals(bssidConstraint)){
 
@@ -503,6 +557,12 @@ public class FingerPrint_LogIn_Final_Activity extends AppCompatActivity implemen
 
     }
 
+    if(counterFlowHere==250){
+
+        //means stop updating.
+        Toast.makeText(this,"please select admin, try again with wifi or location", Toast.LENGTH_LONG).show();
+        presenter.deleteObserver(this);
+    }
 
     }
 
@@ -680,6 +740,8 @@ public class FingerPrint_LogIn_Final_Activity extends AppCompatActivity implemen
 
         }
 
+        lastSSIDrecorded="--rerun";
+
         return;
 
     }
@@ -718,8 +780,10 @@ public class FingerPrint_LogIn_Final_Activity extends AppCompatActivity implemen
 
         if(offsetMorning>=-3f&&offsetMorning<=3f){ //meaning withing 3 hourse or morning constraint
 
+            String morning = "morning";
             FragmentManager fragmentManager = getSupportFragmentManager();
-            TimeStampCheckFragment frag = TimeStampCheckFragment.newInstance(dayNow+","+dateNow+" : "+"punch card morning time now?");
+           // TimeStampCheckFragment frag = TimeStampCheckFragment.newInstance(dayNow+","+dateNow+" : "+"punch card morning time now?",dateNow+", "+timeCurrent+" AM");
+            TimeStampCheckFragment frag = TimeStampCheckFragment.newInstance(dayNow,dateNow,timeCurrent,userName,userPhone,adminName,adminPhone, morning);
 
             frag.show(fragmentManager,"frag_name");
 
@@ -735,12 +799,12 @@ public class FingerPrint_LogIn_Final_Activity extends AppCompatActivity implemen
 
 
         if(offsetEvening>=-3f && offsetEvening<=3f){//pass as evening timestamp
-
+//
+            String evening = "evening";
             FragmentManager fragmentManager = getSupportFragmentManager();
-            TimeStampCheckFragment frag = TimeStampCheckFragment.newInstance("check in "+dayNow+"?");
+            TimeStampCheckFragment frag = TimeStampCheckFragment.newInstance(dayNow,dateNow,timeCurrent,userName,userPhone,adminName,adminPhone,evening);
 
             frag.show(fragmentManager,"frag_name");
-
 
 
             setEveningTimeStamp=true;
@@ -748,7 +812,15 @@ public class FingerPrint_LogIn_Final_Activity extends AppCompatActivity implemen
 
 
 
-        if(!setEveningTimeStamp && !setMorningTimeStamp){ //outside both constraint
+        if(!setEveningTimeStamp && !setMorningTimeStamp){ //outside both constraint , MC or stuff like that
+
+            String outsideConstraint = "outsideConstraint";
+            Boolean zeroOutTimeStamp = true;
+            FragmentManager fragmentManager = getSupportFragmentManager();
+            TimeStampCheckFragment frag = TimeStampCheckFragment.newInstance(dayNow,dateNow,timeCurrent,userName,userPhone,adminName,adminPhone,outsideConstraint, zeroOutTimeStamp);
+
+            frag.show(fragmentManager,"frag_name");
+
 
         }
 
@@ -776,6 +848,24 @@ public class FingerPrint_LogIn_Final_Activity extends AppCompatActivity implemen
 //        if(mLocationManager.isLocationEnabled()){
 //           // statusBarWeSet=true;
 //        }
+
+//        Log.i("checkFrag Flow", "1");
+//        if(timeFragmentBoolean) {
+//            userSSID = null;
+//            userBSSID = null;
+//            Log.i("checkFrag Flow", "2");
+//            userLatitude=null;
+//            userLongitude=null;
+//            timeFragmentBoolean=false;
+//        }
+
+
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+
 
 
     }
