@@ -31,11 +31,13 @@ import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Observable;
+import java.util.Observer;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.TimeUnit;
 
-public class RegAdmin_AsAdmin_Activity extends AppCompatActivity {
+public class RegAdmin_AsAdmin_Activity extends AppCompatActivity implements Observer {
 
     private EditText editTextName, editTextPhone, editTextCode;
     private Button buttonLogin, buttonGetCode;
@@ -48,6 +50,9 @@ public class RegAdmin_AsAdmin_Activity extends AppCompatActivity {
     private PhoneAuthProvider.OnVerificationStateChangedCallbacks mCallBack;
 
     private boolean allowCreateAdmin;
+    private Presenter_RegAdmin_AsAdmin_Activity presenter;
+    private String codeFromFirebase;
+    private String codeUserAdminEnter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -65,10 +70,11 @@ public class RegAdmin_AsAdmin_Activity extends AppCompatActivity {
 
         textViewMessage = findViewById(R.id.regAdmin_asAdmin_textViewMessageiD);
 
+        presenter = new Presenter_RegAdmin_AsAdmin_Activity(this);
 
         //testing animation view
 
-        timer = new Timer();
+//        timer = new Timer();
 
         count=0;
 //
@@ -95,6 +101,25 @@ public class RegAdmin_AsAdmin_Activity extends AppCompatActivity {
 //        },0,3000);
 //
 
+        buttonLogin.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                codeUserAdminEnter = editTextCode.getText().toString();
+                if(checkInput(codeUserAdminEnter)){
+
+                    //send method verify
+
+                    checkCredential(codeUserAdminEnter,codeFromFirebase);
+
+                }else {
+
+
+
+                }
+
+            }
+        });
 
         buttonGetCode.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -148,106 +173,27 @@ public class RegAdmin_AsAdmin_Activity extends AppCompatActivity {
             public void onCodeSent(String s, PhoneAuthProvider.ForceResendingToken forceResendingToken) {
                 super.onCodeSent(s, forceResendingToken);
 
+                codeFromFirebase=s;
+
             }
         };
 
 
     }
 
+    private void checkCredential(String codeUserAdminEnter, String codeFromFirebase) {
+
+        PhoneAuthCredential credential = PhoneAuthProvider.getCredential(codeUserAdminEnter,codeFromFirebase);
+        if(credential!=null) {
+            checkPhoneCredential(credential);
+        }
+
+    }
+
     private void checkPhoneCredential(PhoneAuthCredential phoneAuthCredential) {
-
-
-        FirebaseAuth.getInstance().signInWithCredential(phoneAuthCredential).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
-            @Override
-            public void onComplete(@NonNull Task<AuthResult> task) {
-
-                if(task.isSuccessful()){
-
-                    //check user withing admin document.
-
-                    CollectionReference collectionReference = FirebaseFirestore.getInstance()
-                            .collection("all_admins_collections");
-
-                    if(userPhone!=null) {
-                        Query query1 = collectionReference.whereEqualTo("phone", userPhone);
-
-                        query1.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                            @Override
-                            public void onComplete(@NonNull Task<QuerySnapshot> task) {
-
-                                if(task.isSuccessful()){
-
-                                    if(task.getResult()!=null) {
-
-                                        if (task.getResult().isEmpty()) {
-
-                                            //here we can add document
-
-                                            allowCreateAdmin=true;
-
-                                            Map<String,Object> kk = new HashMap<>();
-
-                                            kk.put("name",userName);
-                                            kk.put("phone",userPhone);
-
-
-                                            DocumentReference reference = FirebaseFirestore.getInstance()
-                                                    .collection("all_admins_collections")
-                                                    .document(userName+userPhone+"collection");
-
-
-                                            reference.set(kk).addOnCompleteListener(new OnCompleteListener<Void>() {
-                                                @Override
-                                                public void onComplete(@NonNull Task<Void> task) {
-
-
-
-                                                }
-                                            }).addOnCanceledListener(new OnCanceledListener() {
-                                                @Override
-                                                public void onCanceled() {
-
-
-                                                }
-                                            });
-
-                                        } else {
-                                            //toast not forward
-
-                                        }
-
-                                     }
-                                }else {
-
-                                    //toast not forward
-                                }
-
-                            }
-                        }).addOnCanceledListener(new OnCanceledListener() {
-                            @Override
-                            public void onCanceled() {
-
-
-                            }
-                        });
-
-
-
-
-                    }
-
-
-                }else { //task unsuccessful
-
-
-                }
-            }
-        }).addOnCanceledListener(new OnCanceledListener() {
-            @Override
-            public void onCanceled() {
-
-            }
-        });
+        if(userName!=null&&userPhone!=null) {
+            presenter.checkCredentialWithUpdates(phoneAuthCredential, userName, userPhone);
+        }
 
 
     }
@@ -261,6 +207,20 @@ public class RegAdmin_AsAdmin_Activity extends AppCompatActivity {
                 RegAdmin_AsAdmin_Activity.this,
                 mCallBack);
 
+
+
+    }
+
+    private boolean checkInput(String code){
+        if(code.equals("")|| code==null){
+
+            return false;
+        }
+        else {
+
+
+            return true;
+        }
 
 
     }
@@ -304,4 +264,36 @@ public class RegAdmin_AsAdmin_Activity extends AppCompatActivity {
     }
 
 
+    @Override
+    public void update(Observable observable, Object o) {
+
+    if(o instanceof Presenter_RegAdmin_AsAdmin_Activity){
+
+
+        // 0 = initial , 1 = success , 2 = fail
+        int adminDocumentCreated = ((Presenter_RegAdmin_AsAdmin_Activity) o).getIfDocumentCreated();
+
+        if(adminDocumentCreated==1){
+
+
+        }
+        if(adminDocumentCreated==0){
+
+        }
+        if(adminDocumentCreated==2){
+
+            //here can intent to next.
+
+        }
+        if(adminDocumentCreated==3){ //already exist.
+
+
+        }
+
+
+    }
+
+
+
+    }
 }
