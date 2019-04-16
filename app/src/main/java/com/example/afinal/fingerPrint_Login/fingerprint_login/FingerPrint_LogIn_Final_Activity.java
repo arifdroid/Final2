@@ -144,11 +144,17 @@ public class FingerPrint_LogIn_Final_Activity extends AppCompatActivity implemen
     //ensuring location not tampered
 
     private String lastLocationRecorded;
+    private String dateNow;
+    private boolean setEveningTimeStamp;
+    private boolean setMorningTimeStamp;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_finger_print__log_in__final_);
+
+        setMorningTimeStamp =false;
+        setEveningTimeStamp=false;
 
         lastLocationRecorded="";
 
@@ -256,76 +262,6 @@ public class FingerPrint_LogIn_Final_Activity extends AppCompatActivity implemen
                         presenter.checkSupportedDevice();
                         Log.i("checkFinalFlow : ", " 8 backstackFragment() activity, after fingerprint");
 
-//                        textView.addTextChangedListener(new TextWatcher() {
-//                            @Override
-//                            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-//
-//                            }
-//
-//                            @Override
-//                            public void onTextChanged(CharSequence s, int start, int before, int count) {
-//
-//                            }
-//
-//                            @Override
-//                            public void afterTextChanged(Editable s) { //being triggered everytime, this is the problem.
-//
-//
-//                                countFinalFlow++;
-//                                textViewFinalData.setText("trigerred textchange :"+ countFinalFlow);
-//
-//                                Log.i("checkFinalFlow : ", " 3 backfragment() aftertextchange");
-//
-//                                if(s.toString().equals("success verified")) {
-//
-//                                    // https://firebase.google.com/docs/firestore/manage-data/delete-data#fields
-//                                    // https://stackoverflow.com/questions/53836195/firebase-functions-update-all-documents-inside-a-collection
-//                                    //  https://github.com/firebase/snippets-node/blob/e709ef93b8d7c6f538d1b4143ffe8ec2e2741d2e/firestore/main/index.js#L916-L956
-//
-//                                    // https://github.com/firebase/functions-samples/blob/master/delete-old-child-nodes/functions/.eslintrc.json
-//                                    // https://stackoverflow.com/questions/32004582/delete-firebase-data-older-than-2-hours
-//                                    // https://firebase.google.com/docs/firestore/extend-with-functionsx
-//
-//                                    // problem, this do not return anything.
-//
-//                                    Log.i("finalSharePreDataCheck","FingerPrintLogin_Final_Activity 6 , before return,name: "
-//                                            + nameUser+ ", phone: "+phoneUser+ ", adminName:"
-//                                            +globalAdminNameHere+" , adminPhone: "+globalAdminPhoneHere);
-//
-//                                    //right data, but we dont retrieve data.
-//                                    presenter.getCurrent_User_Admin_Server_Value(nameUser,phoneUser,globalAdminNameHere,globalAdminPhoneHere);
-//
-//
-//                                    Log.i("checkFinalFlow : ", " 4 backFragment(), success verified, before server time ");
-//
-//                                    Log.i("checkFinalFlow : ", " 5 backFragment(), success verified, AFTER server time ");
-//
-//
-//
-//                                }else if(s.toString().equals("waiting")){
-//
-//                                    Log.i("checkFinalFlow : ", " 6 backFragment(), do nothing waiting for fingerprint ");
-//
-//                                }else if(s.toString().equals("try again")){
-//
-//                                    Log.i("checkFinalFlow : ", " 7 backFragment(), try again fingerprint ");
-//
-//                                    Toast.makeText(FingerPrint_LogIn_Final_Activity.this,"please select admin, try finger again" ,Toast.LENGTH_SHORT).show();
-//
-//
-//                                }
-////                                else {
-////
-//////handle here, if return nothing
-////                                    //update(this,"");
-////                                    presenter.stopListetingFingerprint(); //cannot stop here
-////                                    Log.i("checkFinalFlow : ", " 8 backFragment(), fingerprint need try again");
-////
-////                                    Toast.makeText(FingerPrint_LogIn_Final_Activity.this,"try fingerprint" ,Toast.LENGTH_SHORT).show();
-////                                }
-//
-//                            }
-//                        });
                     }
                 } else {
 
@@ -520,6 +456,9 @@ public class FingerPrint_LogIn_Final_Activity extends AppCompatActivity implemen
 
                         presenter.deleteObserver(this);
 
+                        setUserTimeStamp(globalAdminNameHere,globalAdminPhoneHere,nameUser,phoneUser,dateAndTimeNow,userLatitude,userLongitude,morningConstraint,eveningConstraint);
+
+
                     }else { //if bssid different might need to check other bssid available by admin.
 
                        // Toast.makeText(this,"bssid different, bssid "+userBSSID ,Toast.LENGTH_LONG).show();
@@ -699,7 +638,7 @@ public class FingerPrint_LogIn_Final_Activity extends AppCompatActivity implemen
 
                 Toast.makeText(this,"distance within provided, distance: "+ distanceOffset,Toast.LENGTH_LONG).show();
 
-                setUserTimeStamp(globalAdminNameHere,globalAdminPhoneHere,nameUser,phoneUser,dateAndTimeNow,userLatitude,userLongitude);
+                setUserTimeStamp(globalAdminNameHere,globalAdminPhoneHere,nameUser,phoneUser,dateAndTimeNow,userLatitude,userLongitude,morningConstraint,eveningConstraint);
 
                 userLatitude=null;
 
@@ -716,7 +655,7 @@ public class FingerPrint_LogIn_Final_Activity extends AppCompatActivity implemen
 
                 Toast.makeText(this,"distance outside provided "+ distanceOffset,Toast.LENGTH_LONG).show();
 
-                setUserTimeStamp(globalAdminNameHere,globalAdminPhoneHere,nameUser,phoneUser,dateAndTimeNow,userLatitude,userLongitude);
+                setUserTimeStamp(globalAdminNameHere,globalAdminPhoneHere,nameUser,phoneUser,dateAndTimeNow,userLatitude,userLongitude,morningConstraint,eveningConstraint);
 
 
                 //recorded location to admin, and send notification to admin.
@@ -745,7 +684,7 @@ public class FingerPrint_LogIn_Final_Activity extends AppCompatActivity implemen
 
     }
 
-    private void setUserTimeStamp(String adminName,String adminPhone,String userName,String userPhone,String dateAndTimeNow2, String userLatitude2,String userLongitude2){
+    private void setUserTimeStamp(String adminName,String adminPhone,String userName,String userPhone,String dateAndTimeNow2, String userLatitude2,String userLongitude2, String morningConstraint,String eveningConstraint){
 
         //need to check morning constraint.
         //with fragment?
@@ -761,19 +700,69 @@ public class FingerPrint_LogIn_Final_Activity extends AppCompatActivity implemen
         dayNow = dateAndTimeNow2.substring(0,3);
         timeCurrent = dateAndTimeNow2.substring(11, 13);      //process time current first, by server
         timeCurrent2 = dateAndTimeNow2.substring(14, 16);
+        dateNow = dateAndTimeNow2.substring(8,10)+" "+dateAndTimeNow2.substring(4,7);
         timeCurrent = timeCurrent + "." + timeCurrent2; //this output current time.
 
+        //process time stamp and constraint
+        Float adminMorning = Float.valueOf(morningConstraint);
+        Float adminEvening = Float.valueOf(eveningConstraint);
 
-        FragmentManager fragmentManager = getSupportFragmentManager();
-        TimeStampCheckFragment frag = TimeStampCheckFragment.newInstance("check in "+dayNow+"?");
+        Float userCurrentTimeStamp = Float.valueOf(timeCurrent);
 
-        frag.show(fragmentManager,"frag_name");
+        Float offsetMorning = userCurrentTimeStamp -adminMorning;
+
+
+        Log.i("checkDiaglogFragment", "1, time:"+timeCurrent+" , dayNow:"+dayNow+" , date today:"+dateNow);
+
+        Log.i("checkDiaglogFragment", "2, offsetMorning: "+ offsetMorning);
+
+        if(offsetMorning>=-3f&&offsetMorning<=3f){ //meaning withing 3 hourse or morning constraint
+
+            FragmentManager fragmentManager = getSupportFragmentManager();
+            TimeStampCheckFragment frag = TimeStampCheckFragment.newInstance(dayNow+","+dateNow+" : "+"punch card morning time now?");
+
+            frag.show(fragmentManager,"frag_name");
+
+
+            setMorningTimeStamp=true;
+        }
+
+        Float offsetEvening = userCurrentTimeStamp-adminEvening;
+
+        Log.i("checkDiaglogFragment", "3, time:"+timeCurrent+" , dayNow:"+dayNow+" , date today:"+dateNow);
+
+        Log.i("checkDiaglogFragment", "4, offsetEvening: "+offsetEvening);
+
+
+        if(offsetEvening>=-3f && offsetEvening<=3f){//pass as evening timestamp
+
+            FragmentManager fragmentManager = getSupportFragmentManager();
+            TimeStampCheckFragment frag = TimeStampCheckFragment.newInstance("check in "+dayNow+"?");
+
+            frag.show(fragmentManager,"frag_name");
+
+
+
+            setEveningTimeStamp=true;
+        }
+
+
+
+        if(!setEveningTimeStamp && !setMorningTimeStamp){ //outside both constraint
+
+        }
+
+        //if()
+
 
 
 
         userLatitude=null;
         userLongitude=null;
 
+        //before return, set back to false,
+        setEveningTimeStamp =false;
+        setMorningTimeStamp = false;
 
         return;
     }

@@ -25,10 +25,10 @@ public class TimeStampCheckFragment extends DialogFragment {
     }
 
 
-    public static TimeStampCheckFragment newInstance(String title){
+    public static TimeStampCheckFragment newInstance(String day){
         TimeStampCheckFragment timeStampCheckFragment = new TimeStampCheckFragment();
         Bundle args = new Bundle();
-        args.putString("question",title);
+        args.putString("question",day);
         timeStampCheckFragment.setArguments(args);
 
         return timeStampCheckFragment;
@@ -54,6 +54,7 @@ public class TimeStampCheckFragment extends DialogFragment {
         String question = getArguments().getString("question", "Enter Name?");
         getDialog().setTitle(question);
 //a
+        textViewAsk.setText(question);
         textViewAsk.requestFocus(); //what is this?
 
         getDialog().getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE);
