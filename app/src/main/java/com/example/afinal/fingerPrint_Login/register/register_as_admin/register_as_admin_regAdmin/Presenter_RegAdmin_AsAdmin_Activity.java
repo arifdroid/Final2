@@ -9,6 +9,7 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.PhoneAuthCredential;
+import com.google.firebase.auth.PhoneAuthProvider;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -28,6 +29,7 @@ public class Presenter_RegAdmin_AsAdmin_Activity extends Observable {
 
     private Context mContext;
     private int allowCreateAdmin;
+    private PhoneAuthCredential credential;
 
     public Presenter_RegAdmin_AsAdmin_Activity(Context context){
         this.mContext= context;
@@ -96,7 +98,10 @@ public class Presenter_RegAdmin_AsAdmin_Activity extends Observable {
                                                     }else {
 
                                                          allowCreateAdmin=2;
-                                                        Toast.makeText(mContext,"please try again",Toast.LENGTH_SHORT).show();
+                                                        setChanged();
+                                                        notifyObservers();
+                                                        //
+                                                        //Toast.makeText(mContext,"please try again",Toast.LENGTH_SHORT).show();
                                                     }
                                                 }
                                             }).addOnCanceledListener(new OnCanceledListener() {
@@ -113,7 +118,9 @@ public class Presenter_RegAdmin_AsAdmin_Activity extends Observable {
                                         } else {
                                             //toast not forward
                                             allowCreateAdmin=3;
-                                            Toast.makeText(mContext,"please try again",Toast.LENGTH_SHORT).show();
+                                            setChanged();
+                                            notifyObservers();
+                                            //Toast.makeText(mContext,"please try again",Toast.LENGTH_SHORT).show();
 
                                             //already exist.
                                         }
@@ -122,6 +129,9 @@ public class Presenter_RegAdmin_AsAdmin_Activity extends Observable {
                                 }else {
 
                                     allowCreateAdmin=2;
+                                    setChanged();
+                                    notifyObservers();
+                                    //
                                     //toast not forward
                                 }
 
@@ -131,6 +141,9 @@ public class Presenter_RegAdmin_AsAdmin_Activity extends Observable {
                             public void onCanceled() {
 
                                 allowCreateAdmin=2;
+                                setChanged();
+                                notifyObservers();
+                                //
                             }
                         });
 
@@ -143,6 +156,9 @@ public class Presenter_RegAdmin_AsAdmin_Activity extends Observable {
                 }else { //task unsuccessful
 
                     allowCreateAdmin=2;
+                    setChanged();
+                    notifyObservers();
+                    //
                 }
             }
         }).addOnCanceledListener(new OnCanceledListener() {
@@ -157,5 +173,22 @@ public class Presenter_RegAdmin_AsAdmin_Activity extends Observable {
 
     public int getIfDocumentCreated(){
         return allowCreateAdmin;
+    }
+
+    public void getCredentialWithUpdates(String codeUserAdminEnter, String codeFromFirebase) {
+
+
+        credential = PhoneAuthProvider.getCredential(codeUserAdminEnter,codeFromFirebase);
+
+        if(credential!=null){
+            setChanged();
+            notifyObservers();
+        }
+
+
+    }
+
+    public PhoneAuthCredential getCredential() {
+        return credential;
     }
 }

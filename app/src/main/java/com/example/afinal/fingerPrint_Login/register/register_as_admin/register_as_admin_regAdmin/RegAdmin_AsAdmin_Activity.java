@@ -53,12 +53,14 @@ public class RegAdmin_AsAdmin_Activity extends AppCompatActivity implements Obse
     private Presenter_RegAdmin_AsAdmin_Activity presenter;
     private String codeFromFirebase;
     private String codeUserAdminEnter;
+    private PhoneAuthCredential credenttial;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_reg_admin__as_admin_);
 
+        credenttial=null;
         editTextName = findViewById(R.id.regAdmin_asAdmin_editText_NameiD);
         editTextPhone = findViewById(R.id.regAdmin_asAdmin_editTextPhone);
         editTextCode = findViewById(R.id.regAdmin_asAdmin_editText_CodeiD);
@@ -183,10 +185,8 @@ public class RegAdmin_AsAdmin_Activity extends AppCompatActivity implements Obse
 
     private void checkCredential(String codeUserAdminEnter, String codeFromFirebase) {
 
-        PhoneAuthCredential credential = PhoneAuthProvider.getCredential(codeUserAdminEnter,codeFromFirebase);
-        if(credential!=null) {
-            checkPhoneCredential(credential);
-        }
+        presenter.getCredentialWithUpdates(codeUserAdminEnter,codeFromFirebase);
+
 
     }
 
@@ -290,6 +290,12 @@ public class RegAdmin_AsAdmin_Activity extends AppCompatActivity implements Obse
 
         }
 
+        credenttial = ((Presenter_RegAdmin_AsAdmin_Activity) o).getCredential();
+
+        if(credenttial!=null){
+
+            checkPhoneCredential(credenttial);
+        }
 
     }
 
