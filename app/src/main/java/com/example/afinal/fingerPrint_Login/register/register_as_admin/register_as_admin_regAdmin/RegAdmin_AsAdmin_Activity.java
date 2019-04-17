@@ -54,12 +54,15 @@ public class RegAdmin_AsAdmin_Activity extends AppCompatActivity implements Obse
     private String codeFromFirebase;
     private String codeUserAdminEnter;
     private PhoneAuthCredential credenttial;
+    private int countForAnimateButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_reg_admin__as_admin_);
 
+
+        countForAnimateButton=0;
         credenttial=null;
         editTextName = findViewById(R.id.regAdmin_asAdmin_editText_NameiD);
         editTextPhone = findViewById(R.id.regAdmin_asAdmin_editTextPhone);
@@ -76,7 +79,7 @@ public class RegAdmin_AsAdmin_Activity extends AppCompatActivity implements Obse
 
         //testing animation view
 
-//        timer = new Timer();
+        timer = new Timer();
 
         count=0;
 //
@@ -284,6 +287,7 @@ public class RegAdmin_AsAdmin_Activity extends AppCompatActivity implements Obse
 
             //here can intent to next.
 
+
         }
         if(adminDocumentCreated==3){ //already exist.
 
@@ -295,6 +299,45 @@ public class RegAdmin_AsAdmin_Activity extends AppCompatActivity implements Obse
         if(credenttial!=null){
 
             checkPhoneCredential(credenttial);
+
+
+            timer.scheduleAtFixedRate(new TimerTask() {
+                @Override
+                public void run() {
+                     countForAnimateButton++;
+                    //here after got code, we animate button, to visible and move
+                    //after 1 second, after 3 secound
+
+                    if(countForAnimateButton==3){
+
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+
+                                //https://www.youtube.com/watch?v=IECLEh98HnE
+
+                                ObjectAnimator animator = ObjectAnimator.ofFloat(buttonGetCode,"translationY",-80f);
+                                buttonGetCode.animate()
+                                        .alpha(0f)
+                                        .setDuration(400)
+                                        .setListener(null);
+                                animator.setDuration(400);
+                                animator.start();
+                                buttonLogin.animate()
+                                        .alpha(1f)
+                                        .setDuration(400)
+                                        .setListener(null);
+
+
+
+                            }
+                        });
+
+                    }
+
+                }
+            },500,1500);
+
         }
 
     }

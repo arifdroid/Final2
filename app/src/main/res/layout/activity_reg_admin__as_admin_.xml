@@ -14,15 +14,15 @@
         android:layout_marginTop="8dp"
         android:layout_marginEnd="8dp"
         android:layout_marginBottom="8dp"
-        android:hint="name"
-        android:textAlignment="center"
         android:ems="10"
+        android:hint="name"
         android:inputType="textPersonName"
+        android:textAlignment="center"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.185" />
+        app:layout_constraintVertical_bias="0.26" />
 
     <EditText
         android:id="@+id/regAdmin_asAdmin_editTextPhone"
@@ -40,23 +40,15 @@
         app:layout_constraintTop_toBottomOf="@+id/regAdmin_asAdmin_editText_NameiD" />
 
     <Button
-        android:id="@+id/regAdmin_asAdmin_buttonLoginiD"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="15dp"
-        android:layout_marginTop="8dp"
-        android:text="Log in"
-        app:layout_constraintStart_toStartOf="@+id/guideline3"
-        app:layout_constraintTop_toBottomOf="@+id/regAdmin_asAdmin_textViewMessageiD" />
-
-    <Button
         android:id="@+id/regAdmin_asAdmin_button_getCodeiD"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
-        android:layout_marginEnd="15dp"
+        android:layout_marginEnd="8dp"
         android:text="Get Code"
-        app:layout_constraintEnd_toStartOf="@+id/guideline3"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/regAdmin_asAdmin_textViewMessageiD" />
 
     <androidx.constraintlayout.widget.Guideline
@@ -66,6 +58,20 @@
         android:orientation="vertical"
         app:layout_constraintGuide_percent="0.5"/>
 
+    <Button
+        android:id="@+id/regAdmin_asAdmin_buttonLoginiD"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="8dp"
+        android:text="Log in"
+        android:visibility="invisible"
+
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/regAdmin_asAdmin_textViewMessageiD" />
+
     <TextView
         android:id="@+id/regAdmin_asAdmin_textViewMessageiD"
         android:layout_width="wrap_content"
@@ -73,10 +79,13 @@
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
         android:layout_marginEnd="8dp"
+        android:layout_marginBottom="8dp"
         android:text="TextView"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/regAdmin_asAdmin_editText_CodeiD" />
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.4078" />
 
     <EditText
         android:id="@+id/regAdmin_asAdmin_editText_CodeiD"
@@ -85,6 +94,8 @@
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
         android:layout_marginEnd="8dp"
+        android:visibility="invisible"
+
         android:hint="code digit received"
         android:textAlignment="center"
         android:ems="10"
