@@ -65,6 +65,10 @@ public class RegAdmin_AsAdmin_Activity extends AppCompatActivity implements Obse
     private int countForAnimateButton;
     private int copyadminCreated;
 
+    //testing phase
+
+    private Button buttonTestHere;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -78,6 +82,8 @@ public class RegAdmin_AsAdmin_Activity extends AppCompatActivity implements Obse
         editTextCode = findViewById(R.id.regAdmin_asAdmin_editText_CodeiD);
         constraintLayout = findViewById(R.id.regAdmin_constraint);
 
+        buttonTestHere = findViewById(R.id.buttonaksdkasjklda);
+
         allowCreateAdmin=false;
 
         buttonGetCode = findViewById(R.id.regAdmin_asAdmin_button_getCodeiD);
@@ -86,6 +92,22 @@ public class RegAdmin_AsAdmin_Activity extends AppCompatActivity implements Obse
         textViewMessage = findViewById(R.id.regAdmin_asAdmin_textViewMessageiD);
 
         presenter = new Presenter_RegAdmin_AsAdmin_Activity(this);
+
+        buttonTestHere.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                String userName = editTextName.getText().toString();
+                String userPhone = editTextPhone.getText().toString();
+
+                Intent intent = new Intent(RegAdmin_AsAdmin_Activity.this,RegAdmin_asAdmin_Profile_Activity.class);
+                intent.putExtra("adminName_asAdmin",userName);
+                intent.putExtra("adminPhone_asAdmin",userPhone);
+
+                startActivity(intent);
+            }
+        });
+
 
         //testing animation view
 
@@ -398,6 +420,7 @@ public class RegAdmin_AsAdmin_Activity extends AppCompatActivity implements Obse
 
             timer.cancel();
             Log.i("checkFlowAsAdmin", "2");
+            textViewMessage.setText("please try again");
             Toast.makeText(this,"please try again",Toast.LENGTH_SHORT).show();
 
 
@@ -405,7 +428,7 @@ public class RegAdmin_AsAdmin_Activity extends AppCompatActivity implements Obse
         if(adminDocumentCreated==2){
 
             timer.cancel();
-
+            textViewMessage.setText("please try again");
             //here can intent to next.
 
             Log.i("checkFlowAsAdmin", "1");
@@ -417,6 +440,7 @@ public class RegAdmin_AsAdmin_Activity extends AppCompatActivity implements Obse
         }
         if(adminDocumentCreated==3){ //already exist.
 
+            textViewMessage.setText("please try again");
             Toast.makeText(this,"phone already registered",Toast.LENGTH_SHORT).show();
 
         }

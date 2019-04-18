@@ -2,10 +2,8 @@ package com.example.afinal.fingerPrint_Login.register.register_as_admin_setupPro
 
 import android.Manifest;
 import android.app.Activity;
-import android.content.ContentValues;
 import android.content.Context;
 import android.content.pm.PackageManager;
-import android.location.Geocoder;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
@@ -14,15 +12,10 @@ import android.net.wifi.WifiManager;
 import android.os.Bundle;
 import android.util.Log;
 
-import java.io.IOException;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Locale;
 import java.util.Map;
 import java.util.Observable;
-import java.util.prefs.AbstractPreferences;
 
-import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
 import pub.devrel.easypermissions.AfterPermissionGranted;
 import pub.devrel.easypermissions.EasyPermissions;
@@ -38,8 +31,12 @@ public class Presenter_RegAdmin_asAdmin_Profile_Activity extends Observable {
     private Map<String, String> remapReturnLocation;
     private WifiInfo wifiInfo;
     private Map<String,String> returnMapWifi;
+    private String wifiSSID;
+    public static boolean gotWifi;
+    private String wifiBSSID;
 
     public Presenter_RegAdmin_asAdmin_Profile_Activity(Context mContext) {
+        gotWifi=false;
         remapReturnLocation = new HashMap<>();
         returnMapWifi = new HashMap<>();
         this.mContext = mContext;
@@ -157,11 +154,14 @@ public class Presenter_RegAdmin_asAdmin_Profile_Activity extends Observable {
             setChanged();
             notifyObservers();
 
+            Log.i("checkFlowData ", "9, location not null, latitud: "+latitude);
+
         }else {
 
             remapReturnLocation.put("latitudeHere", "");
             remapReturnLocation.put("longitudeHere", "");
 
+            Log.i("checkFlowData ", "10, location null, ");
             setChanged();
             notifyObservers();
 
@@ -172,39 +172,86 @@ public class Presenter_RegAdmin_asAdmin_Profile_Activity extends Observable {
 
     public Map<String, String> getRemapReturnLocation() {
 
+        Log.i("checkFlowData ", "11, location Map:"+remapReturnLocation);
         return remapReturnLocation;
     }
 
-    public void getWifiNow(WifiManager wifiManager) {
+    public void getWifiNow() {
 
-        wifiManager = (WifiManager) mContext.getApplicationContext().getSystemService(Context.WIFI_SERVICE);
+        WifiManager wifiManager = (WifiManager) mContext.getApplicationContext().getSystemService(Context.WIFI_SERVICE);
         wifiInfo = wifiManager.getConnectionInfo();
 
         if(wifiInfo!=null){
 
-            String wifiSSID = wifiInfo.getSSID();
-            String wifiBSSID = wifiInfo.getBSSID();
+            Log.i("checkFlowData ", "12, wifiInfo not null");
 
-            returnMapWifi.put("SSID",wifiSSID);
-            returnMapWifi.put("BSSID",wifiBSSID);
+           wifiSSID = wifiInfo.getSSID();
+           wifiBSSID = wifiInfo.getBSSID();
+
+            if(wifiSSID!=null) {
+                returnMapWifi.put("SSID", wifiSSID);
+                returnMapWifi.put("BSSID", wifiBSSID);
+//
+//                Log.i("checkFlowData ", "12.A, wifiInfo not null, ssid: " + wifiSSID);
+
+                gotWifi=true;
+                setChanged();
+                notifyObservers();
+            }
+
+            if(wifiSSID==null){
+
+                returnMapWifi.put("SSID", wifiSSID);
+                returnMapWifi.put("BSSID", wifiBSSID);
+//
+                gotWifi=false;
+                setChanged();
+                notifyObservers();
+
+            }
 
 
-            setChanged();
-            notifyObservers();
         }else {
 
-
-            returnMapWifi.put("SSID","");
-            returnMapWifi.put("BSSID","");
-
-            setChanged();
-            notifyObservers();
+//
+//            returnMapWifi.put("SSID","");
+//            returnMapWifi.put("BSSID","");
+//
+//            Log.i("checkFlowData ", "13, wifiInfo null");
+//            setChanged();
+//            notifyObservers();
         }
 
     }
+//
+//    public void stopWifiListening(WifiManager wifiManager){
+//        wifiManager.
+//    }
 
-    public Map<String, String> getReturnMapWifi() {
+    public Map<String,String> getwifiResult(){
+        if(returnMapWifi.size()>0) {
+            return returnMapWifi;
+        }
+        return null;
+    }
 
-        return returnMapWifi;
+    public boolean getReturnMapWifi() {
+
+        if(wifiSSID!=null) {
+            Log.i("checkFlowData ", "14, wifiMap: " + returnMapWifi);
+
+
+            return gotWifi;
+        }
+
+        return false;
+    }
+
+
+    public void stopListening(LocationManager mLocationManager) {
+
+        mLocationManager.removeUpdates(mLocationLister);
+        return;
+
     }
 }

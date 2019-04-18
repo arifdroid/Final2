@@ -1,24 +1,21 @@
 package com.example.afinal.fingerPrint_Login.register.register_as_admin_setupProfile;
 
-import android.Manifest;
 import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
-import android.content.pm.PackageManager;
+import android.content.IntentFilter;
 import android.location.Geocoder;
-import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.net.Uri;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 
-import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import com.example.afinal.fingerPrint_Login.register.WifiReceiver;
 import com.example.afinal.fingerPrint_Login.register.register_as_admin_add_userList.Add_User_Activity;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import androidx.core.app.ActivityCompat;
+
 import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -40,11 +37,10 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Observable;
 import java.util.Observer;
-import java.util.prefs.AbstractPreferences;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import de.hdodenhof.circleimageview.CircleImageView;
-import pub.devrel.easypermissions.AfterPermissionGranted;
-import pub.devrel.easypermissions.EasyPermissions;
 
 public class RegAdmin_asAdmin_Profile_Activity extends AppCompatActivity implements Observer {
 
@@ -87,6 +83,14 @@ public class RegAdmin_asAdmin_Profile_Activity extends AppCompatActivity impleme
     private Presenter_RegAdmin_asAdmin_Profile_Activity presenter;
     private boolean imageSetupTrue;
     private Map<String,String> locationMapFinal;
+    private String user_name_asAdmin;
+    private String user_phone_asAdmin;
+    public static String wifiSSIDHere;
+    public static String wifiBSSIDHere;
+    private boolean gotWifi;
+    private Timer timer;
+    private int count;
+    private WifiReceiver wifiReceiver;
 
 
     @Override
@@ -94,11 +98,23 @@ public class RegAdmin_asAdmin_Profile_Activity extends AppCompatActivity impleme
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_reg_admin_as_admin__profile_);
 
+        wifiReceiver = new WifiReceiver();
+
+        Intent intent = getIntent();
+        gotWifi=false;
+        wifiSSIDHere="";
+        wifiBSSIDHere="";
+
+        user_name_asAdmin = intent.getStringExtra("adminName_asAdmin");
+        user_phone_asAdmin = intent.getStringExtra("adminPhone_asAdmin");
+        adminDetailsList = new ArrayList<>();
+
+        count++;
 
         locationMapFinal=new HashMap<>();
-
-        wifiManager = (WifiManager) getApplicationContext().getSystemService(Context.WIFI_SERVICE);
-        wifiInfo = wifiManager.getConnectionInfo();
+//
+//        wifiManager = (WifiManager) getApplicationContext().getSystemService(Context.WIFI_SERVICE);
+//        wifiInfo = wifiManager.getConnectionInfo();
 
         imageSetupTrue=false;
 
@@ -113,7 +129,11 @@ public class RegAdmin_asAdmin_Profile_Activity extends AppCompatActivity impleme
         textViewPhone = findViewById(R.id.admin_Profile_textViewPhoneiD);
 
 
+        if(user_name_asAdmin!=null && user_phone_asAdmin!=null){
 
+            textViewName.setText(user_name_asAdmin);
+            textViewPhone.setText(user_phone_asAdmin);
+        }
 
         presenter.addObserver(this);
 
@@ -121,6 +141,33 @@ public class RegAdmin_asAdmin_Profile_Activity extends AppCompatActivity impleme
 
         storageReference = FirebaseStorage.getInstance().getReference();
 
+//        //setting up wifi if not initially setup.
+//        presenter.getWifiNow();
+
+        //try setup timer
+
+
+//        timer = new Timer();
+//
+//        timer.scheduleAtFixedRate(new TimerTask() {
+//            @Override
+//            public void run() {
+//
+//                count++;
+//
+//                Log.i("checkkLocation", "[TIMER] count : " + count);
+//
+//                if(count==15){
+//                    Log.i("checkkLocation", "[TIMER] count : " + count);
+//
+//                    presenter.getWifiNow();
+//
+//                    timer.cancel();
+//                }
+//
+//
+//            }
+//        },0,1000);
 
 
         //setting up image
@@ -139,13 +186,12 @@ public class RegAdmin_asAdmin_Profile_Activity extends AppCompatActivity impleme
             }
         });
 
-        //setting up wifi if not initially setup.
-        presenter.getWifiNow(wifiManager);
+//        //setting up wifi if not initially setup.
+//        presenter.getWifiNow(wifiManager);
 
 
         mLocationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
 
-        adminDetailsList = new ArrayList<>();
 
         //process data getWifi
         String wifiName = checkWifiStep1();
@@ -164,45 +210,52 @@ public class RegAdmin_asAdmin_Profile_Activity extends AppCompatActivity impleme
             public void onClick(View v) {
 
                 int count = 0;
-                for (AdminDetail adminDetail : returnAdminDetailList) {
 
-                    Log.i("checkkLocation", "13 checkBox = " + adminDetail.isCheckBox());
+                if (imageSetupTrue) {
 
-                    boolean checkBoxHere = adminDetail.isCheckBox();
+                    for (AdminDetail adminDetail : returnAdminDetailList) {
 
-                    Log.i("checkkLocation", "14 checkBox = " + adminDetail.isCheckBox());
+                        Log.i("checkkLocation", "13 checkBox = " + adminDetail.isCheckBox());
 
-                    if (checkBoxHere) {
-                        count++;
+                        boolean checkBoxHere = adminDetail.isCheckBox();
+
+                        Log.i("checkkLocation", "14 checkBox = " + adminDetail.isCheckBox());
+
+                        if (checkBoxHere) {
+                            count++;
+                        }
+
                     }
 
-                }
+
+                    //problem is count always 1, inevitable, keep
 
 
-                //problem is count always 1, inevitable, keep
-
-
-                //if (count == 1 && RecyclerView_Admin_Profile_Adapter.sentCheck == false) {
-                if (count == 0) {
-
-                } else {
-
-                    if ((count) == adminDetailsList.size()) {
-
-                        Toast.makeText(RegAdmin_asAdmin_Profile_Activity.this, "all " + count + " boxes checked", Toast.LENGTH_SHORT).show();
-
-                        Intent intent = new Intent(RegAdmin_asAdmin_Profile_Activity.this, Add_User_Activity.class);
-                        startActivity(intent);
-
+                    //if (count == 1 && RecyclerView_Admin_Profile_Adapter.sentCheck == false) {
+                    if (count == 0) {
 
                     } else {
 
-                        Toast.makeText(RegAdmin_asAdmin_Profile_Activity.this, "only " + count + " boxes checked , size list "+ adminDetailsList.size() , Toast.LENGTH_SHORT).show();
-                        ;
+                        if ((count) == adminDetailsList.size()) {
+
+                            Toast.makeText(RegAdmin_asAdmin_Profile_Activity.this, "all " + count + " boxes checked", Toast.LENGTH_SHORT).show();
+
+                            Intent intent = new Intent(RegAdmin_asAdmin_Profile_Activity.this, Add_User_Activity.class);
+                            startActivity(intent);
+
+
+                        } else {
+
+                            Toast.makeText(RegAdmin_asAdmin_Profile_Activity.this, "only " + count + " boxes checked , size list " + adminDetailsList.size(), Toast.LENGTH_SHORT).show();
+                            ;
+                        }
+
                     }
 
-                }
+                }else { //please setup image
 
+                    Toast.makeText(RegAdmin_asAdmin_Profile_Activity.this,"please set image",Toast.LENGTH_SHORT).show();
+                }
             }
         });
 
@@ -213,6 +266,26 @@ public class RegAdmin_asAdmin_Profile_Activity extends AppCompatActivity impleme
         }
         //recyclerView
         //initRecycler();
+
+
+        //wifi listener
+//
+//        IntentFilter intentFilter = new IntentFilter();
+//
+//        intentFilter.addAction(WifiManager.SUPPLICANT_CONNECTION_CHANGE_ACTION);
+//        //registerReceiver(broadcastReceiver,)
+
+        //broadcast receiver
+
+        Intent intentWifi = new Intent();
+
+        intentWifi.setAction("com.example.afinal.fingerPrint_Login.register.WifiReceiver");
+        sendBroadcast(intentWifi);
+
+        // https://www.journaldev.com/10356/android-broadcastreceiver-example-tutorial
+
+        // https://stackoverflow.com/questions/5888502/how-to-detect-when-wifi-connection-has-been-established-in-android
+
     }
 
     @Override
@@ -385,20 +458,22 @@ public class RegAdmin_asAdmin_Profile_Activity extends AppCompatActivity impleme
             }
         });
 
+        //setting up wifi if not initially setup.
+        presenter.getWifiNow();
+
     }
 
     private String checkBSSIDStep() {
 
 
-        String bssidName = wifiInfo.getBSSID();
-
+        String bssidName ="";
         return bssidName;
     }
 
     private String checkWifiStep1() {
 
 
-        String name = wifiInfo.getSSID();
+        String name = "";
 
 
 
@@ -408,14 +483,16 @@ public class RegAdmin_asAdmin_Profile_Activity extends AppCompatActivity impleme
     @Override
     public void update(Observable observable, Object o) {
 
-        if(observable instanceof Presenter_RegAdmin_asAdmin_Profile_Activity){
+        Log.i("checkFlowData ", "1");
 
+        if(observable instanceof Presenter_RegAdmin_asAdmin_Profile_Activity){
+            Log.i("checkFlowData ", "2");
             //keep listening for location, wifi provided, and
 
             Map<String,String> locationHere = ((Presenter_RegAdmin_asAdmin_Profile_Activity) observable).getRemapReturnLocation();
 
             if(locationHere!=null){
-
+                Log.i("checkFlowData ", "3 , location not null");
                 Geocoder geocoder = new Geocoder(RegAdmin_asAdmin_Profile_Activity.this, Locale.getDefault());
 
                 Double latitudeHere =null;
@@ -435,16 +512,18 @@ public class RegAdmin_asAdmin_Profile_Activity extends AppCompatActivity impleme
                     }
 
 
-                    if(latitudeHere!=null && longitudeHere!=null) {
+                    if(latitudeHere!=null && longitudeHere!=null ) {
                         try {
                             streetName = geocoder.getFromLocation(latitudeHere, longitudeHere, 1).get(0).getSubThoroughfare();
+
+                            Log.i("checkFlowData ", "4 , streetName: "+streetName);
                         } catch (IOException e) {
                             e.printStackTrace();
                         }
 
                         adminDetailsList.add(new AdminDetail(streetName, "drawable/ic_location_on_black_24dp"));
                         recyclerView_Admin_Profile_Adapter.notifyDataSetChanged();
-                        recyclerView.setAdapter(recyclerView_Admin_Profile_Adapter);
+                       // recyclerView.setAdapter(recyclerView_Admin_Profile_Adapter);
                         recyclerView_Admin_Profile_Adapter.setPassResult_checkBox_interface(new PassResult_CheckBox_Interface() {
                             @Override
                             public void passingArray(ArrayList<AdminDetail> adminDetails) {
@@ -454,17 +533,115 @@ public class RegAdmin_asAdmin_Profile_Activity extends AppCompatActivity impleme
                             }
                         });
 
+
+                        presenter.stopListening(mLocationManager);
                     }
                 }
 
 
             }
 
+            Boolean wifiHere = ((Presenter_RegAdmin_asAdmin_Profile_Activity) observable).getReturnMapWifi();
 
-            Map<String, String> wifiHere = ((Presenter_RegAdmin_asAdmin_Profile_Activity) observable).getReturnMapWifi();
+            if(wifiHere){
+
+                Log.i("checkFlowData ", "4 , wifi status: "+wifiHere);
+
+
+                Map<String,String> wifiresult = ((Presenter_RegAdmin_asAdmin_Profile_Activity) observable).getwifiResult();
+
+
+                for(Map.Entry<String,String> kk : wifiresult.entrySet()){
+
+                    Log.i("checkFlowData ", "5 , wifi status: "+kk.getValue());
+
+                    if(kk.getKey().equals("SSID")){
+
+                        wifiSSIDHere = kk.getValue();
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+
+
+                                adminDetailsList.get(0).setTextShow(wifiSSIDHere);
+                                recyclerView_Admin_Profile_Adapter.notifyDataSetChanged();
+                            }
+                        });
+                    }
+                    if(kk.getKey().equals("BSSID")){
+
+                        wifiBSSIDHere = kk.getValue();
+
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+
+
+                                adminDetailsList.get(1).setTextShow(wifiBSSIDHere);
+                                recyclerView_Admin_Profile_Adapter.notifyDataSetChanged();
+                            }
+                        });
+                    }
+
+                }
+
+
+
+
+
+            }
+
+
+//                if(!gotWifi){
+//
+//                    Log.i("checkFlowData ", "6 , wifi not null");
+//
+//                    for(Map.Entry<String,String> kk : wifiHere.entrySet()){
+//
+//
+//                        if(kk.getKey().equals("SSID")){
+//
+//                            wifiSSIDHere = kk.getValue();
+//
+//                            //adminDetailsList.get(0).set(new AdminDetail(wifiSSIDHere, "drawable/ic_wifi_black_24dp"));
+//
+//
+//                                Log.i("checkFlowData ", "7, ssid: " + wifiSSIDHere);
+//
+//
+//                                if (adminDetailsList.size() >= 2) {
+//                                    Log.i("checkFlowData ", "8, somehow fail");
+//                                    adminDetailsList.get(0).setTextShow(wifiSSIDHere);
+//                                    recyclerView_Admin_Profile_Adapter.notifyDataSetChanged();
+//                                    gotWifi=true;
+//
+//                            }
+//                        }
+//
+//                        if(kk.getKey().equals("BSSID")){
+//
+//                            wifiBSSIDHere = kk.getValue(); //this return null
+//
+//                                if (adminDetailsList.size() >= 2) {
+//                                    adminDetailsList.get(1).setTextShow(wifiBSSIDHere);
+//                                    recyclerView_Admin_Profile_Adapter.notifyDataSetChanged();
+//                                }
+//
+//                        }
+//
+//                    }
+//
+//                }
+
 
 
         }
 
     }
+
+    //innerclassfor wifi change test
+
+
+
+
 }
