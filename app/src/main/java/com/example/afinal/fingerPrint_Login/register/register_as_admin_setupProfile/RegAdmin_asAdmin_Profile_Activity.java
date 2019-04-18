@@ -35,10 +35,12 @@ import com.google.firebase.storage.StorageReference;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Observable;
 import java.util.Observer;
+import java.util.prefs.AbstractPreferences;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 import pub.devrel.easypermissions.AfterPermissionGranted;
@@ -83,6 +85,8 @@ public class RegAdmin_asAdmin_Profile_Activity extends AppCompatActivity impleme
     private FirebaseFirestore firebaseFirestore;
 
     private Presenter_RegAdmin_asAdmin_Profile_Activity presenter;
+    private boolean imageSetupTrue;
+    private Map<String,String> locationMapFinal;
 
 
     @Override
@@ -90,8 +94,13 @@ public class RegAdmin_asAdmin_Profile_Activity extends AppCompatActivity impleme
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_reg_admin_as_admin__profile_);
 
+
+        locationMapFinal=new HashMap<>();
+
         wifiManager = (WifiManager) getApplicationContext().getSystemService(Context.WIFI_SERVICE);
         wifiInfo = wifiManager.getConnectionInfo();
+
+        imageSetupTrue=false;
 
         presenter = new Presenter_RegAdmin_asAdmin_Profile_Activity(this);
 
@@ -102,6 +111,11 @@ public class RegAdmin_asAdmin_Profile_Activity extends AppCompatActivity impleme
         circleImageView = findViewById(R.id.admin_Profile_circleImageViewID);
         textViewName = findViewById(R.id.admin_Profile_textViewNameiD);
         textViewPhone = findViewById(R.id.admin_Profile_textViewPhoneiD);
+
+
+
+
+        presenter.addObserver(this);
 
         //firebase reference
 
@@ -124,6 +138,9 @@ public class RegAdmin_asAdmin_Profile_Activity extends AppCompatActivity impleme
 
             }
         });
+
+        //setting up wifi if not initially setup.
+        presenter.getWifiNow(wifiManager);
 
 
         mLocationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
@@ -198,6 +215,12 @@ public class RegAdmin_asAdmin_Profile_Activity extends AppCompatActivity impleme
         //initRecycler();
     }
 
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        presenter.deleteObserver(this);
+    }
+
     //for image loader.
 
     @Override
@@ -214,6 +237,8 @@ public class RegAdmin_asAdmin_Profile_Activity extends AppCompatActivity impleme
 
                 showImage(uri);
 
+                imageSetupTrue=true;
+
             }
         }
 
@@ -226,103 +251,103 @@ public class RegAdmin_asAdmin_Profile_Activity extends AppCompatActivity impleme
         Toast.makeText(RegAdmin_asAdmin_Profile_Activity.this,"image setup", Toast.LENGTH_SHORT).show();
 
     }
-
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-
-        EasyPermissions.onRequestPermissionsResult(requestCode, permissions, grantResults, this);
-    }
-
-    @AfterPermissionGranted(REQUEST_LOCATION_PERMISSION)
-    public void requestLocationPermission() {
-        String[] perms = {Manifest.permission.ACCESS_FINE_LOCATION};
-        if (EasyPermissions.hasPermissions(this, perms)) {
-            //       Toast.makeText(this, "Permission already granted", Toast.LENGTH_SHORT).show();
-
-            if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-                // TODO: Consider calling
-                //    ActivityCompat#requestPermissions
-                // here to request the missing permissions, and then overriding
-                //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-                //                                          int[] grantResults)
-                // to handle the case where the user grants the permission. See the documentation
-                // for ActivityCompat#requestPermissions for more details.
-                return;
-            }
-            mLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 5000,
-                    5, new LocationListener() {
-                        @Override
-                        public void onLocationChanged(Location location) {
-
-                    Double lat = location.getLatitude();
-                    Double longitude = location.getLongitude();
-
-                    Log.i("checkkLocation", "3");
-
-                    Geocoder geocoder = new Geocoder(RegAdmin_asAdmin_Profile_Activity.this, Locale.getDefault());
-
-                    try {
-
-                        Log.i("checkkLocation", "4");
-
-                        streetName = geocoder.getFromLocation(lat, longitude, 1).get(0).getThoroughfare();
-
-                        Log.i("checkkLocation", "5 " + streetName);
-
-                        adminDetailsList.add(new AdminDetail(streetName, "drawable/ic_location_on_black_24dp"));
-                        recyclerView_Admin_Profile_Adapter.notifyDataSetChanged();
-                        recyclerView.setAdapter(recyclerView_Admin_Profile_Adapter);
-                        recyclerView_Admin_Profile_Adapter.setPassResult_checkBox_interface(new PassResult_CheckBox_Interface() {
-                            @Override
-                            public void passingArray(ArrayList<AdminDetail> adminDetails) {
-                                //returned list.
-
-                                returnAdminDetailList = adminDetails;
-                            }
-                        });
-
-
-                        if(streetName!=null|| streetName!=""){
-
-                            mLocationManager.removeUpdates(this);
-                        }
-
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-
-                        }
-
-
-
-                        @Override
-                        public void onStatusChanged(String provider, int status, Bundle extras) {
-
-                        }
-
-                        @Override
-                        public void onProviderEnabled(String provider) {
-
-                        }
-
-                        @Override
-                        public void onProviderDisabled(String provider) {
-
-                        }
-                    });
-
-
-
-        } else {
-
-            Log.i("checkkLocation", "5");
-
-            EasyPermissions.requestPermissions(this, "Please grant the location permission", REQUEST_LOCATION_PERMISSION, perms);
-        }
-
-        return;
-    }
+//
+//    @Override
+//    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+//        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+//
+//        EasyPermissions.onRequestPermissionsResult(requestCode, permissions, grantResults, this);
+//    }
+//
+//    @AfterPermissionGranted(REQUEST_LOCATION_PERMISSION)
+//    public void requestLocationPermission() {
+//        String[] perms = {Manifest.permission.ACCESS_FINE_LOCATION};
+//        if (EasyPermissions.hasPermissions(this, perms)) {
+//            //       Toast.makeText(this, "Permission already granted", Toast.LENGTH_SHORT).show();
+//
+//            if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+//                // TODO: Consider calling
+//                //    ActivityCompat#requestPermissions
+//                // here to request the missing permissions, and then overriding
+//                //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+//                //                                          int[] grantResults)
+//                // to handle the case where the user grants the permission. See the documentation
+//                // for ActivityCompat#requestPermissions for more details.
+//                return;
+//            }
+//            mLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 5000,
+//                    5, new LocationListener() {
+//                        @Override
+//                        public void onLocationChanged(Location location) {
+//
+//                    Double lat = location.getLatitude();
+//                    Double longitude = location.getLongitude();
+//
+//                    Log.i("checkkLocation", "3");
+//
+//                    Geocoder geocoder = new Geocoder(RegAdmin_asAdmin_Profile_Activity.this, Locale.getDefault());
+//
+//                    try {
+//
+//                        Log.i("checkkLocation", "4");
+//
+//                        streetName = geocoder.getFromLocation(lat, longitude, 1).get(0).getThoroughfare();
+//
+//                        Log.i("checkkLocation", "5 " + streetName);
+//
+//                        adminDetailsList.add(new AdminDetail(streetName, "drawable/ic_location_on_black_24dp"));
+//                        recyclerView_Admin_Profile_Adapter.notifyDataSetChanged();
+//                        recyclerView.setAdapter(recyclerView_Admin_Profile_Adapter);
+//                        recyclerView_Admin_Profile_Adapter.setPassResult_checkBox_interface(new PassResult_CheckBox_Interface() {
+//                            @Override
+//                            public void passingArray(ArrayList<AdminDetail> adminDetails) {
+//                                //returned list.
+//
+//                                returnAdminDetailList = adminDetails;
+//                            }
+//                        });
+//
+//
+//                        if(streetName!=null|| streetName!=""){
+//
+//                            mLocationManager.removeUpdates(this);
+//                        }
+//
+//                    } catch (IOException e) {
+//                        e.printStackTrace();
+//                    }
+//
+//                        }
+//
+//
+//
+//                        @Override
+//                        public void onStatusChanged(String provider, int status, Bundle extras) {
+//
+//                        }
+//
+//                        @Override
+//                        public void onProviderEnabled(String provider) {
+//
+//                        }
+//
+//                        @Override
+//                        public void onProviderDisabled(String provider) {
+//
+//                        }
+//                    });
+//
+//
+//
+//        } else {
+//
+//            Log.i("checkkLocation", "5");
+//
+//            EasyPermissions.requestPermissions(this, "Please grant the location permission", REQUEST_LOCATION_PERMISSION, perms);
+//        }
+//
+//        return;
+//    }
 
 
     private void populateData(String wifiName, String wifiBssid, String streetName) {
@@ -385,13 +410,58 @@ public class RegAdmin_asAdmin_Profile_Activity extends AppCompatActivity impleme
 
         if(observable instanceof Presenter_RegAdmin_asAdmin_Profile_Activity){
 
-
-
             //keep listening for location, wifi provided, and
 
             Map<String,String> locationHere = ((Presenter_RegAdmin_asAdmin_Profile_Activity) observable).getRemapReturnLocation();
 
+            if(locationHere!=null){
 
+                Geocoder geocoder = new Geocoder(RegAdmin_asAdmin_Profile_Activity.this, Locale.getDefault());
+
+                Double latitudeHere =null;
+                Double longitudeHere =null;
+
+                for(Map.Entry<String,String> kk: locationHere.entrySet()){
+
+                    if(kk.getKey().equals("latitudeHere")){
+
+                      //  locationMapFinal.put("latitudeFinal" ,kk.getValue());
+                        latitudeHere = Double.valueOf(kk.getValue());
+                    }
+                    if(kk.getKey().equals("longitudeHere")){
+
+                      //  locationMapFinal.put("longitudeFinal", kk.getValue());
+                        longitudeHere = Double.valueOf(kk.getValue());
+                    }
+
+
+                    if(latitudeHere!=null && longitudeHere!=null) {
+                        try {
+                            streetName = geocoder.getFromLocation(latitudeHere, longitudeHere, 1).get(0).getSubThoroughfare();
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+
+                        adminDetailsList.add(new AdminDetail(streetName, "drawable/ic_location_on_black_24dp"));
+                        recyclerView_Admin_Profile_Adapter.notifyDataSetChanged();
+                        recyclerView.setAdapter(recyclerView_Admin_Profile_Adapter);
+                        recyclerView_Admin_Profile_Adapter.setPassResult_checkBox_interface(new PassResult_CheckBox_Interface() {
+                            @Override
+                            public void passingArray(ArrayList<AdminDetail> adminDetails) {
+                                //returned list.
+
+                                returnAdminDetailList = adminDetails;
+                            }
+                        });
+
+                    }
+                }
+
+
+            }
+
+
+            Map<String, String> wifiHere = ((Presenter_RegAdmin_asAdmin_Profile_Activity) observable).getReturnMapWifi();
 
 
         }

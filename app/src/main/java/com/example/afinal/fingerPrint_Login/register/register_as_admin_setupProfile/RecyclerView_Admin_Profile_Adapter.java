@@ -34,7 +34,7 @@ class RecyclerView_Admin_Profile_Adapter extends RecyclerView.Adapter<RecyclerVi
             this.passResult_checkBox_interface=passResult_checkBox_interface;
     }
 
-    public static boolean sentCheck;
+    //public static boolean sentCheck;
 
 
 
@@ -138,15 +138,7 @@ class RecyclerView_Admin_Profile_Adapter extends RecyclerView.Adapter<RecyclerVi
 
             checkBox = itemView.findViewById(R.id.admin_Profile_CardView_checkBox);
 
-//            checkBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-//                @Override
-//                public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-//                    adminDetails.get(j).setCheckBox(isChecked);
-//
-//                    Log.i("checkkLocation", "checkbox adapter " + isChecked + " j is: "+ j + " item is:"+adminDetails.get(j).getTextShow());
-//
-//                }
-//            });
+
         }
 
 

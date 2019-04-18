@@ -9,6 +9,8 @@ import android.location.Geocoder;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
+import android.net.wifi.WifiInfo;
+import android.net.wifi.WifiManager;
 import android.os.Bundle;
 import android.util.Log;
 
@@ -18,6 +20,7 @@ import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Observable;
+import java.util.prefs.AbstractPreferences;
 
 import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
@@ -33,9 +36,12 @@ public class Presenter_RegAdmin_asAdmin_Profile_Activity extends Observable {
 
 
     private Map<String, String> remapReturnLocation;
+    private WifiInfo wifiInfo;
+    private Map<String,String> returnMapWifi;
 
     public Presenter_RegAdmin_asAdmin_Profile_Activity(Context mContext) {
         remapReturnLocation = new HashMap<>();
+        returnMapWifi = new HashMap<>();
         this.mContext = mContext;
     }
 
@@ -60,7 +66,7 @@ public class Presenter_RegAdmin_asAdmin_Profile_Activity extends Observable {
                 // for ActivityCompat#requestPermissions for more details.
                 return;
             }
-            mLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 200,
+            mLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1000,
                     5, mLocationLister = new LocationListener() {
                         @Override
                         public void onLocationChanged(Location location) {
@@ -140,11 +146,26 @@ public class Presenter_RegAdmin_asAdmin_Profile_Activity extends Observable {
 
     private void setLocationReturn(Location location) {
 
-        String latitude = String.valueOf(location.getLatitude());
-        String longitude = String.valueOf(location.getLongitude());
+        if(location!=null) {
 
-        remapReturnLocation.put("latitudeHere", latitude);
-        remapReturnLocation.put("longitudeHere",longitude);
+            String latitude = String.valueOf(location.getLatitude());
+            String longitude = String.valueOf(location.getLongitude());
+
+            remapReturnLocation.put("latitudeHere", latitude);
+            remapReturnLocation.put("longitudeHere", longitude);
+
+            setChanged();
+            notifyObservers();
+
+        }else {
+
+            remapReturnLocation.put("latitudeHere", "");
+            remapReturnLocation.put("longitudeHere", "");
+
+            setChanged();
+            notifyObservers();
+
+        }
 
         return;
     }
@@ -152,5 +173,38 @@ public class Presenter_RegAdmin_asAdmin_Profile_Activity extends Observable {
     public Map<String, String> getRemapReturnLocation() {
 
         return remapReturnLocation;
+    }
+
+    public void getWifiNow(WifiManager wifiManager) {
+
+        wifiManager = (WifiManager) mContext.getApplicationContext().getSystemService(Context.WIFI_SERVICE);
+        wifiInfo = wifiManager.getConnectionInfo();
+
+        if(wifiInfo!=null){
+
+            String wifiSSID = wifiInfo.getSSID();
+            String wifiBSSID = wifiInfo.getBSSID();
+
+            returnMapWifi.put("SSID",wifiSSID);
+            returnMapWifi.put("BSSID",wifiBSSID);
+
+
+            setChanged();
+            notifyObservers();
+        }else {
+
+
+            returnMapWifi.put("SSID","");
+            returnMapWifi.put("BSSID","");
+
+            setChanged();
+            notifyObservers();
+        }
+
+    }
+
+    public Map<String, String> getReturnMapWifi() {
+
+        return returnMapWifi;
     }
 }
