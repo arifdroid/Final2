@@ -10,6 +10,7 @@ import android.net.Uri;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.example.afinal.fingerPrint_Login.register.WifiReceiver;
@@ -41,6 +42,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 import de.hdodenhof.circleimageview.CircleImageView;
+import pub.devrel.easypermissions.EasyPermissions;
 
 public class RegAdmin_asAdmin_Profile_Activity extends AppCompatActivity implements Observer {
 
@@ -140,34 +142,6 @@ public class RegAdmin_asAdmin_Profile_Activity extends AppCompatActivity impleme
         //firebase reference
 
         storageReference = FirebaseStorage.getInstance().getReference();
-
-//        //setting up wifi if not initially setup.
-//        presenter.getWifiNow();
-
-        //try setup timer
-
-
-//        timer = new Timer();
-//
-//        timer.scheduleAtFixedRate(new TimerTask() {
-//            @Override
-//            public void run() {
-//
-//                count++;
-//
-//                Log.i("checkkLocation", "[TIMER] count : " + count);
-//
-//                if(count==15){
-//                    Log.i("checkkLocation", "[TIMER] count : " + count);
-//
-//                    presenter.getWifiNow();
-//
-//                    timer.cancel();
-//                }
-//
-//
-//            }
-//        },0,1000);
 
 
         //setting up image
@@ -325,12 +299,12 @@ public class RegAdmin_asAdmin_Profile_Activity extends AppCompatActivity impleme
 
     }
 //
-//    @Override
-//    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-//        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-//
-//        EasyPermissions.onRequestPermissionsResult(requestCode, permissions, grantResults, this);
-//    }
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+
+        EasyPermissions.onRequestPermissionsResult(requestCode, permissions, grantResults, this);
+    }
 //
 //    @AfterPermissionGranted(REQUEST_LOCATION_PERMISSION)
 //    public void requestLocationPermission() {
