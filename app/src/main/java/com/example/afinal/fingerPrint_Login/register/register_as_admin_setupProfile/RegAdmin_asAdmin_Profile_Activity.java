@@ -36,12 +36,15 @@ import com.google.firebase.storage.StorageReference;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Locale;
+import java.util.Map;
+import java.util.Observable;
+import java.util.Observer;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 import pub.devrel.easypermissions.AfterPermissionGranted;
 import pub.devrel.easypermissions.EasyPermissions;
 
-public class RegAdmin_asAdmin_Profile_Activity extends AppCompatActivity {
+public class RegAdmin_asAdmin_Profile_Activity extends AppCompatActivity implements Observer {
 
     private CircleImageView circleImageView;
 
@@ -79,6 +82,8 @@ public class RegAdmin_asAdmin_Profile_Activity extends AppCompatActivity {
 
     private FirebaseFirestore firebaseFirestore;
 
+    private Presenter_RegAdmin_asAdmin_Profile_Activity presenter;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -87,6 +92,9 @@ public class RegAdmin_asAdmin_Profile_Activity extends AppCompatActivity {
 
         wifiManager = (WifiManager) getApplicationContext().getSystemService(Context.WIFI_SERVICE);
         wifiInfo = wifiManager.getConnectionInfo();
+
+        presenter = new Presenter_RegAdmin_asAdmin_Profile_Activity(this);
+
 
         returnAdminDetailList = new ArrayList<>();
 
@@ -128,7 +136,10 @@ public class RegAdmin_asAdmin_Profile_Activity extends AppCompatActivity {
 
         //get Location
 
-        requestLocationPermission();
+        //requestLocationPermission();
+
+        presenter.requestLocationPermission(mLocationManager);
+
 
 
         floatingActionButton.setOnClickListener(new View.OnClickListener() {
@@ -369,4 +380,21 @@ public class RegAdmin_asAdmin_Profile_Activity extends AppCompatActivity {
         return name;
     }
 
+    @Override
+    public void update(Observable observable, Object o) {
+
+        if(observable instanceof Presenter_RegAdmin_asAdmin_Profile_Activity){
+
+
+
+            //keep listening for location, wifi provided, and
+
+            Map<String,String> locationHere = ((Presenter_RegAdmin_asAdmin_Profile_Activity) observable).getRemapReturnLocation();
+
+
+
+
+        }
+
+    }
 }

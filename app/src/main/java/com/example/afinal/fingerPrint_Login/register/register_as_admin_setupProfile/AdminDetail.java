@@ -2,7 +2,7 @@ package com.example.afinal.fingerPrint_Login.register.register_as_admin_setupPro
 
 import android.widget.ImageView;
 
-class AdminDetail {
+public class AdminDetail {
 
     private String textShow;
     private String imageViewPath;

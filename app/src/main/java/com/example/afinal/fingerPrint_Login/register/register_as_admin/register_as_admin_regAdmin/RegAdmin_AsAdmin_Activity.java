@@ -5,8 +5,13 @@ import android.content.Intent;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.constraintlayout.widget.ConstraintLayout;
+
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -41,6 +46,9 @@ public class RegAdmin_AsAdmin_Activity extends AppCompatActivity implements Obse
 
     private EditText editTextName, editTextPhone, editTextCode;
     private Button buttonLogin, buttonGetCode;
+
+    private ConstraintLayout constraintLayout;
+
     private TextView textViewMessage;
     private Timer timer;
     private int count;
@@ -55,18 +63,20 @@ public class RegAdmin_AsAdmin_Activity extends AppCompatActivity implements Obse
     private String codeUserAdminEnter;
     private PhoneAuthCredential credenttial;
     private int countForAnimateButton;
+    private int copyadminCreated;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_reg_admin__as_admin_);
 
-
+        copyadminCreated=0;
         countForAnimateButton=0;
         credenttial=null;
         editTextName = findViewById(R.id.regAdmin_asAdmin_editText_NameiD);
         editTextPhone = findViewById(R.id.regAdmin_asAdmin_editTextPhone);
         editTextCode = findViewById(R.id.regAdmin_asAdmin_editText_CodeiD);
+        constraintLayout = findViewById(R.id.regAdmin_constraint);
 
         allowCreateAdmin=false;
 
@@ -129,12 +139,13 @@ public class RegAdmin_AsAdmin_Activity extends AppCompatActivity implements Obse
         buttonGetCode.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
+                textViewMessage.setText("check input..");
                 userName =editTextName.getText().toString();
                 userPhone =editTextPhone.getText().toString();
 
                 if(checkInput(userName,userPhone)){
                     //if input true
+                    textViewMessage.setText("getting phone verification..");
 
                     getCallBack(userPhone);
 
@@ -154,9 +165,16 @@ public class RegAdmin_AsAdmin_Activity extends AppCompatActivity implements Obse
             @Override
             public void onClick(View v) {
 
-                Intent intent = new Intent(RegAdmin_AsAdmin_Activity.this,RegAdmin_asAdmin_Profile_Activity.class);
-                startActivity(intent);
-                finish();
+                String codeEntered = editTextCode.getText().toString();
+
+            if(checkInput(codeEntered)){
+
+                checkCredential(codeEntered,codeFromFirebase);
+
+            }else {
+
+                Toast.makeText(RegAdmin_AsAdmin_Activity.this,"please enter code received",Toast.LENGTH_SHORT).show();
+            }
             }
         });
 
@@ -164,13 +182,88 @@ public class RegAdmin_AsAdmin_Activity extends AppCompatActivity implements Obse
 
         mCallBack = new PhoneAuthProvider.OnVerificationStateChangedCallbacks() {
             @Override
-            public void onVerificationCompleted(PhoneAuthCredential phoneAuthCredential) {
+            public void onVerificationCompleted(final PhoneAuthCredential phoneAuthCredential) {
 
-                checkPhoneCredential(phoneAuthCredential);
+                Toast.makeText(RegAdmin_AsAdmin_Activity.this,"verified, please wait, attempt automatically...",Toast.LENGTH_LONG).show();
+
+                //checkPhoneCredential(phoneAuthCredential);
+
+                textViewMessage.setText("phone verified, try automatically...");
+
+
+                timer.scheduleAtFixedRate(new TimerTask() {
+                    @Override
+                    public void run() {
+                        countForAnimateButton++;
+                        //here after got code, we animate button, to visible and move
+                        //after 1 second, after 3 secound
+
+                        if(countForAnimateButton==10 && copyadminCreated!=2){
+                            runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    editTextCode.setHint("please enter code here");
+                                }
+                            });
+
+
+                        }
+
+                        if(countForAnimateButton==1){
+
+                            runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+
+                                    // https://www.youtube.com/watch?v=IECLEh98HnE
+                                    // https://stackoverflow.com/questions/30535304/android-pop-in-animation
+                                    // https://stackoverflow.com/questions/9448732/shaking-wobble-view-animation-in-android
+
+
+
+                                    ObjectAnimator animator = ObjectAnimator.ofFloat(buttonGetCode,"translationY",-70f);
+                                    buttonGetCode.animate()
+                                            .alpha(0f)
+                                            .setDuration(200)
+                                            .setListener(null);
+                                    animator.setDuration(200);
+                                    animator.start();
+
+
+                                    Animation fadeIn = AnimationUtils.loadAnimation(RegAdmin_AsAdmin_Activity.this,R.anim.fadein);
+                                    buttonLogin.startAnimation(fadeIn);
+
+
+                                    ObjectAnimator moveUpGroup = ObjectAnimator.ofFloat(constraintLayout,"translationY",-180f);
+                                    moveUpGroup.setDuration(200);
+                                    moveUpGroup.start();
+                                    editTextCode.startAnimation(fadeIn);
+                                    //editTextCode.setText("try to log in automatically..");
+                                    editTextCode.setHint("auto registering attempt..");
+
+                                    checkPhoneCredential(phoneAuthCredential);
+//                                buttonLogin.animate()
+//                                        .alpha(1f)
+//                                        .setDuration(400)
+//                                        .setListener(null);
+
+
+
+                                }
+                            });
+
+                        }
+
+                    }
+                },500,1000);
+
             }
 
             @Override
             public void onVerificationFailed(FirebaseException e) {
+
+                Toast.makeText(RegAdmin_AsAdmin_Activity.this,"verification fail: ",Toast.LENGTH_LONG).show();
+                Log.i("fail to verify","1 : "+e.getMessage());
 
             }
 
@@ -183,6 +276,7 @@ public class RegAdmin_AsAdmin_Activity extends AppCompatActivity implements Obse
             }
         };
 
+        presenter.addObserver(this);
 
     }
 
@@ -201,11 +295,16 @@ public class RegAdmin_AsAdmin_Activity extends AppCompatActivity implements Obse
 
     }
 
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        presenter.deleteObserver(this);
+    }
 
     private void getCallBack(String userPhone) {
 
       PhoneAuthProvider.getInstance().verifyPhoneNumber(userPhone,
-                45,
+                60,
                 TimeUnit.SECONDS,
                 RegAdmin_AsAdmin_Activity.this,
                 mCallBack);
@@ -269,74 +368,65 @@ public class RegAdmin_AsAdmin_Activity extends AppCompatActivity implements Obse
 
     @Override
     public void update(Observable observable, Object o) {
+        Log.i("checkFlowAsAdmin", "5");
 
-    if(o instanceof Presenter_RegAdmin_AsAdmin_Activity){
+        if(observable instanceof Presenter_RegAdmin_AsAdmin_Activity){
 
-
+        Log.i("checkFlowAsAdmin", "4");
         // 0 = initial , 1 = success , 2 = fail
-        int adminDocumentCreated = ((Presenter_RegAdmin_AsAdmin_Activity) o).getIfDocumentCreated();
-
+        int adminDocumentCreated = ((Presenter_RegAdmin_AsAdmin_Activity) observable).getIfDocumentCreated();
+        copyadminCreated=adminDocumentCreated;
         if(adminDocumentCreated==1){
+
+            Log.i("checkFlowAsAdmin", "3");
+
+            timer.cancel();
+            Toast.makeText(this, "successfully registered", Toast.LENGTH_SHORT).show();
+
+            Intent intent = new Intent(RegAdmin_AsAdmin_Activity.this,RegAdmin_asAdmin_Profile_Activity.class);
+            intent.putExtra("adminName_asAdmin",userName);
+            intent.putExtra("adminPhone_asAdmin",userPhone);
+            //intent.addFlags(Intent.)
+
+            startActivity(intent);
+
+
 
 
         }
         if(adminDocumentCreated==0){
 
+            timer.cancel();
+            Log.i("checkFlowAsAdmin", "2");
+            Toast.makeText(this,"please try again",Toast.LENGTH_SHORT).show();
+
+
         }
         if(adminDocumentCreated==2){
 
+            timer.cancel();
+
             //here can intent to next.
+
+            Log.i("checkFlowAsAdmin", "1");
+            Toast.makeText(this,"please try again",Toast.LENGTH_SHORT).show();
+
+
 
 
         }
         if(adminDocumentCreated==3){ //already exist.
 
+            Toast.makeText(this,"phone already registered",Toast.LENGTH_SHORT).show();
 
         }
 
-        credenttial = ((Presenter_RegAdmin_AsAdmin_Activity) o).getCredential();
+        credenttial = ((Presenter_RegAdmin_AsAdmin_Activity) observable).getCredential();
 
         if(credenttial!=null){
 
             checkPhoneCredential(credenttial);
 
-
-            timer.scheduleAtFixedRate(new TimerTask() {
-                @Override
-                public void run() {
-                     countForAnimateButton++;
-                    //here after got code, we animate button, to visible and move
-                    //after 1 second, after 3 secound
-
-                    if(countForAnimateButton==3){
-
-                        runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-
-                                //https://www.youtube.com/watch?v=IECLEh98HnE
-
-                                ObjectAnimator animator = ObjectAnimator.ofFloat(buttonGetCode,"translationY",-80f);
-                                buttonGetCode.animate()
-                                        .alpha(0f)
-                                        .setDuration(400)
-                                        .setListener(null);
-                                animator.setDuration(400);
-                                animator.start();
-                                buttonLogin.animate()
-                                        .alpha(1f)
-                                        .setDuration(400)
-                                        .setListener(null);
-
-
-
-                            }
-                        });
-
-                    }
-
-                }
-            },500,1500);
 
         }
 

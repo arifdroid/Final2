@@ -33,12 +33,14 @@ public class Presenter_RegAdmin_AsAdmin_Activity extends Observable {
 
     public Presenter_RegAdmin_AsAdmin_Activity(Context context){
         this.mContext= context;
+        allowCreateAdmin=0;
+        return;
 
     }
 
 
     public void checkCredentialWithUpdates(PhoneAuthCredential phoneAuthCredential, String name, String phone) {
-        allowCreateAdmin=0;
+
         this.nameUser_admin=name;
         this.phoneUser_admin=phone;
 
@@ -63,12 +65,9 @@ public class Presenter_RegAdmin_AsAdmin_Activity extends Observable {
 
                                 if(task.isSuccessful()){
 
-                                    if(task.getResult()!=null) {
-
-                                        if (task.getResult().isEmpty()) {
+                                        if(task.getResult().size()==0){
 
                                             //here we can add document
-
 
 
                                             Map<String,Object> kk = new HashMap<>();
@@ -82,12 +81,13 @@ public class Presenter_RegAdmin_AsAdmin_Activity extends Observable {
                                                     .document(nameUser_admin+phoneUser_admin+"collection");
 
 
+
+
                                             reference.set(kk).addOnCompleteListener(new OnCompleteListener<Void>() {
                                                 @Override
                                                 public void onComplete(@NonNull Task<Void> task) {
 
                                                     if(task.isSuccessful()) {
-                                                        Toast.makeText(mContext, "successfully registered", Toast.LENGTH_SHORT).show();
 
                                                         allowCreateAdmin=1;
                                                         setChanged();
@@ -109,7 +109,6 @@ public class Presenter_RegAdmin_AsAdmin_Activity extends Observable {
                                                 public void onCanceled() {
 
                                                     allowCreateAdmin=2;
-                                                    Toast.makeText(mContext,"please try again",Toast.LENGTH_SHORT).show();
 
 
                                                 }
@@ -125,7 +124,7 @@ public class Presenter_RegAdmin_AsAdmin_Activity extends Observable {
                                             //already exist.
                                         }
 
-                                    }
+
                                 }else {
 
                                     allowCreateAdmin=2;
@@ -168,7 +167,7 @@ public class Presenter_RegAdmin_AsAdmin_Activity extends Observable {
             }
         });
 
-
+        return;
     }
 
     public int getIfDocumentCreated(){
@@ -185,7 +184,7 @@ public class Presenter_RegAdmin_AsAdmin_Activity extends Observable {
             notifyObservers();
         }
 
-
+        return;
     }
 
     public PhoneAuthCredential getCredential() {
