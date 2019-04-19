@@ -81,6 +81,7 @@ public class Presenter_RegAdmin_AsAdmin_Activity extends Observable {
                                                     if(task.isSuccessful()){
 
                                                         if(task.getResult().size()==1){ //means already a user for another admin,
+                                                            //just confirmation.
 
                                                             //labeled as TWO
                                                             Map<String,Object> kk = new HashMap<>();

@@ -71,6 +71,7 @@ public class RegAdmin_AsAdmin_Activity extends AppCompatActivity implements Obse
     //testing phase
 
     private Button buttonTestHere;
+    private String admin_Label;
 
     // we try pull if there is any data in shared preferences
 
@@ -118,9 +119,23 @@ public class RegAdmin_AsAdmin_Activity extends AppCompatActivity implements Obse
             SharedPreferences prefse = getSharedPreferences(
                     "com.example.finalV8_punchCard", Context.MODE_PRIVATE);
 
-           // SharedPreferences.Editor editor = prefse.edit();
-
             String nameCheck = prefs.getString("final_User_Name","");
+
+            SharedPreferences.Editor editor = prefse.edit();
+
+            admin_Label="TWO";
+
+            editor.putString("final_adminLabel",admin_Label);  //always pull this.
+
+            //when label is two, then you have to overwrite everything. //problem with this design,
+            //once you uninstall,then you cant log in anymore. .. unless admin allow.
+
+//
+//            SharedPreferences prefsV2 = getSharedPreferences(
+//                    "com.example.finalV8_punchCard"+"_"+admin_Label, Context.MODE_PRIVATE);
+//            //create new shared preferences. //or just put in the old.
+
+
 
             Toast.makeText(this,"shared prefs exist, name: "+ nameCheck,Toast.LENGTH_LONG).show();
 
@@ -130,12 +145,9 @@ public class RegAdmin_AsAdmin_Activity extends AppCompatActivity implements Obse
 
         //if exist, put label on.
 
-
-
 //        SharedPreferences.Editor editor = prefs.edit(); // we need to know, which preferences belong to which admin,
 //        //if user registered to another admin.
-//
-//
+
 //        editor.putString("final_User_Name",userName);
 //        editor.putString("final_User_Phone",userPhone);
 //        editor.putString("final_Admin_Phone",adminPhone);
