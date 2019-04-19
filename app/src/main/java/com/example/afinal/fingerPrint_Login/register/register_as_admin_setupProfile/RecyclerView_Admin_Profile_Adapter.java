@@ -138,7 +138,6 @@ class RecyclerView_Admin_Profile_Adapter extends RecyclerView.Adapter<RecyclerVi
 
             checkBox = itemView.findViewById(R.id.admin_Profile_CardView_checkBox);
 
-
         }
 
 

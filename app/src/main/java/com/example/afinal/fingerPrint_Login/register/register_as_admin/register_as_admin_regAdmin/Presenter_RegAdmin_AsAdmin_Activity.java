@@ -30,6 +30,7 @@ public class Presenter_RegAdmin_AsAdmin_Activity extends Observable {
     private Context mContext;
     private int allowCreateAdmin;
     private PhoneAuthCredential credential;
+    private String adminLABEL;
 
     public Presenter_RegAdmin_AsAdmin_Activity(Context context){
         this.mContext= context;
@@ -52,7 +53,7 @@ public class Presenter_RegAdmin_AsAdmin_Activity extends Observable {
 
                     //check user withing admin document.
 
-                    CollectionReference collectionReference = FirebaseFirestore.getInstance()
+                    final CollectionReference collectionReference = FirebaseFirestore.getInstance()
                             .collection("all_admins_collections");
 
 
@@ -67,52 +68,185 @@ public class Presenter_RegAdmin_AsAdmin_Activity extends Observable {
 
                                         if(task.getResult().size()==0){
 
-                                            //here we can add document
+                                            //meaning no admin being registered yet with this number. thus
+                                            //here we can add document, but we need to add tag, so that we know which admin
+                                            //to pull this
 
+                                            Query queryForLable = collectionReference.whereArrayContains("employee_this_admin",phoneUser_admin);
 
-                                            Map<String,Object> kk = new HashMap<>();
-
-                                            kk.put("name",nameUser_admin);
-                                            kk.put("phone",phoneUser_admin);
-
-
-                                            DocumentReference reference = FirebaseFirestore.getInstance()
-                                                    .collection("all_admins_collections")
-                                                    .document(nameUser_admin+phoneUser_admin+"collection");
-
-
-
-
-                                            reference.set(kk).addOnCompleteListener(new OnCompleteListener<Void>() {
+                                            queryForLable.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                                                 @Override
-                                                public void onComplete(@NonNull Task<Void> task) {
+                                                public void onComplete(@NonNull Task<QuerySnapshot> task) {
 
-                                                    if(task.isSuccessful()) {
+                                                    if(task.isSuccessful()){
 
-                                                        allowCreateAdmin=1;
-                                                        setChanged();
-                                                        notifyObservers();
+                                                        if(task.getResult().size()==1){ //means already a user for another admin,
+
+                                                            //labeled as TWO
+                                                            Map<String,Object> kk = new HashMap<>();
+
+                                                            kk.put("name",nameUser_admin);
+                                                            kk.put("phone",phoneUser_admin);
+                                                            kk.put("adminLabel","TWO");
+
+                                                            adminLABEL = "TWO";
+
+                                                            DocumentReference reference = FirebaseFirestore.getInstance()
+                                                                    .collection("all_admins_collections")
+                                                                    .document(nameUser_admin+phoneUser_admin+"collection");
 
 
 
-                                                    }else {
 
-                                                         allowCreateAdmin=2;
-                                                        setChanged();
-                                                        notifyObservers();
-                                                        //
-                                                        //Toast.makeText(mContext,"please try again",Toast.LENGTH_SHORT).show();
+                                                            reference.set(kk).addOnCompleteListener(new OnCompleteListener<Void>() {
+                                                                @Override
+                                                                public void onComplete(@NonNull Task<Void> task) {
+
+                                                                    if(task.isSuccessful()) {
+
+                                                                        allowCreateAdmin=1;
+                                                                        setChanged();
+                                                                        notifyObservers();
+
+
+
+                                                                    }else {
+
+                                                                        allowCreateAdmin=2;
+                                                                        setChanged();
+                                                                        notifyObservers();
+                                                                        //
+                                                                        //Toast.makeText(mContext,"please try again",Toast.LENGTH_SHORT).show();
+                                                                    }
+                                                                }
+                                                            }).addOnCanceledListener(new OnCanceledListener() {
+                                                                @Override
+                                                                public void onCanceled() {
+
+                                                                    allowCreateAdmin=2;
+
+
+                                                                }
+                                                            });
+
+
+                                                        }
+                                                        if(task.getResult().size()==0){ // first time admin, user, not user for another admin
+
+                                                            //labeled as ONE
+
+                                                            Map<String,Object> kk = new HashMap<>();
+
+                                                            kk.put("name",nameUser_admin);
+                                                            kk.put("phone",phoneUser_admin);
+                                                            kk.put("adminLabel","ONE");
+
+                                                            adminLABEL = "ONE";
+
+                                                            DocumentReference reference = FirebaseFirestore.getInstance()
+                                                                    .collection("all_admins_collections")
+                                                                    .document(nameUser_admin+phoneUser_admin+"collection");
+
+                                                            reference.set(kk).addOnCompleteListener(new OnCompleteListener<Void>() {
+                                                                @Override
+                                                                public void onComplete(@NonNull Task<Void> task) {
+
+                                                                    if(task.isSuccessful()) {
+
+                                                                        allowCreateAdmin=1;
+                                                                        setChanged();
+                                                                        notifyObservers();
+
+
+
+                                                                    }else {
+
+                                                                        allowCreateAdmin=2;
+                                                                        setChanged();
+                                                                        notifyObservers();
+                                                                        //
+                                                                        //Toast.makeText(mContext,"please try again",Toast.LENGTH_SHORT).show();
+                                                                    }
+                                                                }
+                                                            }).addOnCanceledListener(new OnCanceledListener() {
+                                                                @Override
+                                                                public void onCanceled() {
+
+                                                                    allowCreateAdmin=2;
+
+
+                                                                }
+                                                            });
+
+
+                                                        }
+
+                                                        else { // other error., somehow more than 1
+
+
+
+                                                        }
+
+                                                    }
+                                                    else { //task fail, need to check again
+
+
                                                     }
                                                 }
                                             }).addOnCanceledListener(new OnCanceledListener() {
                                                 @Override
                                                 public void onCanceled() {
 
-                                                    allowCreateAdmin=2;
 
 
                                                 }
                                             });
+//
+//
+//
+//                                            Map<String,Object> kk = new HashMap<>();
+//
+//                                            kk.put("name",nameUser_admin);
+//                                            kk.put("phone",phoneUser_admin);
+//
+//
+//                                            DocumentReference reference = FirebaseFirestore.getInstance()
+//                                                    .collection("all_admins_collections")
+//                                                    .document(nameUser_admin+phoneUser_admin+"collection");
+//
+//
+//
+//
+//                                            reference.set(kk).addOnCompleteListener(new OnCompleteListener<Void>() {
+//                                                @Override
+//                                                public void onComplete(@NonNull Task<Void> task) {
+//
+//                                                    if(task.isSuccessful()) {
+//
+//                                                        allowCreateAdmin=1;
+//                                                        setChanged();
+//                                                        notifyObservers();
+//
+//
+//
+//                                                    }else {
+//
+//                                                         allowCreateAdmin=2;
+//                                                        setChanged();
+//                                                        notifyObservers();
+//                                                        //
+//                                                        //Toast.makeText(mContext,"please try again",Toast.LENGTH_SHORT).show();
+//                                                    }
+//                                                }
+//                                            }).addOnCanceledListener(new OnCanceledListener() {
+//                                                @Override
+//                                                public void onCanceled() {
+//
+//                                                    allowCreateAdmin=2;
+//
+//
+//                                                }
+//                                            });
 
                                         } else {
                                             //toast not forward

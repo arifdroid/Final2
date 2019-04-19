@@ -1,8 +1,10 @@
 package com.example.afinal.fingerPrint_Login.register.register_as_admin_setupProfile;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.location.Geocoder;
 import android.location.LocationListener;
 import android.location.LocationManager;
@@ -70,7 +72,7 @@ public class RegAdmin_asAdmin_Profile_Activity extends AppCompatActivity impleme
 
     private FloatingActionButton floatingActionButton;
 
-    private final int REQUEST_LOCATION_PERMISSION = 1;
+//    private final int REQUEST_LOCATION_PERMISSION = 1;
 
     //static final for image
 
@@ -143,10 +145,7 @@ public class RegAdmin_asAdmin_Profile_Activity extends AppCompatActivity impleme
 
         storageReference = FirebaseStorage.getInstance().getReference();
 
-
         //setting up image
-
-
         circleImageView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -163,7 +162,6 @@ public class RegAdmin_asAdmin_Profile_Activity extends AppCompatActivity impleme
 //        //setting up wifi if not initially setup.
 //        presenter.getWifiNow(wifiManager);
 
-
         mLocationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
 
 
@@ -176,8 +174,6 @@ public class RegAdmin_asAdmin_Profile_Activity extends AppCompatActivity impleme
         //requestLocationPermission();
 
         presenter.requestLocationPermission(mLocationManager);
-
-
 
         floatingActionButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -200,8 +196,6 @@ public class RegAdmin_asAdmin_Profile_Activity extends AppCompatActivity impleme
                         }
 
                     }
-
-
                     //problem is count always 1, inevitable, keep
 
 
@@ -214,8 +208,41 @@ public class RegAdmin_asAdmin_Profile_Activity extends AppCompatActivity impleme
 
                             Toast.makeText(RegAdmin_asAdmin_Profile_Activity.this, "all " + count + " boxes checked", Toast.LENGTH_SHORT).show();
 
+                            //here start a service save all this , create document for user.
+                            //and sharedpreferences as well.
+
+                            //here we saved all in sharedpreferences //create 4 pin id.
+
+
+                            //problem is when this admin want to register as user for other admin.
+                            //so we need to put label, then pull according to corresponding lable.
+
+                            //two tag,
+                            // tag ONE , mean user was admin, and added user under its tree
+                            // tag TWO , mean user was user , and want to become admin.
+                            //must be done at first phase.
+
+                            SharedPreferences prefs = getSharedPreferences(
+                                    "com.example.finalV8_punchCard", Context.MODE_PRIVATE);
+
+                            SharedPreferences.Editor editor = prefs.edit(); // we need to know, which preferences belong to which admin,
+                            //if user registered to another admin.
+
+                            editor.putString("final_User_Name",user_name_asAdmin);
+                            editor.putString("final_User_Phone",user_phone_asAdmin);
+
+                            editor.putString("final_Admin_Name", user_name_asAdmin);
+                            editor.putString("final_Admin_Phone",user_phone_asAdmin);
+                            //editor.putString("final_User_Picture", storageReference.toString());
+
+                            editor.commit();
+
+
+
                             Intent intent = new Intent(RegAdmin_asAdmin_Profile_Activity.this, Add_User_Activity.class);
                             startActivity(intent);
+
+
 
 
                         } else {
@@ -243,13 +270,7 @@ public class RegAdmin_asAdmin_Profile_Activity extends AppCompatActivity impleme
 
 
         //wifi listener
-//
-//        IntentFilter intentFilter = new IntentFilter();
-//
-//        intentFilter.addAction(WifiManager.SUPPLICANT_CONNECTION_CHANGE_ACTION);
-//        //registerReceiver(broadcastReceiver,)
 
-        //broadcast receiver
 
         Intent intentWifi = new Intent();
 
@@ -305,96 +326,6 @@ public class RegAdmin_asAdmin_Profile_Activity extends AppCompatActivity impleme
 
         EasyPermissions.onRequestPermissionsResult(requestCode, permissions, grantResults, this);
     }
-//
-//    @AfterPermissionGranted(REQUEST_LOCATION_PERMISSION)
-//    public void requestLocationPermission() {
-//        String[] perms = {Manifest.permission.ACCESS_FINE_LOCATION};
-//        if (EasyPermissions.hasPermissions(this, perms)) {
-//            //       Toast.makeText(this, "Permission already granted", Toast.LENGTH_SHORT).show();
-//
-//            if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-//                // TODO: Consider calling
-//                //    ActivityCompat#requestPermissions
-//                // here to request the missing permissions, and then overriding
-//                //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-//                //                                          int[] grantResults)
-//                // to handle the case where the user grants the permission. See the documentation
-//                // for ActivityCompat#requestPermissions for more details.
-//                return;
-//            }
-//            mLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 5000,
-//                    5, new LocationListener() {
-//                        @Override
-//                        public void onLocationChanged(Location location) {
-//
-//                    Double lat = location.getLatitude();
-//                    Double longitude = location.getLongitude();
-//
-//                    Log.i("checkkLocation", "3");
-//
-//                    Geocoder geocoder = new Geocoder(RegAdmin_asAdmin_Profile_Activity.this, Locale.getDefault());
-//
-//                    try {
-//
-//                        Log.i("checkkLocation", "4");
-//
-//                        streetName = geocoder.getFromLocation(lat, longitude, 1).get(0).getThoroughfare();
-//
-//                        Log.i("checkkLocation", "5 " + streetName);
-//
-//                        adminDetailsList.add(new AdminDetail(streetName, "drawable/ic_location_on_black_24dp"));
-//                        recyclerView_Admin_Profile_Adapter.notifyDataSetChanged();
-//                        recyclerView.setAdapter(recyclerView_Admin_Profile_Adapter);
-//                        recyclerView_Admin_Profile_Adapter.setPassResult_checkBox_interface(new PassResult_CheckBox_Interface() {
-//                            @Override
-//                            public void passingArray(ArrayList<AdminDetail> adminDetails) {
-//                                //returned list.
-//
-//                                returnAdminDetailList = adminDetails;
-//                            }
-//                        });
-//
-//
-//                        if(streetName!=null|| streetName!=""){
-//
-//                            mLocationManager.removeUpdates(this);
-//                        }
-//
-//                    } catch (IOException e) {
-//                        e.printStackTrace();
-//                    }
-//
-//                        }
-//
-//
-//
-//                        @Override
-//                        public void onStatusChanged(String provider, int status, Bundle extras) {
-//
-//                        }
-//
-//                        @Override
-//                        public void onProviderEnabled(String provider) {
-//
-//                        }
-//
-//                        @Override
-//                        public void onProviderDisabled(String provider) {
-//
-//                        }
-//                    });
-//
-//
-//
-//        } else {
-//
-//            Log.i("checkkLocation", "5");
-//
-//            EasyPermissions.requestPermissions(this, "Please grant the location permission", REQUEST_LOCATION_PERMISSION, perms);
-//        }
-//
-//        return;
-//    }
 
 
     private void populateData(String wifiName, String wifiBssid, String streetName) {
@@ -560,62 +491,14 @@ public class RegAdmin_asAdmin_Profile_Activity extends AppCompatActivity impleme
                 }
 
 
-
-
-
             }
 
-
-//                if(!gotWifi){
-//
-//                    Log.i("checkFlowData ", "6 , wifi not null");
-//
-//                    for(Map.Entry<String,String> kk : wifiHere.entrySet()){
-//
-//
-//                        if(kk.getKey().equals("SSID")){
-//
-//                            wifiSSIDHere = kk.getValue();
-//
-//                            //adminDetailsList.get(0).set(new AdminDetail(wifiSSIDHere, "drawable/ic_wifi_black_24dp"));
-//
-//
-//                                Log.i("checkFlowData ", "7, ssid: " + wifiSSIDHere);
-//
-//
-//                                if (adminDetailsList.size() >= 2) {
-//                                    Log.i("checkFlowData ", "8, somehow fail");
-//                                    adminDetailsList.get(0).setTextShow(wifiSSIDHere);
-//                                    recyclerView_Admin_Profile_Adapter.notifyDataSetChanged();
-//                                    gotWifi=true;
-//
-//                            }
-//                        }
-//
-//                        if(kk.getKey().equals("BSSID")){
-//
-//                            wifiBSSIDHere = kk.getValue(); //this return null
-//
-//                                if (adminDetailsList.size() >= 2) {
-//                                    adminDetailsList.get(1).setTextShow(wifiBSSIDHere);
-//                                    recyclerView_Admin_Profile_Adapter.notifyDataSetChanged();
-//                                }
-//
-//                        }
-//
-//                    }
-//
-//                }
 
 
 
         }
 
     }
-
-    //innerclassfor wifi change test
-
-
 
 
 }

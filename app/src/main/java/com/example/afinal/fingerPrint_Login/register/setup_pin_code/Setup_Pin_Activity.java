@@ -182,96 +182,6 @@ public class Setup_Pin_Activity extends AppCompatActivity {
 
 
 
-//        timer.scheduleAtFixedRate(new TimerTask() {
-//            @Override
-//            public void run() {
-//
-//                if(storageReference!=null) {
-//                    storageReference.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
-//                        @Override
-//                        public void onSuccess(Uri uri) {
-//
-//                            Log.i("checkSharedPreferences ", ", name: "+ nameHere + ", phone: "+ phoneHere );
-//
-//                            Picasso.with(Setup_Pin_Activity.this).load(uri.toString()).into(circleImageView);
-//                            if (nameHere != null) {
-//                                //textViewName.setText(nameHere +"updated");
-//
-//                            }
-//                            if (phoneHere != null) {
-//
-//
-//                               // textViewName.setText(nameHere +"updated");
-//                            }
-//                            textView.setText("please wait..automatica..l.");
-//                            Toast.makeText(Setup_Pin_Activity.this,"your image uploaded", Toast.LENGTH_SHORT).show();
-//                            //documentReference.addSnapshotListener()
-//
-//                            //timer.cancel();
-//                        }
-//                    }).addOnCanceledListener(new OnCanceledListener() {
-//                        @Override
-//                        public void onCanceled() {
-//
-//                            Log.i("checkSharedPreferences ", "canceled "+", name: "+ nameHere + ", phone: "+ phoneHere );
-//
-//                        }
-//                    }).addOnFailureListener(new OnFailureListener() {
-//                        @Override
-//                        public void onFailure(@NonNull Exception e) {
-//
-//                            Log.i("checkSharedPreferences ", "onfailure "+ e.getMessage());
-//
-//                        }
-//                    });
-//
-//
-//                }
-//
-//            }
-//        },0,2000);
-
-//        if(storageReference!=null) {
-//            storageReference.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
-//                @Override
-//                public void onSuccess(Uri uri) {
-//
-//                    Log.i("checkSharedPreferences ", ", name: "+ nameHere + ", phone: "+ phoneHere );
-//
-//                    Picasso.with(Setup_Pin_Activity.this).load(uri.toString()).into(circleImageView);
-//                    if (nameHere != null) {
-//                        //textViewName.setText(nameHere +"updated");
-//
-//                    }
-//                    if (phoneHere != null) {
-//
-//
-//                        // textViewName.setText(nameHere +"updated");
-//                    }
-//                    textView.setText("please wait..automatica..l.");
-//                    Toast.makeText(Setup_Pin_Activity.this,"your image uploaded", Toast.LENGTH_SHORT).show();
-//                    //documentReference.addSnapshotListener()
-//
-//                    //timer.cancel();
-//                }
-//            }).addOnCanceledListener(new OnCanceledListener() {
-//                @Override
-//                public void onCanceled() {
-//
-//                    Log.i("checkSharedPreferences ", "canceled "+", name: "+ nameHere + ", phone: "+ phoneHere );
-//
-//                }
-//            }).addOnFailureListener(new OnFailureListener() {
-//                @Override
-//                public void onFailure(@NonNull Exception e) {
-//
-//                    Log.i("checkSharedPreferences ", "onfailure "+ e.getMessage());
-//
-//                }
-//            });
-//
-//
-//        }
 
         button = findViewById(R.id.regUser_pinCode_buttoniD);
 
@@ -293,9 +203,6 @@ public class Setup_Pin_Activity extends AppCompatActivity {
                                 String number = number1+number2+number3+number4+"";
 
                                 //need to store to firestore as well.
-
-
-
                                 SharedPreferences prefs = getSharedPreferences(
                                         "com.example.finalV8_punchCard", Context.MODE_PRIVATE);
 

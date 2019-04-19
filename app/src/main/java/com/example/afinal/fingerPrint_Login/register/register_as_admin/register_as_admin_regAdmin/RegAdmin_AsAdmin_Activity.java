@@ -1,12 +1,14 @@
 package com.example.afinal.fingerPrint_Login.register.register_as_admin.register_as_admin_regAdmin;
 
 import android.animation.ObjectAnimator;
+import android.content.Context;
 import android.content.Intent;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
 
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -34,6 +36,7 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QuerySnapshot;
 
+import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Observable;
@@ -69,6 +72,9 @@ public class RegAdmin_AsAdmin_Activity extends AppCompatActivity implements Obse
 
     private Button buttonTestHere;
 
+    // we try pull if there is any data in shared preferences
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -93,6 +99,51 @@ public class RegAdmin_AsAdmin_Activity extends AppCompatActivity implements Obse
 
         presenter = new Presenter_RegAdmin_AsAdmin_Activity(this);
 
+        presenter.addObserver(this);
+
+
+        //here we saved all in sharedpreferences //create 4 pin id.
+
+        SharedPreferences prefs = getSharedPreferences(
+                "com.example.finalV8_punchCard", Context.MODE_PRIVATE);
+
+        // https://stackoverflow.com/questions/23635644/how-can-i-view-the-shared-preferences-file-using-android-studio
+
+        File f = new File("/data/data/com.example.afinal/shared_prefs/com.example.finalV8_punchCard.xml");
+        //File f2 = new File(Context.);
+
+
+        if(f.exists()){
+
+            SharedPreferences prefse = getSharedPreferences(
+                    "com.example.finalV8_punchCard", Context.MODE_PRIVATE);
+
+           // SharedPreferences.Editor editor = prefse.edit();
+
+            String nameCheck = prefs.getString("final_User_Name","");
+
+            Toast.makeText(this,"shared prefs exist, name: "+ nameCheck,Toast.LENGTH_LONG).show();
+
+        }else {
+            Toast.makeText(this,"shared prefs NOT exist",Toast.LENGTH_LONG).show();
+        }
+
+        //if exist, put label on.
+
+
+
+//        SharedPreferences.Editor editor = prefs.edit(); // we need to know, which preferences belong to which admin,
+//        //if user registered to another admin.
+//
+//
+//        editor.putString("final_User_Name",userName);
+//        editor.putString("final_User_Phone",userPhone);
+//        editor.putString("final_Admin_Phone",adminPhone);
+//        editor.putString("final_Admin_Name", adminName);
+//
+//        editor.putString("final_User_Picture", storageReference.toString());
+
+
         buttonTestHere.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -114,29 +165,7 @@ public class RegAdmin_AsAdmin_Activity extends AppCompatActivity implements Obse
         timer = new Timer();
 
         count=0;
-//
-//        timer.scheduleAtFixedRate(new TimerTask() {
-//            @Override
-//            public void run() {
-//                //move button here
-//
-//                count++;
-//                runOnUiThread(new Runnable() {
-//                    @Override
-//                    public void run() {
-//
-//                        Toast.makeText(RegAdmin_AsAdmin_Activity.this,"test animation"+count,Toast.LENGTH_SHORT).show();
-//                        ObjectAnimator animator = ObjectAnimator.ofFloat(buttonGetCode,"translationX",-70f);
-//                        animator.setDuration(1500);
-//                        animator.start();
-//                       // timer.cancel();
-//                    }
-//                });
-//
-//
-//            }
-//        },0,3000);
-//
+
 
         buttonLogin.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -298,7 +327,19 @@ public class RegAdmin_AsAdmin_Activity extends AppCompatActivity implements Obse
             }
         };
 
-        presenter.addObserver(this);
+        //problem is when this admin want to register as user for other admin.
+        //so we need to put label, then pull according to corresponding lable.
+
+        //two tag,
+        // tag ONE , mean user was admin, and added user under its tree
+        // tag TWO , mean user was user , and want to become admin.
+        //must be done at first phase.
+
+
+
+
+
+
 
     }
 
