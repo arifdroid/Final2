@@ -100,7 +100,7 @@ public class Login_Select_Action_Fragment extends Fragment implements View.OnCli
 
                     //hence pull the first value, ,, the admin phone, since we need the admin phone number to retrieve shared prefs
 
-                    String sharedPrefsCheck = prefs_Main_Pool.getString("final_Admin_Phone",""); //this relevant if 1 admin only.
+                    String sharedPrefsCheck = prefs_Main_Pool.getString("final_Admin_Phone_MainPool",""); //this relevant if 1 admin only.
 
                     //after pull admin phone, pull dedicated sharedpreferences to this admin, check exist? if not exist,
 
@@ -124,10 +124,14 @@ public class Login_Select_Action_Fragment extends Fragment implements View.OnCli
 
                         } else { //file not exist.
 
+                            Toast.makeText(getContext(),"issue: please contact admin.", Toast.LENGTH_LONG).show();
+
 
                         }
 
                     }else{ //somehow pulling data from pull dont contain admin phone
+
+                        Toast.makeText(getContext(),"issue: please contact admin.", Toast.LENGTH_LONG).show();
 
                     }
 
@@ -135,8 +139,8 @@ public class Login_Select_Action_Fragment extends Fragment implements View.OnCli
 
                     //so when we pull here, need special way to pull two shared prefs data.
 
-                    String sharedPrefsCheck_Admin_1 = prefs_Main_Pool.getString("final_Admin_Phone",""); //this relevant if 1 admin only.
-                    String sharedPrefsCheck_Admin_2 = prefs_Main_Pool.getString("final_Admin_Phone_2",""); //this relevant if 1 admin only.
+                    String sharedPrefsCheck_Admin_1 = prefs_Main_Pool.getString("final_Admin_Phone_MainPool",""); //this relevant if 1 admin only.
+                    String sharedPrefsCheck_Admin_2 = prefs_Main_Pool.getString("final_Admin_Phone_MainPool_2",""); //this relevant if 1 admin only.
 
                     //handle admin 1 first.
 
@@ -157,6 +161,7 @@ public class Login_Select_Action_Fragment extends Fragment implements View.OnCli
 
                         }else { //something wrong if not exist.
 
+                            Toast.makeText(getContext(),"issue: please contact admin.", Toast.LENGTH_LONG).show();
 
 
                         }
@@ -166,6 +171,9 @@ public class Login_Select_Action_Fragment extends Fragment implements View.OnCli
 
                     }
                     else { //somehow admin 1 phone number not written
+
+                        Toast.makeText(getContext(),"issue: please contact admin.", Toast.LENGTH_LONG).show();
+
 
 
                     }
@@ -190,28 +198,20 @@ public class Login_Select_Action_Fragment extends Fragment implements View.OnCli
 
                         }else { //something wrong if not exist.
 
+                            Toast.makeText(getContext(),"issue: please contact admin.", Toast.LENGTH_LONG).show();
 
 
                         }
 
-
-
-
                     }
 
+                }else { //other than string 1 or 2
 
-
-
-
+                    Toast.makeText(getContext(),"issue: please contact admin.", Toast.LENGTH_LONG).show();
 
                 }
 
             }
-
-
-
-
-
 
         }else { //if main pool dont even exist.
 
@@ -220,9 +220,6 @@ public class Login_Select_Action_Fragment extends Fragment implements View.OnCli
 
 
         }
-
-
-
 
         ///
 
@@ -238,8 +235,6 @@ public class Login_Select_Action_Fragment extends Fragment implements View.OnCli
         floatButton_Reg_Admin.setOnClickListener(this);
         floatButton_Back.setOnClickListener(this);
         floatButton_Note_MC.setOnClickListener(this);
-
-
 
 
 
@@ -291,7 +286,18 @@ public class Login_Select_Action_Fragment extends Fragment implements View.OnCli
 
                 break;
             case R.id.select_fragment_FloatButton_admin2:
-                ((FingerPrint_LogIn_Final_Activity)getActivity()).nameUser = "ryn";
+                if(nameHere!=null) {
+                    FingerPrint_LogIn_Final_Activity.timeFragmentBoolean=true;
+                    ((FingerPrint_LogIn_Final_Activity) getActivity()).nameUser = nameHere_2; //
+                    ((FingerPrint_LogIn_Final_Activity) getActivity()).phoneUser = phoneHere_2; //
+                    ((FingerPrint_LogIn_Final_Activity) getActivity()).globalAdminNameHere = adminName_2; //
+                    ((FingerPrint_LogIn_Final_Activity) getActivity()).globalAdminPhoneHere = adminPhone_2; //
+
+                    Log.i("finalSharePreDataCheck","Login_Select_Fragment 4, before return,name: "
+                            + nameHere_2+ ", phone: "+phoneHere_2+ ", adminName:"
+                            +adminName_2+" , adminPhone: "+adminPhone_2);
+                }
+
                 getFragmentManager().popBackStack();
 
 

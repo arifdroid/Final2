@@ -85,10 +85,10 @@ public class Presenter_RegAdmin_AsAdmin_Activity extends Observable {
                                                             //labeled as TWO
                                                             Map<String,Object> kk = new HashMap<>();
 
-                                                            sharedPrefs_label = "com.example.finalV8_punchCard." + phoneUser_admin;
+                                                           // sharedPrefs_label = "com.example.finalV8_punchCard." + phoneUser_admin;
                                                             kk.put("name",nameUser_admin);
                                                             kk.put("phone",phoneUser_admin);
-                                                            kk.put("sharedPrefs_label",sharedPrefs_label);
+                                                           // kk.put("sharedPrefs_label",sharedPrefs_label);
 
                                                             //sharedPrefs_label = "TWO";
 
@@ -138,11 +138,11 @@ public class Presenter_RegAdmin_AsAdmin_Activity extends Observable {
 
                                                             Map<String,Object> kk = new HashMap<>();
 
-                                                            sharedPrefs_label = "com.example.finalV8_punchCard." + phoneUser_admin;
+                                                          //  sharedPrefs_label = "com.example.finalV8_punchCard." + phoneUser_admin;
 
                                                             kk.put("name",nameUser_admin);
                                                             kk.put("phone",phoneUser_admin);
-                                                            kk.put("sharedPrefs_label",sharedPrefs_label); // or dont write it?
+                                                           // kk.put("sharedPrefs_label",sharedPrefs_label); // or dont write it?
 
 
                                                             //change label to share preferences

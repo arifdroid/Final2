@@ -222,15 +222,16 @@ public class RegAdmin_asAdmin_Profile_Activity extends AppCompatActivity impleme
                             // tag TWO , mean user was user , and want to become admin.
                             //must be done at first phase.
 
+                            //create new shared pref pool
+
                             SharedPreferences prefs = getSharedPreferences(
-                                    "com.example.finalV8_punchCard", Context.MODE_PRIVATE);
+                                    "com.example.finalV8_punchCard."+user_phone_asAdmin, Context.MODE_PRIVATE);
 
                             SharedPreferences.Editor editor = prefs.edit(); // we need to know, which preferences belong to which admin,
                             //if user registered to another admin.
 
                             editor.putString("final_User_Name",user_name_asAdmin);
                             editor.putString("final_User_Phone",user_phone_asAdmin);
-
                             editor.putString("final_Admin_Name", user_name_asAdmin);
                             editor.putString("final_Admin_Phone",user_phone_asAdmin);
                             //editor.putString("final_User_Picture", storageReference.toString());

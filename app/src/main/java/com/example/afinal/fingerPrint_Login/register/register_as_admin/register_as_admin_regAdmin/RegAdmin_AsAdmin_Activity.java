@@ -20,6 +20,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.afinal.R;
+import com.example.afinal.fingerPrint_Login.fingerprint_login.FingerPrint_LogIn_Final_Activity;
 import com.example.afinal.fingerPrint_Login.register.register_as_admin_setupProfile.RegAdmin_asAdmin_Profile_Activity;
 import com.example.afinal.fingerPrint_Login.register.register_user_activity.RegUser_Activity;
 import com.google.android.gms.tasks.OnCanceledListener;
@@ -104,67 +105,6 @@ public class RegAdmin_AsAdmin_Activity extends AppCompatActivity implements Obse
         presenter.addObserver(this);
 
 
-        //here we saved all in sharedpreferences //create 4 pin id.
-//
-//        SharedPreferences prefs = getSharedPreferences(
-//                "com.example.finalV8_punchCard", Context.MODE_PRIVATE);
-//
-//        // https://stackoverflow.com/questions/23635644/how-can-i-view-the-shared-preferences-file-using-android-studio
-//
-//        File f = new File("/data/data/com.example.afinal/shared_prefs/com.example.finalV8_punchCard.xml");
-//        //File f2 = new File(Context.);
-//
-//
-//        if(f.exists()){
-//
-//            SharedPreferences prefse = getSharedPreferences(
-//                    "com.example.finalV8_punchCard", Context.MODE_PRIVATE);
-//
-//            //maybe for easier task, we put identified phone at the back of shared preferences.
-//
-//            //just the shareprefs name keep changing.
-//
-//            editTextPhone.getText().toString();
-//
-//
-//
-//            String phoneUserCheck = prefs.getString("final_User_Phone",""); //possibly user exist, but admin not exist,
-//            //so still can create admin. admin will be automatically become its first admins user.
-//
-//            String phoneAdminCheck = prefs.getString("final_Admin_Phone","");
-//
-//            SharedPreferences.Editor editor = prefse.edit();
-//
-//            admin_Label="TWO";
-//
-//            editor.putString("final_adminLabel",admin_Label);  //always pull this.
-//
-//            //when label is two, then you have to overwrite everything. //problem with this design,
-//            //once you uninstall,then you cant log in anymore. .. unless admin allow.
-//
-//            //here we pull if exist, ready to, need a counter, if user register to many admin. we need to know which data to pull.
-//            //but we constrainst to single admin, dual user only right.
-//
-//            //this means user is already registered.
-//
-//            Toast.makeText(this,"shared prefs exist, phone: "+ phoneUserCheck,Toast.LENGTH_LONG).show();
-//
-//        }else {
-//            Toast.makeText(this,"shared prefs NOT exist",Toast.LENGTH_LONG).show();
-//        }
-
-        //if exist, put label on.
-
-//        SharedPreferences.Editor editor = prefs.edit(); // we need to know, which preferences belong to which admin,
-//        //if user registered to another admin.
-
-//        editor.putString("final_User_Name",userName);
-//        editor.putString("final_User_Phone",userPhone);
-//        editor.putString("final_Admin_Phone",adminPhone);
-//        editor.putString("final_Admin_Name", adminName);
-//
-//        editor.putString("final_User_Picture", storageReference.toString());
-
 
         buttonTestHere.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -212,25 +152,33 @@ public class RegAdmin_AsAdmin_Activity extends AppCompatActivity implements Obse
         buttonGetCode.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                textViewMessage.setText("check input..");
-                userName =editTextName.getText().toString();
-                userPhone =editTextPhone.getText().toString();
+                if(checkNumberOfAdminRegisteredTo()) {
+                    userName = editTextName.getText().toString();
+                    userPhone = editTextPhone.getText().toString();
 
-                if(checkInput(userName,userPhone)){
-                    //if input true
-                    textViewMessage.setText("getting phone verification..");
+                    textViewMessage.setText("check input..");
+                    if (checkInput(userName, userPhone)) {
+                        //if input true
+                        textViewMessage.setText("getting phone verification..");
 
-                    getCallBack(userPhone);
+                        getCallBack(userPhone);
 
-                }else {
+                    } else {
 
-                    //if input faulty
+                        //if input faulty
 
 
+                    }
+
+
+                }else { //if FALSE,
+
+                    //intent go back, disallow register more than one user//or admin, since registering admin, means registering user.
+
+                    Intent intentBack = new Intent(RegAdmin_AsAdmin_Activity.this, FingerPrint_LogIn_Final_Activity.class);
+                    startActivity(intentBack);
+                    finish();
                 }
-
-
-
             }
         });
 
@@ -359,11 +307,76 @@ public class RegAdmin_AsAdmin_Activity extends AppCompatActivity implements Obse
 
 
 
-
-
-
-
     }
+
+    //check shared preferences, if already 2, dont allow to register to admin
+
+    private boolean checkNumberOfAdminRegisteredTo(){
+
+        File f_MainPool = new File("/data/data/com.example.afinal/shared_prefs/com.example.finalV8_punchCard.MAIN_POOL.xml");
+
+        if(f_MainPool.exists()){ //if exist, should
+
+            //if exist, is already user to other admin, so counter should read 1.
+            //read count first if 2 or higher, send error.
+
+            SharedPreferences prefs_Main_Pool = this.getSharedPreferences("com.example.finalV8_punchCard.MAIN_POOL", Context.MODE_PRIVATE);
+
+            String count_admin = prefs_Main_Pool.getString("count_admin","");
+
+            if(Integer.valueOf(count_admin)==1){
+
+
+                return true; //return can create new admmin, since within 2 user max.
+
+//                SharedPreferences.Editor editor_Main_Pool = prefs_Main_Pool.edit();
+//
+//                editor_Main_Pool.putString("count_admin","2"); //here we update the count. //we could just check earlier.
+//                editor_Main_Pool.putString("final_Admin_Phone_MainPool_2",userPhone);
+//                //editor_Main_Pool.putString("")
+//
+//                editor_Main_Pool.commit();
+
+
+            }if((Integer.valueOf(count_admin)>=2)){
+
+
+                return false;
+                //this should be error. somehow, should not happen to have register to 2 admin.
+
+
+            }else {
+
+
+
+                return false;// somehow something weird data pulled
+            }
+
+
+
+
+
+
+        }else {
+
+
+            return true; //not exist yet, so can add more user. //another user
+
+            //here we create, since it is not exist yet.
+//
+//            SharedPreferences prefs_Main_Pool = this.getSharedPreferences("com.example.finalV8_punchCard.MAIN_POOL", Context.MODE_PRIVATE);
+//
+//            SharedPreferences.Editor editor_Main_Pool = prefs_Main_Pool.edit();
+//
+//            editor_Main_Pool.putString("count_admin","1");
+//            editor_Main_Pool.putString("final_Admin_Phone_MainPool",userPhone);
+//            //editor_Main_Pool.putString("")
+//
+//            editor_Main_Pool.commit();
+
+        }
+    }
+
 
     private void checkCredential(String codeUserAdminEnter, String codeFromFirebase) {
 
@@ -471,48 +484,60 @@ public class RegAdmin_AsAdmin_Activity extends AppCompatActivity implements Obse
 
             // https://stackoverflow.com/questions/23635644/how-can-i-view-the-shared-preferences-file-using-android-studio
 
-            String sharedPrefsCheck = "com.example.finalV8_punchCard." + userPhone;
+            //first check with pool, need to update or create?
 
-            //this is admin belong phone user. so in user check, enter admin detail.
+            File f_MainPool = new File("/data/data/com.example.afinal/shared_prefs/com.example.finalV8_punchCard.MAIN_POOL.xml");
 
-            File f = new File("/data/data/com.example.afinal/shared_prefs/"+sharedPrefsCheck +".xml");
-            //File f2 = new File(Context.);
+            if(f_MainPool.exists()){ //if exist, should
+
+                //if exist, is already user to other admin, so counter should read 1.
+                //read count first if 2 or higher, send error.
+
+                SharedPreferences prefs_Main_Pool = this.getSharedPreferences("com.example.finalV8_punchCard.MAIN_POOL", Context.MODE_PRIVATE);
+
+                String count_admin = prefs_Main_Pool.getString("count_admin","");
+
+                if(Integer.valueOf(count_admin)==1){
+
+                    SharedPreferences.Editor editor_Main_Pool = prefs_Main_Pool.edit();
+
+                    editor_Main_Pool.putString("count_admin","2"); //here we update the count. //we could just check earlier.
+                    editor_Main_Pool.putString("final_Admin_Phone_MainPool_2",userPhone);
+                    //editor_Main_Pool.putString("")
+
+                    editor_Main_Pool.commit();
 
 
-            if(f.exists()){
+                }if((Integer.valueOf(count_admin)>=2)){
 
-                SharedPreferences prefse = getSharedPreferences(
-                        sharedPrefsCheck, Context.MODE_PRIVATE);
+                    //this should be error. somehow, should not happen to have register to 2 admin.
 
-              //  String phoneUserCheck = prefse.getString("final_User_Phone",""); //possibly user exist, but admin not exist,
-                //so still can create admin. admin will be automatically become its first admins user.
-                String phoneAdminCheck = prefse.getString("final_Admin_Phone","");
 
-                SharedPreferences.Editor editor = prefse.edit();
+                }
 
 
 
-                //editor.putStringSet()
 
-//                admin_Label="TWO";
-//
-//                editor.putString("final_adminLabel",admin_Label);  //always pull this.
 
-                //when label is two, then you have to overwrite everything. //problem with this design,
-                //once you uninstall,then you cant log in anymore. .. unless admin allow.
-
-                //here we pull if exist, ready to, need a counter, if user register to many admin. we need to know which data to pull.
-                //but we constrainst to single admin, dual user only right.
-
-                //this means user is already registered.
-
-                Toast.makeText(this,"shared prefs exist, phone: "+ phoneAdminCheck,Toast.LENGTH_LONG).show();
 
             }else {
-                Toast.makeText(this,"shared prefs NOT exist, can create : "+userPhone,Toast.LENGTH_LONG).show();
+
+                //here we create, since it is not exist yet.
+
+                SharedPreferences prefs_Main_Pool = this.getSharedPreferences("com.example.finalV8_punchCard.MAIN_POOL", Context.MODE_PRIVATE);
+
+                SharedPreferences.Editor editor_Main_Pool = prefs_Main_Pool.edit();
+
+                editor_Main_Pool.putString("count_admin","1");
+                editor_Main_Pool.putString("final_Admin_Phone_MainPool",userPhone);
+                //editor_Main_Pool.putString("final_Admin_Name_MainPool",userPhone);
+
+                //editor_Main_Pool.putString("")
+
+                editor_Main_Pool.commit();
+
             }
 
-            Log.i("checkFlowAsAdmin", "3");
 
             timer.cancel();
             Toast.makeText(this, "successfully registered", Toast.LENGTH_SHORT).show();

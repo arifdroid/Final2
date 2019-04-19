@@ -49,6 +49,7 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 
+import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Observable;
@@ -98,6 +99,7 @@ public class RegUser_Activity extends AppCompatActivity implements View.OnClickL
     private StorageReference storageReference;
     private Uri mImageuri;
     private Timer timer2;
+    private int count_adminGlobal;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -421,12 +423,24 @@ public class RegUser_Activity extends AppCompatActivity implements View.OnClickL
 
                 case R.id.regUser_Button_GetCodeID:
 
-                    textViewMessage.setText("getting code..");
+                    //we can create boolean check, if user is maxed here.
 
-                    Log.i("checkk UserReg: ", "tt 4");
+                    if(checkNumberOfAdminRegisteredTo()){
 
-                    //presenter.phonecallBack();
-                    getCallBack(phone);
+
+                        textViewMessage.setText("getting code..");
+
+                        Log.i("checkk UserReg: ", "tt 4");
+
+                        //presenter.phonecallBack();
+                        getCallBack(phone);
+
+                    }else {
+
+                        Intent intentHereGoBack_MaxAlready = new Intent(RegUser_Activity.this,FingerPrint_LogIn_Final_Activity.class);
+                        startActivity(intentHereGoBack_MaxAlready);
+                        finish();
+                    }
 
                     break;
 
@@ -450,6 +464,54 @@ public class RegUser_Activity extends AppCompatActivity implements View.OnClickL
         }else if(!inputValid_2){
 
             textViewMessage.setText("please enter code");
+        }
+
+
+    }
+
+    //check if max user is registered.
+    private boolean checkNumberOfAdminRegisteredTo() {
+
+        File f_MainPool = new File("/data/data/com.example.afinal/shared_prefs/com.example.finalV8_punchCard.MAIN_POOL.xml");
+
+        if(f_MainPool.exists()){ //if exist, should
+
+            //if exist, is already user to other admin, so counter should read 1.
+            //read count first if 2 or higher, send error.
+
+            SharedPreferences prefs_Main_Pool = this.getSharedPreferences("com.example.finalV8_punchCard.MAIN_POOL", Context.MODE_PRIVATE);
+
+            String count_admin = prefs_Main_Pool.getString("count_admin","");
+
+            if(Integer.valueOf(count_admin)==1){
+
+
+                count_adminGlobal =1;
+
+                return true; //
+
+
+
+            }if((Integer.valueOf(count_admin)>=2)){
+
+                count_adminGlobal =2;
+                return false;
+                //this should be error. somehow, should not happen to have register to 2 admin.
+
+
+            }else {
+
+                return false;// somehow something weird data pulled
+            }
+
+
+        }else {
+
+            count_adminGlobal =0;
+            return true; //not exist yet, so can add more user. //another user
+
+
+
         }
 
 
@@ -551,27 +613,93 @@ public class RegUser_Activity extends AppCompatActivity implements View.OnClickL
 
                         //here we saved all in sharedpreferences //create 4 pin id.
 
-                        SharedPreferences prefs = getSharedPreferences(
-                                "com.example.finalV8_punchCard", Context.MODE_PRIVATE);
-
-                        SharedPreferences.Editor editor = prefs.edit(); // we need to know, which preferences belong to which admin,
-                        //if user registered to another admin.
+                        //check sharedpref into the right admin. ..first check pool, where to create.
 
 
-                        editor.putString("final_User_Name",userName);
-                        editor.putString("final_User_Phone",userPhone);
-                        editor.putString("final_Admin_Phone",adminPhone);
-                        editor.putString("final_Admin_Name", adminName);
 
-                        editor.putString("final_User_Picture", storageReference.toString());
+                        if(count_adminGlobal==0){ //here we can create the whole.
 
-                        Log.i("finalSharePreDataCheck","Reg_User_Activity 1,name: "+ userName+ ", phone: "+userPhone + ", adminName:"
-                        +adminName+" , adminPhone: "+adminPhone);
+                            //create 2 file2,
+
+                            SharedPreferences prefs_Main_Pool = RegUser_Activity.this.getSharedPreferences("com.example.finalV8_punchCard.MAIN_POOL", Context.MODE_PRIVATE);
+
+                            SharedPreferences.Editor editor_Main_Pool = prefs_Main_Pool.edit();
+
+                            editor_Main_Pool.putString("count_admin","1");
+                            editor_Main_Pool.putString("final_Admin_Phone_MainPool",userPhone);
+
+                            editor_Main_Pool.commit();
+
+                            //here for direct
 
 
-                        //FingerPrint_LogIn_Final_Activity.userCount++;
+                            SharedPreferences prefs = getSharedPreferences(
+                                    "com.example.finalV8_punchCard."+adminPhone, Context.MODE_PRIVATE);
 
-                        editor.commit();
+                            SharedPreferences.Editor editor = prefs.edit(); // we need to know, which preferences belong to which admin,
+                            //if user registered to another admin.
+
+
+                            editor.putString("final_User_Name",userName);
+                            editor.putString("final_User_Phone",userPhone);
+                            editor.putString("final_Admin_Phone",adminPhone);
+                            editor.putString("final_Admin_Name", adminName);
+
+                            editor.putString("final_User_Picture", storageReference.toString());
+
+                            Log.i("finalSharePreDataCheck","Reg_User_Activity 1,name: "+ userName+ ", phone: "+userPhone + ", adminName:"
+                                    +adminName+" , adminPhone: "+adminPhone);
+
+
+                            //FingerPrint_LogIn_Final_Activity.userCount++;
+
+                            editor.commit();
+
+                        }if(count_adminGlobal==1){
+
+                            //create file
+
+                            SharedPreferences prefs_Main_Pool = RegUser_Activity.this.getSharedPreferences("com.example.finalV8_punchCard.MAIN_POOL", Context.MODE_PRIVATE);
+
+                            SharedPreferences.Editor editor_Main_Pool = prefs_Main_Pool.edit();
+
+                            editor_Main_Pool.putString("count_admin","2");
+                            editor_Main_Pool.putString("final_Admin_Phone_MainPool_2",userPhone);
+
+                            editor_Main_Pool.commit();
+
+
+                            SharedPreferences prefs = getSharedPreferences(
+                                    "com.example.finalV8_punchCard."+adminPhone, Context.MODE_PRIVATE);
+
+                            SharedPreferences.Editor editor = prefs.edit(); // we need to know, which preferences belong to which admin,
+                            //if user registered to another admin.
+
+
+                            editor.putString("final_User_Name",userName);
+                            editor.putString("final_User_Phone",userPhone);
+                            editor.putString("final_Admin_Phone",adminPhone);
+                            editor.putString("final_Admin_Name", adminName);
+
+                            editor.putString("final_User_Picture", storageReference.toString());
+
+                            Log.i("finalSharePreDataCheck","Reg_User_Activity 1,name: "+ userName+ ", phone: "+userPhone + ", adminName:"
+                                    +adminName+" , adminPhone: "+adminPhone);
+
+
+                            //FingerPrint_LogIn_Final_Activity.userCount++;
+
+                            editor.commit();
+
+
+
+                        }if(count_adminGlobal>=2){
+
+                            //cancel create, should not create here.,, not create anything.
+
+                        }
+
+
 
                         //we skipped this?
 
