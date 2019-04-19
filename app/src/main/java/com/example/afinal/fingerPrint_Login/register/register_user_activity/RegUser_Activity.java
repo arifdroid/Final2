@@ -100,11 +100,14 @@ public class RegUser_Activity extends AppCompatActivity implements View.OnClickL
     private Uri mImageuri;
     private Timer timer2;
     private int count_adminGlobal;
+    private boolean imageSetup;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.reg_user);
+
+        imageSetup =false;
 
         buttonGetCode = findViewById(R.id.regUser_Button_GetCodeID);
         buttonLogin = findViewById(R.id.regUser_Button_LogInID);
@@ -179,7 +182,7 @@ public class RegUser_Activity extends AppCompatActivity implements View.OnClickL
             }
         };
 
-        timer2 = new Timer();
+//        timer2 = new Timer();
 
 //        timer2.schedule(new TimerTask() { .. no need timer if use snapshot listener
 //            @Override
@@ -250,6 +253,8 @@ public class RegUser_Activity extends AppCompatActivity implements View.OnClickL
             if(data!=null){
 
                 mImageuri = data.getData();
+
+                imageSetup =true;
 
                 showImage(mImageuri);
             }
@@ -418,14 +423,17 @@ public class RegUser_Activity extends AppCompatActivity implements View.OnClickL
         if(inputValid|| inputValid_2) {
             Log.i("checkk UserReg: ", "tt 3");
             userName = name;
-            userPhone =phone;
+            userPhone = phone;
+
+            if(imageSetup){
+
             switch (v.getId()) {
 
                 case R.id.regUser_Button_GetCodeID:
 
                     //we can create boolean check, if user is maxed here.
 
-                    if(checkNumberOfAdminRegisteredTo()){
+                    if (checkNumberOfAdminRegisteredTo()) {
 
 
                         textViewMessage.setText("getting code..");
@@ -435,9 +443,9 @@ public class RegUser_Activity extends AppCompatActivity implements View.OnClickL
                         //presenter.phonecallBack();
                         getCallBack(phone);
 
-                    }else {
+                    } else {
 
-                        Intent intentHereGoBack_MaxAlready = new Intent(RegUser_Activity.this,FingerPrint_LogIn_Final_Activity.class);
+                        Intent intentHereGoBack_MaxAlready = new Intent(RegUser_Activity.this, FingerPrint_LogIn_Final_Activity.class);
                         startActivity(intentHereGoBack_MaxAlready);
                         finish();
                     }
@@ -448,13 +456,18 @@ public class RegUser_Activity extends AppCompatActivity implements View.OnClickL
 
                     Log.i("checkk UserReg: ", "tt 5");
 
-                    checkCredential(code,codeFromFirebase);
+                    checkCredential(code, codeFromFirebase);
 
-                    Log.i("checkk UserReg: ", "tt 6, after check credential compare ourCode: "+ code + " , codeFirebase: "+ codeFromFirebase);
+                    Log.i("checkk UserReg: ", "tt 6, after check credential compare ourCode: " + code + " , codeFirebase: " + codeFromFirebase);
 
 
                     break;
 
+            }
+
+        }else {
+
+                textViewMessage.setText("please click picture, and set profile picture");
             }
         }
 
