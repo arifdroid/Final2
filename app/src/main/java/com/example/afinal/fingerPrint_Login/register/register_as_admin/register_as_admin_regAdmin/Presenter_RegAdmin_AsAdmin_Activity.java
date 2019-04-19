@@ -1,7 +1,6 @@
 package com.example.afinal.fingerPrint_Login.register.register_as_admin.register_as_admin_regAdmin;
 
 import android.content.Context;
-import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCanceledListener;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -30,7 +29,7 @@ public class Presenter_RegAdmin_AsAdmin_Activity extends Observable {
     private Context mContext;
     private int allowCreateAdmin;
     private PhoneAuthCredential credential;
-    private String adminLABEL;
+    private String sharedPrefs_label;
 
     public Presenter_RegAdmin_AsAdmin_Activity(Context context){
         this.mContext= context;
@@ -86,11 +85,12 @@ public class Presenter_RegAdmin_AsAdmin_Activity extends Observable {
                                                             //labeled as TWO
                                                             Map<String,Object> kk = new HashMap<>();
 
+                                                            sharedPrefs_label = "com.example.finalV8_punchCard." + phoneUser_admin;
                                                             kk.put("name",nameUser_admin);
                                                             kk.put("phone",phoneUser_admin);
-                                                            kk.put("adminLabel","TWO");
+                                                            kk.put("sharedPrefs_label",sharedPrefs_label);
 
-                                                            adminLABEL = "TWO";
+                                                            //sharedPrefs_label = "TWO";
 
                                                             DocumentReference reference = FirebaseFirestore.getInstance()
                                                                     .collection("all_admins_collections")
@@ -138,11 +138,14 @@ public class Presenter_RegAdmin_AsAdmin_Activity extends Observable {
 
                                                             Map<String,Object> kk = new HashMap<>();
 
+                                                            sharedPrefs_label = "com.example.finalV8_punchCard." + phoneUser_admin;
+
                                                             kk.put("name",nameUser_admin);
                                                             kk.put("phone",phoneUser_admin);
-                                                            kk.put("adminLabel","ONE");
+                                                            kk.put("sharedPrefs_label",sharedPrefs_label); // or dont write it?
 
-                                                            adminLABEL = "ONE";
+
+                                                            //change label to share preferences
 
                                                             DocumentReference reference = FirebaseFirestore.getInstance()
                                                                     .collection("all_admins_collections")

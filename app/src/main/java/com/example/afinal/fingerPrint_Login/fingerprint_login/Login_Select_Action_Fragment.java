@@ -14,10 +14,13 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.afinal.R;
 import com.example.afinal.fingerPrint_Login.register.register_as_admin.register_as_admin_regAdmin.RegAdmin_AsAdmin_Activity;
 import com.example.afinal.fingerPrint_Login.register.register_with_activity.RegAdmin_Activity;
+
+import java.io.File;
 
 public class Login_Select_Action_Fragment extends Fragment implements View.OnClickListener{
 
@@ -33,6 +36,10 @@ public class Login_Select_Action_Fragment extends Fragment implements View.OnCli
     private String phoneHere;
     private String adminName;
     private String adminPhone;
+    private String nameHere_2;
+    private String phoneHere_2;
+    private String adminName_2;
+    private String adminPhone_2;
 
 
     @Nullable
@@ -57,19 +64,162 @@ public class Login_Select_Action_Fragment extends Fragment implements View.OnCli
         textView_RegAdmin = rootView.findViewById(R.id.select_fragment_textView_regAdmin_1id);
 
         //we pull from shared preferences here once
-        //then set text
+        //then set text, this is the part, how we know to which admin do we pull from,
+//
+//        SharedPreferences prefs = getActivity().getSharedPreferences("com.example.finalV8_punchCard", Context.MODE_PRIVATE);
+//
+//        //SharedPreferences prefs = (SharedPreferences) getActivity().getPreferences("com.example.finalV8_punchCard", Context.MODE_PRIVATE);
+//
+//        nameHere = prefs.getString("final_User_Name","");
+//        phoneHere = prefs.getString("final_User_Phone","");
+//        adminName = prefs.getString("final_Admin_Name","");
+//        adminPhone = prefs.getString("final_Admin_Phone","");
+//
+//        Log.i("finalSharePreDataCheck","Login_Select_Fragment 3,name: "+ nameHere+ ", phone: "+phoneHere + ", adminName:"
+//                +adminName+" , adminPhone: "+adminPhone);
 
-        SharedPreferences prefs = getActivity().getSharedPreferences("com.example.finalV8_punchCard", Context.MODE_PRIVATE);
+        //REAL PULL HERE., we dont add anything, we just check
 
-        //SharedPreferences prefs = (SharedPreferences) getActivity().getPreferences("com.example.finalV8_punchCard", Context.MODE_PRIVATE);
+        //check if exist first,
 
-        nameHere = prefs.getString("final_User_Name","");
-        phoneHere = prefs.getString("final_User_Phone","");
-        adminName = prefs.getString("final_Admin_Name","");
-        adminPhone = prefs.getString("final_Admin_Phone","");
+        File f = new File("/data/data/com.example.afinal/shared_prefs/com.example.finalV8_punchCard.MAIN_POOL.xml");
 
-        Log.i("finalSharePreDataCheck","Login_Select_Fragment 3,name: "+ nameHere+ ", phone: "+phoneHere + ", adminName:"
-                +adminName+" , adminPhone: "+adminPhone);
+        if(f.exists()){
+
+            SharedPreferences prefs_Main_Pool = getActivity().getSharedPreferences("com.example.finalV8_punchCard.MAIN_POOL", Context.MODE_PRIVATE);
+            ///if this not exist, means user need to register to an admin first.
+
+            //here should contain
+
+            //can use string set, but we use simple counter, translate to string instead.
+
+            String countAdmin = prefs_Main_Pool.getString("count_admin","");
+            if(countAdmin!=null || !countAdmin.equals("")) {
+
+                if (Integer.valueOf(countAdmin) == 1) {  //this means only 1 admin exist.
+
+                    //hence pull the first value, ,, the admin phone, since we need the admin phone number to retrieve shared prefs
+
+                    String sharedPrefsCheck = prefs_Main_Pool.getString("final_Admin_Phone",""); //this relevant if 1 admin only.
+
+                    //after pull admin phone, pull dedicated sharedpreferences to this admin, check exist? if not exist,
+
+                  //  String sharedPrefsCheck = adminPhoneHere;
+
+                    if(!sharedPrefsCheck.equals("")) { //
+
+                        File fileHere = new File("/data/data/com.example.afinal/shared_prefs/" + sharedPrefsCheck + ".xml");
+
+                        if (fileHere.exists()) {
+
+                            SharedPreferences sharedPrefs_1 = getActivity().getSharedPreferences("com.example.finalV8_punchCard."+sharedPrefsCheck, Context.MODE_PRIVATE);
+                            //will be read sharedprefs of "com.example.finalV8_punchCard.+60184670568"
+
+                            nameHere = sharedPrefs_1.getString("final_User_Name","");
+                            phoneHere = sharedPrefs_1.getString("final_User_Phone","");
+                            adminName = sharedPrefs_1.getString("final_Admin_Name","");
+                            adminPhone = sharedPrefs_1.getString("final_Admin_Phone","");
+
+
+
+                        } else { //file not exist.
+
+
+                        }
+
+                    }else{ //somehow pulling data from pull dont contain admin phone
+
+                    }
+
+                }if(Integer.valueOf(countAdmin) == 2){ //if admin is admin 2nd time registered.
+
+                    //so when we pull here, need special way to pull two shared prefs data.
+
+                    String sharedPrefsCheck_Admin_1 = prefs_Main_Pool.getString("final_Admin_Phone",""); //this relevant if 1 admin only.
+                    String sharedPrefsCheck_Admin_2 = prefs_Main_Pool.getString("final_Admin_Phone_2",""); //this relevant if 1 admin only.
+
+                    //handle admin 1 first.
+
+                    if(!sharedPrefsCheck_Admin_1.equals("")){
+
+                        File fileHere = new File("/data/data/com.example.afinal/shared_prefs/" + sharedPrefsCheck_Admin_1 + ".xml");
+
+                        if(fileHere.exists()){
+
+
+                            SharedPreferences sharedPrefs_1 = getActivity().getSharedPreferences("com.example.finalV8_punchCard."+sharedPrefsCheck_Admin_1, Context.MODE_PRIVATE);
+                            //will be read sharedprefs of "com.example.finalV8_punchCard.+60184670568"
+
+                            nameHere = sharedPrefs_1.getString("final_User_Name","");
+                            phoneHere = sharedPrefs_1.getString("final_User_Phone","");
+                            adminName = sharedPrefs_1.getString("final_Admin_Name","");
+                            adminPhone = sharedPrefs_1.getString("final_Admin_Phone","");
+
+                        }else { //something wrong if not exist.
+
+
+
+                        }
+
+
+
+
+                    }
+                    else { //somehow admin 1 phone number not written
+
+
+                    }
+
+                    //handle admin 2nd
+
+
+                    if(!sharedPrefsCheck_Admin_2.equals("")){
+
+                        File fileHere = new File("/data/data/com.example.afinal/shared_prefs/" + sharedPrefsCheck_Admin_2 + ".xml");
+
+                        if(fileHere.exists()){
+
+
+                            SharedPreferences sharedPrefs_2 = getActivity().getSharedPreferences("com.example.finalV8_punchCard."+sharedPrefsCheck_Admin_2, Context.MODE_PRIVATE);
+                            //will be read sharedprefs of "com.example.finalV8_punchCard.+60184670568"
+
+                            nameHere_2 = sharedPrefs_2.getString("final_User_Name","");
+                            phoneHere_2 = sharedPrefs_2.getString("final_User_Phone","");
+                            adminName_2 = sharedPrefs_2.getString("final_Admin_Name","");
+                            adminPhone_2 = sharedPrefs_2.getString("final_Admin_Phone","");
+
+                        }else { //something wrong if not exist.
+
+
+
+                        }
+
+
+
+
+                    }
+
+
+
+
+
+
+                }
+
+            }
+
+
+
+
+
+
+        }else { //if main pool dont even exist.
+
+
+            Toast.makeText(getContext(),"please register to an admin, or create admin", Toast.LENGTH_LONG).show();
+
+
+        }
 
 
 
@@ -77,9 +227,9 @@ public class Login_Select_Action_Fragment extends Fragment implements View.OnCli
         ///
 
         textView_RegAdmin.setText("Register As Admin");
-        textView_RegUser.setText("Register As UserCheckIn");
-        textViewAdmin_1.setText("Log in to Admin 1");
-        textViewAdmin_2.setText("Log in to Admin 2");
+        textView_RegUser.setText("Register As User");
+        textViewAdmin_1.setText("Log in to Admin 1 :"+adminName);
+        textViewAdmin_2.setText("Log in to Admin 2 :"+adminName_2);
         textView_Note.setText("MC or Outstation?");
 
         floatButton_Admin_1.setOnClickListener(this);

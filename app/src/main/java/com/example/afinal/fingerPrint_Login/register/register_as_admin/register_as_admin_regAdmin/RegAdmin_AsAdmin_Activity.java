@@ -41,6 +41,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Observable;
 import java.util.Observer;
+import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.TimeUnit;
@@ -104,44 +105,53 @@ public class RegAdmin_AsAdmin_Activity extends AppCompatActivity implements Obse
 
 
         //here we saved all in sharedpreferences //create 4 pin id.
-
-        SharedPreferences prefs = getSharedPreferences(
-                "com.example.finalV8_punchCard", Context.MODE_PRIVATE);
-
-        // https://stackoverflow.com/questions/23635644/how-can-i-view-the-shared-preferences-file-using-android-studio
-
-        File f = new File("/data/data/com.example.afinal/shared_prefs/com.example.finalV8_punchCard.xml");
-        //File f2 = new File(Context.);
-
-
-        if(f.exists()){
-
-            SharedPreferences prefse = getSharedPreferences(
-                    "com.example.finalV8_punchCard", Context.MODE_PRIVATE);
-
-            String nameCheck = prefs.getString("final_User_Name","");
-
-            SharedPreferences.Editor editor = prefse.edit();
-
-            admin_Label="TWO";
-
-            editor.putString("final_adminLabel",admin_Label);  //always pull this.
-
-            //when label is two, then you have to overwrite everything. //problem with this design,
-            //once you uninstall,then you cant log in anymore. .. unless admin allow.
-
 //
-//            SharedPreferences prefsV2 = getSharedPreferences(
-//                    "com.example.finalV8_punchCard"+"_"+admin_Label, Context.MODE_PRIVATE);
-//            //create new shared preferences. //or just put in the old.
-
-
-
-            Toast.makeText(this,"shared prefs exist, name: "+ nameCheck,Toast.LENGTH_LONG).show();
-
-        }else {
-            Toast.makeText(this,"shared prefs NOT exist",Toast.LENGTH_LONG).show();
-        }
+//        SharedPreferences prefs = getSharedPreferences(
+//                "com.example.finalV8_punchCard", Context.MODE_PRIVATE);
+//
+//        // https://stackoverflow.com/questions/23635644/how-can-i-view-the-shared-preferences-file-using-android-studio
+//
+//        File f = new File("/data/data/com.example.afinal/shared_prefs/com.example.finalV8_punchCard.xml");
+//        //File f2 = new File(Context.);
+//
+//
+//        if(f.exists()){
+//
+//            SharedPreferences prefse = getSharedPreferences(
+//                    "com.example.finalV8_punchCard", Context.MODE_PRIVATE);
+//
+//            //maybe for easier task, we put identified phone at the back of shared preferences.
+//
+//            //just the shareprefs name keep changing.
+//
+//            editTextPhone.getText().toString();
+//
+//
+//
+//            String phoneUserCheck = prefs.getString("final_User_Phone",""); //possibly user exist, but admin not exist,
+//            //so still can create admin. admin will be automatically become its first admins user.
+//
+//            String phoneAdminCheck = prefs.getString("final_Admin_Phone","");
+//
+//            SharedPreferences.Editor editor = prefse.edit();
+//
+//            admin_Label="TWO";
+//
+//            editor.putString("final_adminLabel",admin_Label);  //always pull this.
+//
+//            //when label is two, then you have to overwrite everything. //problem with this design,
+//            //once you uninstall,then you cant log in anymore. .. unless admin allow.
+//
+//            //here we pull if exist, ready to, need a counter, if user register to many admin. we need to know which data to pull.
+//            //but we constrainst to single admin, dual user only right.
+//
+//            //this means user is already registered.
+//
+//            Toast.makeText(this,"shared prefs exist, phone: "+ phoneUserCheck,Toast.LENGTH_LONG).show();
+//
+//        }else {
+//            Toast.makeText(this,"shared prefs NOT exist",Toast.LENGTH_LONG).show();
+//        }
 
         //if exist, put label on.
 
@@ -452,6 +462,55 @@ public class RegAdmin_AsAdmin_Activity extends AppCompatActivity implements Obse
         int adminDocumentCreated = ((Presenter_RegAdmin_AsAdmin_Activity) observable).getIfDocumentCreated();
         copyadminCreated=adminDocumentCreated;
         if(adminDocumentCreated==1){
+
+            //setup shared preferences.
+
+
+//            SharedPreferences prefs = getSharedPreferences(
+//                    "com.example.finalV8_punchCard"+userPhone, Context.MODE_PRIVATE);
+
+            // https://stackoverflow.com/questions/23635644/how-can-i-view-the-shared-preferences-file-using-android-studio
+
+            String sharedPrefsCheck = "com.example.finalV8_punchCard." + userPhone;
+
+            //this is admin belong phone user. so in user check, enter admin detail.
+
+            File f = new File("/data/data/com.example.afinal/shared_prefs/"+sharedPrefsCheck +".xml");
+            //File f2 = new File(Context.);
+
+
+            if(f.exists()){
+
+                SharedPreferences prefse = getSharedPreferences(
+                        sharedPrefsCheck, Context.MODE_PRIVATE);
+
+              //  String phoneUserCheck = prefse.getString("final_User_Phone",""); //possibly user exist, but admin not exist,
+                //so still can create admin. admin will be automatically become its first admins user.
+                String phoneAdminCheck = prefse.getString("final_Admin_Phone","");
+
+                SharedPreferences.Editor editor = prefse.edit();
+
+
+
+                //editor.putStringSet()
+
+//                admin_Label="TWO";
+//
+//                editor.putString("final_adminLabel",admin_Label);  //always pull this.
+
+                //when label is two, then you have to overwrite everything. //problem with this design,
+                //once you uninstall,then you cant log in anymore. .. unless admin allow.
+
+                //here we pull if exist, ready to, need a counter, if user register to many admin. we need to know which data to pull.
+                //but we constrainst to single admin, dual user only right.
+
+                //this means user is already registered.
+
+                Toast.makeText(this,"shared prefs exist, phone: "+ phoneAdminCheck,Toast.LENGTH_LONG).show();
+
+            }else {
+                Toast.makeText(this,"shared prefs NOT exist, can create : "+userPhone,Toast.LENGTH_LONG).show();
+            }
 
             Log.i("checkFlowAsAdmin", "3");
 
