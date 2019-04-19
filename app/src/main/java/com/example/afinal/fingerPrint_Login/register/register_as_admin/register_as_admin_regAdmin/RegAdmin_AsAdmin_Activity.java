@@ -516,10 +516,6 @@ public class RegAdmin_AsAdmin_Activity extends AppCompatActivity implements Obse
                 }
 
 
-
-
-
-
             }else {
 
                 //here we create, since it is not exist yet.

@@ -182,58 +182,6 @@ public class RegUser_Activity extends AppCompatActivity implements View.OnClickL
             }
         };
 
-//        timer2 = new Timer();
-
-//        timer2.schedule(new TimerTask() { .. no need timer if use snapshot listener
-//            @Override
-//            public void run() {
-
-//                if(adminName!=null && adminPhone!=null && userName!=null && userPhone!=null) {
-//                    DocumentReference documentReference = FirebaseFirestore.getInstance().collection("all_admin_doc_collections")
-//                            .document(adminName + adminPhone + "doc").collection("all_employee_thisAdmin_collection")
-//                            .document(userName + userPhone + "doc");
-
-//                    CollectionReference collectionReference = FirebaseFirestore.getInstance().collection("all_admin_doc_collections").
-//                            document(adminName + adminPhone + "doc").collection("all_employee_thisAdmin_collection");
-//
-//                    Query query1 = collectionReference.whereEqualTo("name",userName);   //check if it is written.
-//
-//                    query1.addSnapshotListener(new EventListener<QuerySnapshot>() {
-//
-//                        @Override
-//                        public void onEvent(@javax.annotation.Nullable QuerySnapshot queryDocumentSnapshots, @javax.annotation.Nullable FirebaseFirestoreException e) {
-//
-//                            Log.i("checkSnapShotListener", "1 start");
-//                            if(e!=null){
-//
-//                                return;
-//                            }
-//
-//                            if(queryDocumentSnapshots!=null ){
-//                               int size =  queryDocumentSnapshots.size();
-//                                  Log.i("checkSnapShotListener", "2 not null");
-////                                for(DocumentSnapshot documentSnapshot: queryDocumentSnapshots){
-////
-////                                }
-////
-//                                if (size>=1){
-//
-//                                    //move to next activity?
-//
-//                                    Log.i("checkSnapShotListener", " 3 exist");
-//
-//                                    Intent intent1 = new Intent(RegUser_Activity.this,Setup_Pin_Activity.class);
-//                                    startActivity(intent1);
-//                                    finish();
-//                                }
-//
-//                            }
-//                        }
-//                    });
-// //               }
-
-//            }
-//        },0,1500);  //every 1.5 seconds check doc created or not.
 
     }
 

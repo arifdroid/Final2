@@ -1,6 +1,7 @@
 package com.example.afinal.fingerPrint_Login.register.register_as_admin_setupProfile;
 
 import android.app.Activity;
+import android.app.TimePickerDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
@@ -15,20 +16,25 @@ import android.net.wifi.WifiManager;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import com.example.afinal.fingerPrint_Login.register.TimePickerFragment;
 import com.example.afinal.fingerPrint_Login.register.WifiReceiver;
 import com.example.afinal.fingerPrint_Login.register.register_as_admin_add_userList.Add_User_Activity;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
+
+import androidx.fragment.app.DialogFragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
+import android.widget.TimePicker;
 import android.widget.Toast;
 
 import com.example.afinal.R;
+import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
@@ -46,7 +52,7 @@ import java.util.TimerTask;
 import de.hdodenhof.circleimageview.CircleImageView;
 import pub.devrel.easypermissions.EasyPermissions;
 
-public class RegAdmin_asAdmin_Profile_Activity extends AppCompatActivity implements Observer {
+public class RegAdmin_asAdmin_Profile_Activity extends AppCompatActivity implements Observer, TimePickerDialog.OnTimeSetListener {
 
     private CircleImageView circleImageView;
 
@@ -95,6 +101,12 @@ public class RegAdmin_asAdmin_Profile_Activity extends AppCompatActivity impleme
     private Timer timer;
     private int count;
     private WifiReceiver wifiReceiver;
+    private Double latitudeHere;
+    private Double longitudeHere;
+    private String morning_constraint;
+    private String evening_constraint;
+    public static String hour;
+    public static String minute;
 
 
     @Override
@@ -239,6 +251,33 @@ public class RegAdmin_asAdmin_Profile_Activity extends AppCompatActivity impleme
                             editor.commit();
 
 
+                            DocumentReference documentReference = FirebaseFirestore.getInstance().collection("all_admin_doc_collections")
+                                    .document(user_name_asAdmin+user_phone_asAdmin+"doc");
+
+                            //here add all to
+
+                            Map<String,Object> mapUserAsAdmin = new HashMap<>();
+                            mapUserAsAdmin.put("name",user_name_asAdmin);
+                            mapUserAsAdmin.put("phone",user_phone_asAdmin);
+                            mapUserAsAdmin.put("ssid",wifiSSIDHere);
+                            mapUserAsAdmin.put("bssid",wifiBSSIDHere);
+
+                            String latitudeString = String.valueOf(latitudeHere);
+
+                            String longitudeString = String.valueOf(longitudeHere);
+
+                            mapUserAsAdmin.put("latitude",latitudeString);
+
+                            mapUserAsAdmin.put("longitude",longitudeString);
+
+                            mapUserAsAdmin.put("morning_constraint",morning_constraint);
+
+                            mapUserAsAdmin.put("evening_constraint",evening_constraint);
+
+                            mapUserAsAdmin.put("admin_street_name",streetName);
+
+                            documentReference.set(mapUserAsAdmin);
+
 
                             Intent intent = new Intent(RegAdmin_asAdmin_Profile_Activity.this, Add_User_Activity.class);
                             startActivity(intent);
@@ -337,13 +376,20 @@ public class RegAdmin_asAdmin_Profile_Activity extends AppCompatActivity impleme
 
         Log.i("checkkLocation", "6");
 
-        adminDetailsList.add(new AdminDetail(wifiName, "drawable/ic_wifi_black_24dp"));
-        adminDetailsList.add(new AdminDetail(wifiBssid, "drawable/ic_wifi_lock_black_24dp"));
+        adminDetailsList.add(new AdminDetail("please connect to your wifi network", "drawable/ic_wifi_black_24dp"));
+        adminDetailsList.add(new AdminDetail("please connect to your wifi network", "drawable/ic_wifi_lock_black_24dp"));
+        adminDetailsList.add(new AdminDetail("click here to set morning time","drawable/ic_wifi_timer_black_24dp"));
+        adminDetailsList.add(new AdminDetail("click here to set evening time","drawable/ic_wifi_timer_black_24dp"));
         initRecycler();
 
 
-
+//        DialogFragment timepickerFragment = new TimePickerFragment();
+//
+//        timepickerFragment.show(this.getSupportFragmentManager(),);
     }
+
+
+
 
     private void initRecycler() {
 
@@ -401,8 +447,8 @@ public class RegAdmin_asAdmin_Profile_Activity extends AppCompatActivity impleme
                 Log.i("checkFlowData ", "3 , location not null");
                 Geocoder geocoder = new Geocoder(RegAdmin_asAdmin_Profile_Activity.this, Locale.getDefault());
 
-                Double latitudeHere =null;
-                Double longitudeHere =null;
+                latitudeHere =null;
+                longitudeHere =null;
 
                 for(Map.Entry<String,String> kk: locationHere.entrySet()){
 
@@ -502,4 +548,11 @@ public class RegAdmin_asAdmin_Profile_Activity extends AppCompatActivity impleme
     }
 
 
+    @Override
+    public void onTimeSet(TimePicker timePicker, int i, int i1) {
+
+        this.hour =String.valueOf(i);
+        this.minute =String.valueOf(i1);
+
+    }
 }
