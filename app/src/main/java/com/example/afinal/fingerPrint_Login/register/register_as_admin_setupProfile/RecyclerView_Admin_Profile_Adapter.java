@@ -18,13 +18,18 @@ import android.widget.TextView;
 import android.widget.TimePicker;
 
 import com.example.afinal.R;
+import com.example.afinal.fingerPrint_Login.PassResult;
+import com.example.afinal.fingerPrint_Login.register.PassResultMap;
 import com.example.afinal.fingerPrint_Login.register.TimePickerFragment;
 
 import java.util.ArrayList;
+import java.util.Map;
 
-class RecyclerView_Admin_Profile_Adapter extends RecyclerView.Adapter<RecyclerView_Admin_Profile_Adapter.InsideHolder>{
+public class RecyclerView_Admin_Profile_Adapter extends RecyclerView.Adapter<RecyclerView_Admin_Profile_Adapter.InsideHolder>{
 
 //    FragMangageCompat fragMangageCompat;
+
+    private RegAdmin_asAdmin_Profile_Activity viewH;
 
     private Context mContext;
 
@@ -39,6 +44,7 @@ class RecyclerView_Admin_Profile_Adapter extends RecyclerView.Adapter<RecyclerVi
     private PassResult_CheckBox_Interface passResult_checkBox_interface;
     private String hour;
     private String minute;
+    private int k;
 
     public void setPassResult_checkBox_interface(PassResult_CheckBox_Interface passResult_checkBox_interface){
             this.passResult_checkBox_interface=passResult_checkBox_interface;
@@ -47,7 +53,9 @@ class RecyclerView_Admin_Profile_Adapter extends RecyclerView.Adapter<RecyclerVi
     //public static boolean sentCheck;
 
 
+    public RecyclerView_Admin_Profile_Adapter() {
 
+    }
 
     public RecyclerView_Admin_Profile_Adapter(Context context, ArrayList<AdminDetail> adminDetails) {
        // fragMangageCompat = new FragMangageCompat();
@@ -60,6 +68,8 @@ class RecyclerView_Admin_Profile_Adapter extends RecyclerView.Adapter<RecyclerVi
     @NonNull
     @Override
     public InsideHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int i) {
+
+        viewH = new RegAdmin_asAdmin_Profile_Activity();
 
         View rootView = LayoutInflater.from(mContext).inflate(R.layout.cardview_admin_profile,viewGroup,false);
 
@@ -111,109 +121,70 @@ class RecyclerView_Admin_Profile_Adapter extends RecyclerView.Adapter<RecyclerVi
             }
         });
 
-
-
-
 //       //problem is i always 1 for the problem.
 
 
-
         int id = mContext.getApplicationContext().getResources().getIdentifier(ss,null, mContext.getPackageName());
-
-        if(i==2) {
-
-            Log.i("checkkLocation", "9 location " +adminDetails.get(i).getTextShow());
-        }
+//
+//        if(i==2) {
+//
+//            Log.i("checkkLocation", "9 location " +adminDetails.get(i).getTextShow());
+//        }
         insideHolder.imageViewList.setImageResource(id);
         insideHolder.textViewList.setText(adminDetails.get(i).getTextShow());
 
 
         //set onclicklistener for cardview.
+
         if(i==2) {
+            Log.i("checkTime", "bindHolder, i is 2" );
+           final int jj =2;
             insideHolder.cardView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
 
-//                    DialogFragment timepickerFragment = new TimePickerFragment();
-//                    timepickerFragment.show(((AppCompatActivity)mContext).getSupportFragmentManager(),"Time Picker");
 
-//                    fragMangageCompat.getTime(mContext);
-//
-//                    //if(fragMangageCompat.on)
-//                   hour = fragMangageCompat.getHour();
-//                   minute = fragMangageCompat.getMinute();
+                    //need to sent label, which entry.
 
-                    DialogFragment dialogFragment = new TimePickerFragment();
-                    dialogFragment.show(((AppCompatActivity)mContext).getSupportFragmentManager(),"Time Picker");
+
+
+                    DialogFragment dialogFragment2 = new TimePickerFragment(jj);
+                    //((TimePickerFragment) dialogFragment).setLabel(k);
+                    dialogFragment2.show(((AppCompatActivity)mContext).getSupportFragmentManager(),"Time Picker");
 
                 }
+
+
             });
 
-            hour = RegAdmin_asAdmin_Profile_Activity.hour;
-            minute = RegAdmin_asAdmin_Profile_Activity.minute;
+            //insideHolder.textViewList
 
-            if(i==2) {
-
-
-
-                if (hour != null) {
-
-                    insideHolder.textViewList.setText("morning time is: "+hour+":"+minute);
-
-                }
-
-            }
-            if(i==3){
-
-                if (hour != null) {
-
-                    insideHolder.textViewList.setText("evening time is: "+hour+":"+minute);
-
-                }
-
-
-            }
 
         }
 
         if(i==3) {
+
+            Log.i("checkTime", "bindHolder, i is 3" );
+           final int kkj =3;
             insideHolder.cardView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
 
-//                    DialogFragment timepickerFragment = new TimePickerFragment();
-//                    timepickerFragment.show(((AppCompatActivity)mContext).getSupportFragmentManager(),"Time Picker");
+                    //need to sent label, which entry.
 
-//                    fragMangageCompat.getTime(mContext);
-//
-//                    //if(fragMangageCompat.on)
-//                   hour = fragMangageCompat.getHour();
-//                   minute = fragMangageCompat.getMinute();
-
-                    DialogFragment dialogFragment = new TimePickerFragment();
+                    DialogFragment dialogFragment = new TimePickerFragment(kkj);
+                    //((TimePickerFragment) dialogFragment).setLabel(k);
                     dialogFragment.show(((AppCompatActivity)mContext).getSupportFragmentManager(),"Time Picker");
 
                 }
+
+
             });
 
-            hour = RegAdmin_asAdmin_Profile_Activity.hour;
-            minute = RegAdmin_asAdmin_Profile_Activity.minute;
 
 
-            if(i==3){
-
-                if (hour != null) {
-
-                    insideHolder.textViewList.setText("evening time is: "+hour+":"+minute);
-
-                }
-
-
-            }
 
         }
-
-
 
     }
 

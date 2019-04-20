@@ -16,6 +16,8 @@ import android.net.wifi.WifiManager;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import com.example.afinal.fingerPrint_Login.PassResult;
+import com.example.afinal.fingerPrint_Login.register.PassResultMap;
 import com.example.afinal.fingerPrint_Login.register.TimePickerFragment;
 import com.example.afinal.fingerPrint_Login.register.WifiReceiver;
 import com.example.afinal.fingerPrint_Login.register.register_as_admin_add_userList.Add_User_Activity;
@@ -53,6 +55,19 @@ import de.hdodenhof.circleimageview.CircleImageView;
 import pub.devrel.easypermissions.EasyPermissions;
 
 public class RegAdmin_asAdmin_Profile_Activity extends AppCompatActivity implements Observer, TimePickerDialog.OnTimeSetListener {
+
+    //
+
+    //setup listener
+    private PassResult passResult;
+
+    public void setPassResult(PassResult passResult){
+        this.passResult = passResult;
+    }
+
+    //this is for returning from fragment, problem is, what method gets called after fragment.
+
+    ///
 
     private CircleImageView circleImageView;
 
@@ -107,7 +122,6 @@ public class RegAdmin_asAdmin_Profile_Activity extends AppCompatActivity impleme
     private String evening_constraint;
     public static String hour;
     public static String minute;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -547,12 +561,62 @@ public class RegAdmin_asAdmin_Profile_Activity extends AppCompatActivity impleme
 
     }
 
+    private PassResultMap passResultMap;
+
+    public void setPassResultMap(PassResultMap passResultMap){
+        this.passResultMap = passResultMap;
+    }
+
 
     @Override
     public void onTimeSet(TimePicker timePicker, int i, int i1) {
 
         this.hour =String.valueOf(i);
         this.minute =String.valueOf(i1);
+
+        //need to access current label
+
+        int labelHere = TimePickerFragment.getLabel();
+
+        if(labelHere==2){
+
+            Log.i("checkTime", "2");
+
+            adminDetailsList.get(2).setTextShow("morning time stamp is: "+hour+":"+minute);
+            recyclerView_Admin_Profile_Adapter.notifyDataSetChanged();
+
+        }if(labelHere==3){
+
+            Log.i("checkTime", "3");
+
+            adminDetailsList.get(3).setTextShow("evening time stamp is: "+hour+":"+minute);
+            recyclerView_Admin_Profile_Adapter.notifyDataSetChanged();
+
+        }
+
+
+//        if(this.hour!=null) {
+//
+//                if(this.minute==null){
+//                    this.minute="00";
+//                }
+//
+//
+//            Map<String, String> kk = new HashMap<>();
+//            kk.put("hour", this.hour);
+//            kk.put("minute",this.minute);
+//
+//            if(passResultMap!=null){
+//
+//                passResultMap.setPassResultMap(kk);
+//            }
+//
+
+
+          // recyclerView_Admin_Profile_Adapter
+           //recyclerView_Admin_Profile_Adapter.notifyDataSetChanged();
+
+   //     }
 
     }
 }

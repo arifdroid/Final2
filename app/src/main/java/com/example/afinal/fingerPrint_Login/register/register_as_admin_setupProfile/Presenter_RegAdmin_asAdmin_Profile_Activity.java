@@ -12,6 +12,8 @@ import android.net.wifi.WifiManager;
 import android.os.Bundle;
 import android.util.Log;
 
+import com.example.afinal.fingerPrint_Login.PassResult;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Observable;
@@ -34,6 +36,12 @@ public class Presenter_RegAdmin_asAdmin_Profile_Activity extends Observable {
     private String wifiSSID;
     public static boolean gotWifi;
     private String wifiBSSID;
+
+    private PassResult passResult;
+
+    public void setPassResult(PassResult passResult){
+        this.passResult = passResult;
+    }
 
     public Presenter_RegAdmin_asAdmin_Profile_Activity(Context mContext) {
         gotWifi=false;
