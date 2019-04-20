@@ -71,7 +71,7 @@ public class Presenter_RegAdmin_asAdmin_Profile_Activity extends Observable {
                 // for ActivityCompat#requestPermissions for more details.
                 return;
             }
-            mLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1000,
+            mLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 50,
                     5, mLocationLister = new LocationListener() {
                         @Override
                         public void onLocationChanged(Location location) {

@@ -411,8 +411,9 @@ public class RegAdmin_asAdmin_Profile_Activity extends AppCompatActivity impleme
 
         adminDetailsList.add(new AdminDetail("please connect to your wifi network", "drawable/ic_wifi_black_24dp"));
         adminDetailsList.add(new AdminDetail("please connect to your wifi network", "drawable/ic_wifi_lock_black_24dp"));
-        adminDetailsList.add(new AdminDetail("click here to set morning time","drawable/ic_wifi_timer_black_24dp"));
-        adminDetailsList.add(new AdminDetail("click here to set evening time","drawable/ic_wifi_timer_black_24dp"));
+        adminDetailsList.add(new AdminDetail("click here to set morning time","drawable/ic_timer_black_24dp"));
+
+        adminDetailsList.add(new AdminDetail("click here to set evening time","drawable/ic_timer_black_24dp"));
         initRecycler();
 
 
@@ -506,26 +507,53 @@ public class RegAdmin_asAdmin_Profile_Activity extends AppCompatActivity impleme
                                 streetName = geocoder.getFromLocation(latitudeHere, longitudeHere, 1).get(0).getThoroughfare();
                             }
 
+
+                            if(streetName!=null || streetName.equals("")) {
+
+                                if(adminDetailsList.size()<=4) {
+                                    adminDetailsList.add(new AdminDetail(streetName, "drawable/ic_location_on_black_24dp"));
+                                    recyclerView_Admin_Profile_Adapter.notifyDataSetChanged();
+                                    // recyclerView.setAdapter(recyclerView_Admin_Profile_Adapter);
+                                    recyclerView_Admin_Profile_Adapter.setPassResult_checkBox_interface(new PassResult_CheckBox_Interface() {
+                                        @Override
+                                        public void passingArray(ArrayList<AdminDetail> adminDetails) {
+                                            //returned list.
+
+                                            returnAdminDetailList = adminDetails;
+                                        }
+                                    });
+                                }else {
+                                    presenter.stopListening(mLocationManager);
+
+                                }
+                            }
+
                             Log.i("checkFlowData ", "4 , streetName: "+streetName);
                         } catch (IOException e) {
                             e.printStackTrace();
                         }
 
-                        if(streetName!=null || streetName.equals("")) {
-
-                            adminDetailsList.add(new AdminDetail(streetName, "drawable/ic_location_on_black_24dp"));
-                            recyclerView_Admin_Profile_Adapter.notifyDataSetChanged();
-                            // recyclerView.setAdapter(recyclerView_Admin_Profile_Adapter);
-                            recyclerView_Admin_Profile_Adapter.setPassResult_checkBox_interface(new PassResult_CheckBox_Interface() {
-                                @Override
-                                public void passingArray(ArrayList<AdminDetail> adminDetails) {
-                                    //returned list.
-
-                                    returnAdminDetailList = adminDetails;
-                                }
-                            });
-
-                        }
+//
+//
+//                        if(streetName!=null || streetName.equals("")) {
+//
+//                            if(adminDetailsList.size()<=4) {
+//                                adminDetailsList.add(new AdminDetail(streetName, "drawable/ic_location_on_black_24dp"));
+//                                recyclerView_Admin_Profile_Adapter.notifyDataSetChanged();
+//                                // recyclerView.setAdapter(recyclerView_Admin_Profile_Adapter);
+//                                recyclerView_Admin_Profile_Adapter.setPassResult_checkBox_interface(new PassResult_CheckBox_Interface() {
+//                                    @Override
+//                                    public void passingArray(ArrayList<AdminDetail> adminDetails) {
+//                                        //returned list.
+//
+//                                        returnAdminDetailList = adminDetails;
+//                                    }
+//                                });
+//                            }else {
+//                                presenter.stopListening(mLocationManager);
+//
+//                            }
+//                        }
                         presenter.stopListening(mLocationManager);
                     }
                 }

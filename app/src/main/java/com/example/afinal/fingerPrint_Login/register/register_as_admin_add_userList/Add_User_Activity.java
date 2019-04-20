@@ -5,6 +5,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.animation.ObjectAnimator;
 import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
@@ -12,13 +13,18 @@ import android.os.Bundle;
 import android.provider.ContactsContract;
 import android.util.Log;
 import android.view.View;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import com.example.afinal.R;
+import com.example.afinal.fingerPrint_Login.register.register_as_admin.register_as_admin_regAdmin.RegAdmin_AsAdmin_Activity;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.util.ArrayList;
+import java.util.Timer;
+import java.util.TimerTask;
 
 public class Add_User_Activity extends AppCompatActivity implements View.OnClickListener {
 
@@ -31,18 +37,57 @@ public class Add_User_Activity extends AppCompatActivity implements View.OnClick
     //private ArrayList<UserFromAdmin> u
 
     private RecyclerViewAdapter_UserList recyclerViewAdapter_UserList;
+    private Timer timer;
+    private FloatingActionButton buttonNext;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add__user_);
 
+        buttonNext = findViewById(R.id.add_User_FloatButtonFinalizeID);
         floatingActionButton = findViewById(R.id.add_User_FloatButtoniD);
         recyclerView = findViewById(R.id.add_User_RecycleriD);
 
         initRecycler();
 
         floatingActionButton.setOnClickListener(this);
+
+        timer = new Timer();
+
+        timer.scheduleAtFixedRate(new TimerTask() {
+            @Override
+            public void run() {
+
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+
+
+                        ObjectAnimator animator = ObjectAnimator.ofFloat(buttonNext,"translationY",-180f);
+                        buttonNext.animate()
+                                .alpha(1f)
+                                .setDuration(200)
+                                .setListener(null);
+                        animator.setDuration(200);
+                        animator.start();
+
+
+                        Animation fadeIn = AnimationUtils.loadAnimation(Add_User_Activity.this,R.anim.fadein);
+                        buttonNext.startAnimation(fadeIn);
+
+
+                        timer.cancel();
+
+
+                    }
+
+                });
+
+
+
+            }
+        },1500,10);
 
     }
 
