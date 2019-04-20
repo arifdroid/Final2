@@ -13,6 +13,7 @@ import android.provider.ContactsContract;
 import android.util.Log;
 import android.view.View;
 import android.widget.LinearLayout;
+import android.widget.Toast;
 
 import com.example.afinal.R;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
@@ -89,6 +90,8 @@ public class Add_User_Activity extends AppCompatActivity implements View.OnClick
 
                     cursor.moveToFirst();
 
+                    Toast.makeText(this,"pick contact you wish to add to your user list",Toast.LENGTH_LONG).show();
+
                     String number = cursor.getString(cursor.getColumnIndexOrThrow(ContactsContract.CommonDataKinds.Phone.NUMBER));
                     String name = cursor.getString(cursor.getColumnIndexOrThrow(ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME_PRIMARY));
 
@@ -104,7 +107,7 @@ public class Add_User_Activity extends AppCompatActivity implements View.OnClick
                         Log.i("checkAddingUser, ","8 before setadpater again");
 
 
-                        recyclerView.setAdapter(recyclerViewAdapter_UserList);
+                       // recyclerView.setAdapter(recyclerViewAdapter_UserList);
 
                         Log.i("checkAddingUser, ","9 before setadpater again");
 

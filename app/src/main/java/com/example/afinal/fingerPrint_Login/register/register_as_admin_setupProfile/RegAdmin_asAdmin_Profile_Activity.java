@@ -60,6 +60,8 @@ public class RegAdmin_asAdmin_Profile_Activity extends AppCompatActivity impleme
 
     //setup listener
     private PassResult passResult;
+    private boolean eveningBooleanSet;
+    private boolean morningBooleanSet;
 
     public void setPassResult(PassResult passResult){
         this.passResult = passResult;
@@ -127,6 +129,9 @@ public class RegAdmin_asAdmin_Profile_Activity extends AppCompatActivity impleme
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_reg_admin_as_admin__profile_);
+
+        morningBooleanSet =false;
+        eveningBooleanSet =false;
 
         wifiReceiver = new WifiReceiver();
 
@@ -207,110 +212,124 @@ public class RegAdmin_asAdmin_Profile_Activity extends AppCompatActivity impleme
 
                 int count = 0;
 
-                if (imageSetupTrue) {
+                //also check for location. address.
 
-                    for (AdminDetail adminDetail : returnAdminDetailList) {
+                if (streetName!=null && !streetName.equals("")) {
 
-                        Log.i("checkkLocation", "13 checkBox = " + adminDetail.isCheckBox());
 
-                        boolean checkBoxHere = adminDetail.isCheckBox();
+                    if (morningBooleanSet && eveningBooleanSet) {
 
-                        Log.i("checkkLocation", "14 checkBox = " + adminDetail.isCheckBox());
+                    if (imageSetupTrue) {
 
-                        if (checkBoxHere) {
-                            count++;
+                        for (AdminDetail adminDetail : returnAdminDetailList) {
+
+                            Log.i("checkkLocation", "13 checkBox = " + adminDetail.isCheckBox());
+
+                            boolean checkBoxHere = adminDetail.isCheckBox();
+
+                            Log.i("checkkLocation", "14 checkBox = " + adminDetail.isCheckBox());
+
+                            if (checkBoxHere) {
+                                count++;
+                            }
+
                         }
-
-                    }
-                    //problem is count always 1, inevitable, keep
+                        //problem is count always 1, inevitable, keep
 
 
-                    //if (count == 1 && RecyclerView_Admin_Profile_Adapter.sentCheck == false) {
-                    if (count == 0) {
-
-                    } else {
-
-                        if ((count) == adminDetailsList.size()) {
-
-                            Toast.makeText(RegAdmin_asAdmin_Profile_Activity.this, "all " + count + " boxes checked", Toast.LENGTH_SHORT).show();
-
-                            //here start a service save all this , create document for user.
-                            //and sharedpreferences as well.
-
-                            //here we saved all in sharedpreferences //create 4 pin id.
-
-
-                            //problem is when this admin want to register as user for other admin.
-                            //so we need to put label, then pull according to corresponding lable.
-
-                            //two tag,
-                            // tag ONE , mean user was admin, and added user under its tree
-                            // tag TWO , mean user was user , and want to become admin.
-                            //must be done at first phase.
-
-                            //create new shared pref pool
-
-                            SharedPreferences prefs = getSharedPreferences(
-                                    "com.example.finalV8_punchCard."+user_phone_asAdmin, Context.MODE_PRIVATE);
-
-                            SharedPreferences.Editor editor = prefs.edit(); // we need to know, which preferences belong to which admin,
-                            //if user registered to another admin.
-
-                            editor.putString("final_User_Name",user_name_asAdmin);
-                            editor.putString("final_User_Phone",user_phone_asAdmin);
-                            editor.putString("final_Admin_Name", user_name_asAdmin);
-                            editor.putString("final_Admin_Phone",user_phone_asAdmin);
-                            //editor.putString("final_User_Picture", storageReference.toString());
-
-                            editor.commit();
-
-
-                            DocumentReference documentReference = FirebaseFirestore.getInstance().collection("all_admin_doc_collections")
-                                    .document(user_name_asAdmin+user_phone_asAdmin+"doc");
-
-                            //here add all to
-
-                            Map<String,Object> mapUserAsAdmin = new HashMap<>();
-                            mapUserAsAdmin.put("name",user_name_asAdmin);
-                            mapUserAsAdmin.put("phone",user_phone_asAdmin);
-                            mapUserAsAdmin.put("ssid",wifiSSIDHere);
-                            mapUserAsAdmin.put("bssid",wifiBSSIDHere);
-
-                            String latitudeString = String.valueOf(latitudeHere);
-
-                            String longitudeString = String.valueOf(longitudeHere);
-
-                            mapUserAsAdmin.put("latitude",latitudeString);
-
-                            mapUserAsAdmin.put("longitude",longitudeString);
-
-                            mapUserAsAdmin.put("morning_constraint",morning_constraint);
-
-                            mapUserAsAdmin.put("evening_constraint",evening_constraint);
-
-                            mapUserAsAdmin.put("admin_street_name",streetName);
-
-                            documentReference.set(mapUserAsAdmin);
-
-
-                            Intent intent = new Intent(RegAdmin_asAdmin_Profile_Activity.this, Add_User_Activity.class);
-                            startActivity(intent);
-
-
-
+                        //if (count == 1 && RecyclerView_Admin_Profile_Adapter.sentCheck == false) {
+                        if (count == 0) {
 
                         } else {
 
-                            Toast.makeText(RegAdmin_asAdmin_Profile_Activity.this, "only " + count + " boxes checked , size list " + adminDetailsList.size(), Toast.LENGTH_SHORT).show();
-                            ;
+                            if ((count) == adminDetailsList.size()) {
+
+                                Toast.makeText(RegAdmin_asAdmin_Profile_Activity.this, "all " + count + " boxes checked", Toast.LENGTH_SHORT).show();
+
+                                //here start a service save all this , create document for user.
+                                //and sharedpreferences as well.
+
+                                //here we saved all in sharedpreferences //create 4 pin id.
+
+
+                                //problem is when this admin want to register as user for other admin.
+                                //so we need to put label, then pull according to corresponding lable.
+
+                                //two tag,
+                                // tag ONE , mean user was admin, and added user under its tree
+                                // tag TWO , mean user was user , and want to become admin.
+                                //must be done at first phase.
+
+                                //create new shared pref pool
+
+                                SharedPreferences prefs = getSharedPreferences(
+                                        "com.example.finalV8_punchCard." + user_phone_asAdmin, Context.MODE_PRIVATE);
+
+                                SharedPreferences.Editor editor = prefs.edit(); // we need to know, which preferences belong to which admin,
+                                //if user registered to another admin.
+
+                                editor.putString("final_User_Name", user_name_asAdmin);
+                                editor.putString("final_User_Phone", user_phone_asAdmin);
+                                editor.putString("final_Admin_Name", user_name_asAdmin);
+                                editor.putString("final_Admin_Phone", user_phone_asAdmin);
+                                //editor.putString("final_User_Picture", storageReference.toString());
+
+                                editor.commit();
+
+
+                                DocumentReference documentReference = FirebaseFirestore.getInstance().collection("all_admin_doc_collections")
+                                        .document(user_name_asAdmin + user_phone_asAdmin + "doc");
+
+                                //here add all to
+
+                                Map<String, Object> mapUserAsAdmin = new HashMap<>();
+                                mapUserAsAdmin.put("name", user_name_asAdmin);
+                                mapUserAsAdmin.put("phone", user_phone_asAdmin);
+                                mapUserAsAdmin.put("ssid", wifiSSIDHere);
+                                mapUserAsAdmin.put("bssid", wifiBSSIDHere);
+
+                                String latitudeString = String.valueOf(latitudeHere);
+
+                                String longitudeString = String.valueOf(longitudeHere);
+
+                                mapUserAsAdmin.put("latitude", latitudeString);
+
+                                mapUserAsAdmin.put("longitude", longitudeString);
+
+                                mapUserAsAdmin.put("morning_constraint", morning_constraint);
+
+                                mapUserAsAdmin.put("evening_constraint", evening_constraint);
+
+                                mapUserAsAdmin.put("admin_street_name", streetName);
+
+                                documentReference.set(mapUserAsAdmin);
+
+
+                                Intent intent = new Intent(RegAdmin_asAdmin_Profile_Activity.this, Add_User_Activity.class);
+                                startActivity(intent);
+
+
+                            } else {
+
+                                Toast.makeText(RegAdmin_asAdmin_Profile_Activity.this, "only " + count + " boxes checked , size list " + adminDetailsList.size(), Toast.LENGTH_SHORT).show();
+                                ;
+                            }
+
                         }
 
+                    } else { //please setup image
+
+                        Toast.makeText(RegAdmin_asAdmin_Profile_Activity.this, "please set image", Toast.LENGTH_SHORT).show();
                     }
+                } else { //set morning and evening time
 
-                }else { //please setup image
-
-                    Toast.makeText(RegAdmin_asAdmin_Profile_Activity.this,"please set image",Toast.LENGTH_SHORT).show();
+                    Toast.makeText(RegAdmin_asAdmin_Profile_Activity.this, "please set both morning check in and evening check out", Toast.LENGTH_SHORT).show();
                 }
+
+            } else{
+
+                Toast.makeText(RegAdmin_asAdmin_Profile_Activity.this, "please turn on GPS", Toast.LENGTH_SHORT).show();
+            }
             }
         });
 
@@ -480,26 +499,33 @@ public class RegAdmin_asAdmin_Profile_Activity extends AppCompatActivity impleme
 
                     if(latitudeHere!=null && longitudeHere!=null ) {
                         try {
-                            streetName = geocoder.getFromLocation(latitudeHere, longitudeHere, 1).get(0).getSubThoroughfare();
+
+                            streetName = geocoder.getFromLocation(latitudeHere, longitudeHere, 1).get(0).getAddressLine(0);
+
+                            if(streetName==null || streetName.equals("")){
+                                streetName = geocoder.getFromLocation(latitudeHere, longitudeHere, 1).get(0).getThoroughfare();
+                            }
 
                             Log.i("checkFlowData ", "4 , streetName: "+streetName);
                         } catch (IOException e) {
                             e.printStackTrace();
                         }
 
-                        adminDetailsList.add(new AdminDetail(streetName, "drawable/ic_location_on_black_24dp"));
-                        recyclerView_Admin_Profile_Adapter.notifyDataSetChanged();
-                       // recyclerView.setAdapter(recyclerView_Admin_Profile_Adapter);
-                        recyclerView_Admin_Profile_Adapter.setPassResult_checkBox_interface(new PassResult_CheckBox_Interface() {
-                            @Override
-                            public void passingArray(ArrayList<AdminDetail> adminDetails) {
-                                //returned list.
+                        if(streetName!=null || streetName.equals("")) {
 
-                                returnAdminDetailList = adminDetails;
-                            }
-                        });
+                            adminDetailsList.add(new AdminDetail(streetName, "drawable/ic_location_on_black_24dp"));
+                            recyclerView_Admin_Profile_Adapter.notifyDataSetChanged();
+                            // recyclerView.setAdapter(recyclerView_Admin_Profile_Adapter);
+                            recyclerView_Admin_Profile_Adapter.setPassResult_checkBox_interface(new PassResult_CheckBox_Interface() {
+                                @Override
+                                public void passingArray(ArrayList<AdminDetail> adminDetails) {
+                                    //returned list.
 
+                                    returnAdminDetailList = adminDetails;
+                                }
+                            });
 
+                        }
                         presenter.stopListening(mLocationManager);
                     }
                 }
@@ -578,19 +604,37 @@ public class RegAdmin_asAdmin_Profile_Activity extends AppCompatActivity impleme
 
         int labelHere = TimePickerFragment.getLabel();
 
+        if(minute.length()<=1){
+            minute="0"+minute;
+        }
+
+
         if(labelHere==2){
 
-            Log.i("checkTime", "2");
+            if(Integer.valueOf(hour)<12){
 
-            adminDetailsList.get(2).setTextShow("morning time stamp is: "+hour+":"+minute);
-            recyclerView_Admin_Profile_Adapter.notifyDataSetChanged();
+                Log.i("checkTime", "2");
+
+                adminDetailsList.get(2).setTextShow("morning time stamp is: "+hour+":"+minute);
+                morning_constraint=hour+minute;
+                recyclerView_Admin_Profile_Adapter.notifyDataSetChanged();
+
+                morningBooleanSet=true;
+
+            }
+            else {
+
+                Toast.makeText(this,"please check AM in time picker, try again", Toast.LENGTH_LONG).show();
+            }
 
         }if(labelHere==3){
 
             Log.i("checkTime", "3");
 
             adminDetailsList.get(3).setTextShow("evening time stamp is: "+hour+":"+minute);
+            evening_constraint=hour+minute;
             recyclerView_Admin_Profile_Adapter.notifyDataSetChanged();
+            eveningBooleanSet=true;
 
         }
 
