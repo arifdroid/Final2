@@ -10,7 +10,6 @@
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 
-
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
@@ -18,7 +17,8 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".fingerPrint_Login.register.setup_pin_code.Setup_Pin_Activity"></activity>
+        <activity android:name=".fingerPrint_Login.fingerprint_login.FingerPrint_LogIn_Final_Activity"></activity>
+        <activity android:name=".fingerPrint_Login.register.setup_pin_code.Setup_Pin_Activity" />
         <activity android:name=".fingerPrint_Login.register.register_as_admin_add_userList.Add_User_Activity" />
         <activity
             android:name=".fingerPrint_Login.main_activity_fragment.Main_BottomNav_Activity"
@@ -29,7 +29,9 @@
         <activity android:name=".fingerPrint_Login.register.register_user_activity.RegUser_Activity" />
         <activity android:name=".fingerPrint_Login.register.register_with_activity.RegAdmin_Activity" />
         <activity android:name=".fingerPrint_Login.test_mvp.Test_Activity" />
-        <activity android:name=".fingerPrint_Login.fingerprint_login.FingerPrint_LogIn_Final_Activity" android:launchMode="singleTask">
+        <activity
+            android:name=".fingerPrint_Login.startup_load.Startup_Activity"
+            android:launchMode="singleTask">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -37,13 +39,11 @@
             </intent-filter>
         </activity>
 
-        <receiver android:name="com.example.afinal.fingerPrint_Login.register.WifiReceiver" >
+        <receiver android:name=".fingerPrint_Login.register.WifiReceiver">
             <intent-filter android:priority="100">
                 <action android:name="android.net.wifi.STATE_CHANGE" />
             </intent-filter>
         </receiver>
     </application>
-
-
 
 </manifest>

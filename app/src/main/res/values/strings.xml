@@ -7,7 +7,6 @@
     <string name="title_activity_main__bottom_nav_">Main_BottomNav_Activity</string>
 
 
-
     <string name="simple_circle_button_example">Simple Circle Button Example</string>
     <string name="text_inside_circle_button_example">Text Inside Circle Button Example</string>
     <string name="text_outside_circle_button_example">Text Outside Circle Button Example</string>
@@ -40,12 +39,11 @@
 
     <string name="text_outside_circle_button_text">Test</string>
 
-    <string name = "button_zero">Register as Admin</string>
-    <string name = "button_one">Register as User</string>
-    <string name = "button_two">MC</string>
-    <string name = "button_three">Log in to admin 2</string>
-    <string name = "button_four">Log in to admin 1</string>
-
+    <string name="button_zero">Register as Admin</string>
+    <string name="button_one">Register as User</string>
+    <string name="button_two">MC</string>
+    <string name="button_three">Log in to admin 2</string>
+    <string name="button_four">Log in to admin 1</string>
 
 
     <string name="text_outside_circle_button_text_highlighted">Text Outside Circle Button(Highlighted)</string>
@@ -57,10 +55,6 @@
     <string name="text_ham_button_sub_text_normal">Ham Button Sub Text(Normal)</string>
     <string name="text_ham_button_sub_text_highlighted">Ham Button Sub Text(Highlighted)</string>
     <string name="text_ham_button_sub_text_unable">Ham Button Sub Text(Unable)</string>
-
-
-
-
 
 
 </resources>
