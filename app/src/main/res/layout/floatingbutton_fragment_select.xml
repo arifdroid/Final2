@@ -15,7 +15,6 @@
         android:layout_height="match_parent"
         android:alpha="0.2"
         android:onClick="onClick"
-        android:background="@android:color/holo_red_light"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
