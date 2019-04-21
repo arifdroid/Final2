@@ -258,12 +258,12 @@ public class Login_Select_Action_Fragment extends Fragment{
         }
 
         ///
-
-        textView_RegAdmin.setText("Register As Admin");
-        textView_RegUser.setText("Register As User");
-        textViewAdmin_1.setText("Log in to Admin 1 :"+adminName);
-        textViewAdmin_2.setText("Log in to Admin 2 :"+adminName_2);
-        textView_Note.setText("MC or Outstation?");
+//
+//        textView_RegAdmin.setText("Register As Admin");
+//        textView_RegUser.setText("Register As User");
+//        textViewAdmin_1.setText("Log in to Admin 1 :"+adminName);
+//        textViewAdmin_2.setText("Log in to Admin 2 :"+adminName_2);
+//        textView_Note.setText("MC or Outstation?");
 
 //        floatButton_Admin_1.setOnClickListener(this);
 //        floatButton_Admin_2.setOnClickListener(this);
@@ -278,6 +278,9 @@ public class Login_Select_Action_Fragment extends Fragment{
 
             boomMenuButton.addBuilder(BuilderManager.getTextOutsideCircleButtonBuilder(j));
             final long ss = boomMenuButton.getShowDuration();
+
+            boomMenuButton.setAutoBoom(true);
+
             boomMenuButton.setOnBoomListener(new OnBoomListener() {
 
 

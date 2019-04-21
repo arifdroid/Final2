@@ -24,128 +24,6 @@
         app:layout_constraintVertical_bias="0.0"/>
 
 
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/select_fragment_FloatButton_backiD"
-        android:layout_width="50dp"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginEnd="8dp"
-        android:layout_marginBottom="100dp"
-        android:onClick="onClick"
-        app:backgroundTint="@android:color/holo_red_light"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.976"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.987" />
-
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/select_fragment_FloatButton_admin1id"
-        android:layout_width="40dp"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="20dp"
-        android:onClick="onClick"
-        app:backgroundTint="@android:color/holo_red_light"
-        app:layout_constraintBottom_toTopOf="@+id/select_fragment_FloatButton_backiD"
-        app:layout_constraintEnd_toEndOf="@+id/select_fragment_FloatButton_backiD"
-        app:layout_constraintStart_toStartOf="@+id/select_fragment_FloatButton_backiD" />
-
-    <TextView
-        android:id="@+id/select_fragment_textView_regAdmin_1id"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="20dp"
-        android:text="TextView"
-        app:layout_constraintBottom_toBottomOf="@+id/select_fragment_FloatButton_RegisterAdminiD"
-        app:layout_constraintEnd_toStartOf="@+id/select_fragment_FloatButton_RegisterAdminiD"
-        app:layout_constraintTop_toTopOf="@+id/select_fragment_FloatButton_RegisterAdminiD" />
-
-    <TextView
-        android:id="@+id/select_fragment_textView_regUser_1id"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="20dp"
-        android:text="TextView"
-        app:layout_constraintBottom_toBottomOf="@+id/select_fragment_FloatButton_RegisterUseriD"
-        app:layout_constraintEnd_toStartOf="@+id/select_fragment_FloatButton_RegisterUseriD"
-        app:layout_constraintTop_toTopOf="@+id/select_fragment_FloatButton_RegisterUseriD" />
-
-    <TextView
-        android:id="@+id/select_fragment_textView_admin1id"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="20dp"
-        android:text="TextView"
-        app:layout_constraintBottom_toBottomOf="@+id/select_fragment_FloatButton_admin1id"
-        app:layout_constraintEnd_toStartOf="@+id/select_fragment_FloatButton_admin1id"
-        app:layout_constraintTop_toTopOf="@+id/select_fragment_FloatButton_admin1id" />
-
-    <TextView
-        android:id="@+id/select_fragment_textView_admin2id"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="20dp"
-        android:text="TextView"
-        app:layout_constraintBottom_toBottomOf="@+id/select_fragment_FloatButton_admin2"
-        app:layout_constraintEnd_toStartOf="@+id/select_fragment_FloatButton_admin2"
-        app:layout_constraintTop_toTopOf="@+id/select_fragment_FloatButton_admin2" />
-
-    <TextView
-        android:id="@+id/select_fragment_textView_addNote_1id"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="20dp"
-        android:text="TextView"
-        app:layout_constraintBottom_toBottomOf="@+id/select_fragment_FloatButton_addNoteMCiD"
-        app:layout_constraintEnd_toStartOf="@+id/select_fragment_FloatButton_addNoteMCiD"
-        app:layout_constraintTop_toTopOf="@+id/select_fragment_FloatButton_addNoteMCiD" />
-
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/select_fragment_FloatButton_admin2"
-        android:layout_width="40dp"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="20dp"
-        android:onClick="onClick"
-        app:backgroundTint="@android:color/holo_red_light"
-        app:layout_constraintBottom_toTopOf="@+id/select_fragment_FloatButton_admin1id"
-        app:layout_constraintEnd_toEndOf="@+id/select_fragment_FloatButton_backiD"
-        app:layout_constraintStart_toStartOf="@+id/select_fragment_FloatButton_backiD" />
-
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/select_fragment_FloatButton_RegisterUseriD"
-        android:layout_width="40dp"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="20dp"
-        android:onClick="onClick"
-        app:backgroundTint="@android:color/holo_red_light"
-        app:layout_constraintBottom_toTopOf="@+id/select_fragment_FloatButton_admin2"
-        app:layout_constraintEnd_toEndOf="@+id/select_fragment_FloatButton_backiD"
-        app:layout_constraintStart_toStartOf="@+id/select_fragment_FloatButton_backiD" />
-
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/select_fragment_FloatButton_RegisterAdminiD"
-        android:layout_width="40dp"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="20dp"
-        android:onClick="onClick"
-        app:backgroundTint="@android:color/holo_red_light"
-        app:layout_constraintBottom_toTopOf="@+id/select_fragment_FloatButton_RegisterUseriD"
-        app:layout_constraintEnd_toEndOf="@+id/select_fragment_FloatButton_backiD"
-        app:layout_constraintStart_toStartOf="@+id/select_fragment_FloatButton_backiD" />
-
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/select_fragment_FloatButton_addNoteMCiD"
-        android:layout_width="40dp"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="20dp"
-        android:onClick="onClick"
-        app:backgroundTint="@android:color/holo_red_light"
-        app:layout_constraintBottom_toTopOf="@+id/select_fragment_FloatButton_RegisterAdminiD"
-        app:layout_constraintEnd_toEndOf="@+id/select_fragment_FloatButton_backiD"
-        app:layout_constraintStart_toStartOf="@+id/select_fragment_FloatButton_backiD" />
-
     <com.nightonke.boommenu.BoomMenuButton
         android:id="@+id/boomMenuiD"
         android:layout_width="wrap_content"
@@ -158,7 +36,7 @@
         app:layout_constraintEnd_toEndOf="parent"
 
 
-       >
+        >
 
     </com.nightonke.boommenu.BoomMenuButton>
 
