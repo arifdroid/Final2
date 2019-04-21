@@ -13,16 +13,25 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.afinal.R;
 import com.example.afinal.fingerPrint_Login.register.register_as_admin.register_as_admin_regAdmin.RegAdmin_AsAdmin_Activity;
 import com.example.afinal.fingerPrint_Login.register.register_with_activity.RegAdmin_Activity;
+import com.nightonke.boommenu.BoomButtons.BoomButton;
+import com.nightonke.boommenu.BoomButtons.ButtonPlaceEnum;
+import com.nightonke.boommenu.BoomMenuButton;
+import com.nightonke.boommenu.ButtonEnum;
+import com.nightonke.boommenu.OnBoomListener;
+import com.nightonke.boommenu.Piece.PiecePlaceEnum;
 
 import java.io.File;
+import java.util.Timer;
+import java.util.TimerTask;
 
-public class Login_Select_Action_Fragment extends Fragment implements View.OnClickListener{
+public class Login_Select_Action_Fragment extends Fragment{
 
     private Context mContext;
 
@@ -42,6 +51,16 @@ public class Login_Select_Action_Fragment extends Fragment implements View.OnCli
     private String adminPhone_2;
 
 
+    //boom menu test
+
+    private BoomMenuButton boomMenuButton;
+    private Timer timer;
+    private int countHere;
+    private boolean registerUserBoolean;
+    private boolean registerAdminBoolean;
+    private boolean popAdmin_1;
+    private boolean popAdmin_2;
+
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -50,18 +69,35 @@ public class Login_Select_Action_Fragment extends Fragment implements View.OnCli
         View rootView = inflater.inflate(R.layout.floatingbutton_fragment_select, container,false);
         mContext = container.getContext();
 
-        floatButton_Admin_1 = rootView.findViewById(R.id.select_fragment_FloatButton_admin1id);
-        floatButton_Admin_2 = rootView.findViewById(R.id.select_fragment_FloatButton_admin2);
-        floatButton_Reg_User = rootView.findViewById(R.id.select_fragment_FloatButton_RegisterUseriD);
-        floatButton_Reg_Admin = rootView.findViewById(R.id.select_fragment_FloatButton_RegisterAdminiD);
-        floatButton_Note_MC = rootView.findViewById(R.id.select_fragment_FloatButton_addNoteMCiD);
-        floatButton_Back = rootView.findViewById(R.id.select_fragment_FloatButton_backiD);
+        countHere =0;
+        boomMenuButton = rootView.findViewById(R.id.boomMenuiD);
+        assert  boomMenuButton!=null;
+        boomMenuButton.setButtonEnum(ButtonEnum.TextOutsideCircle);
+        boomMenuButton.setPiecePlaceEnum(PiecePlaceEnum.DOT_5_3);
+        boomMenuButton.setButtonPlaceEnum(ButtonPlaceEnum.SC_5_3);
 
-        textView_Note = rootView.findViewById(R.id.select_fragment_textView_addNote_1id);
-        textViewAdmin_1 = rootView.findViewById(R.id.select_fragment_textView_admin1id);
-        textViewAdmin_2 = rootView.findViewById(R.id.select_fragment_textView_admin2id);
-        textView_RegUser = rootView.findViewById(R.id.select_fragment_textView_regUser_1id);
-        textView_RegAdmin = rootView.findViewById(R.id.select_fragment_textView_regAdmin_1id);
+        //test boom menu
+
+        registerUserBoolean =false;
+        registerAdminBoolean = false;
+
+        popAdmin_1 =false;
+        popAdmin_2 = false;
+//
+//
+//
+//        floatButton_Admin_1 = rootView.findViewById(R.id.select_fragment_FloatButton_admin1id);
+//        floatButton_Admin_2 = rootView.findViewById(R.id.select_fragment_FloatButton_admin2);
+//        floatButton_Reg_User = rootView.findViewById(R.id.select_fragment_FloatButton_RegisterUseriD);
+//        floatButton_Reg_Admin = rootView.findViewById(R.id.select_fragment_FloatButton_RegisterAdminiD);
+//        floatButton_Note_MC = rootView.findViewById(R.id.select_fragment_FloatButton_addNoteMCiD);
+//        floatButton_Back = rootView.findViewById(R.id.select_fragment_FloatButton_backiD);
+//
+//        textView_Note = rootView.findViewById(R.id.select_fragment_textView_addNote_1id);
+//        textViewAdmin_1 = rootView.findViewById(R.id.select_fragment_textView_admin1id);
+//        textViewAdmin_2 = rootView.findViewById(R.id.select_fragment_textView_admin2id);
+//        textView_RegUser = rootView.findViewById(R.id.select_fragment_textView_regUser_1id);
+//        textView_RegAdmin = rootView.findViewById(R.id.select_fragment_textView_regAdmin_1id);
 
         //we pull from shared preferences here once
         //then set text, this is the part, how we know to which admin do we pull from,
@@ -229,12 +265,162 @@ public class Login_Select_Action_Fragment extends Fragment implements View.OnCli
         textViewAdmin_2.setText("Log in to Admin 2 :"+adminName_2);
         textView_Note.setText("MC or Outstation?");
 
-        floatButton_Admin_1.setOnClickListener(this);
-        floatButton_Admin_2.setOnClickListener(this);
-        floatButton_Reg_User.setOnClickListener(this);
-        floatButton_Reg_Admin.setOnClickListener(this);
-        floatButton_Back.setOnClickListener(this);
-        floatButton_Note_MC.setOnClickListener(this);
+//        floatButton_Admin_1.setOnClickListener(this);
+//        floatButton_Admin_2.setOnClickListener(this);
+//        floatButton_Reg_User.setOnClickListener(this);
+//        floatButton_Reg_Admin.setOnClickListener(this);
+//        floatButton_Back.setOnClickListener(this);
+//        floatButton_Note_MC.setOnClickListener(this);
+
+        // must be done here , boom menu
+
+        for(int j = 0; j < boomMenuButton.getPiecePlaceEnum().pieceNumber();j++){
+
+            boomMenuButton.addBuilder(BuilderManager.getTextOutsideCircleButtonBuilder(j));
+            final long ss = boomMenuButton.getShowDuration();
+            boomMenuButton.setOnBoomListener(new OnBoomListener() {
+
+
+                @Override
+                public void onClicked(int index, BoomButton boomButton) {
+
+                    if(index==0){ //register admin
+
+                       // boomButton.getLayoutAnimationListener().onAnimationEnd(this);
+
+                        registerAdminBoolean = true;
+
+
+
+                    }
+
+                    if(index==1){ // register user
+
+                        registerUserBoolean=true;
+
+                    }
+
+                    if(index==2){ // MC
+
+
+                        Toast.makeText(getContext(),"duration is: "+String.valueOf(ss),Toast.LENGTH_SHORT).show();
+                    }
+
+
+                    if(index==3){ //log to admin 2
+
+                        popAdmin_2=true;
+
+
+
+
+
+                    }
+
+
+                    if(index==4){ //log to admin 1
+
+
+                    }
+
+
+
+
+                }
+
+                @Override
+                public void onBackgroundClick() {
+
+                    getFragmentManager().popBackStack();
+
+                }
+
+                @Override
+                public void onBoomWillHide() {
+
+                }
+
+                @Override
+                public void onBoomDidHide() {
+
+                    if(registerUserBoolean) {
+
+                        registerUserBoolean=false;
+                        Intent intent = new Intent(getActivity(), RegAdmin_Activity.class);
+                        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK); //creating new task for registering,
+                        //but we dont want user to be able to back.
+                        startActivity(intent);
+                    }
+
+                    if(registerAdminBoolean){
+                        registerAdminBoolean=false;
+
+                        Intent intent2 = new Intent(getActivity(), RegAdmin_AsAdmin_Activity.class);
+                        intent2.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                        startActivity(intent2);
+
+
+                    }
+
+                    if(popAdmin_1){
+                        popAdmin_1=false;
+
+                        if(nameHere!=null) {
+                            FingerPrint_LogIn_Final_Activity.timeFragmentBoolean=true;
+                            ((FingerPrint_LogIn_Final_Activity) getActivity()).nameUser = nameHere; //
+                            ((FingerPrint_LogIn_Final_Activity) getActivity()).phoneUser = phoneHere; //
+                            ((FingerPrint_LogIn_Final_Activity) getActivity()).globalAdminNameHere = adminName; //
+                            ((FingerPrint_LogIn_Final_Activity) getActivity()).globalAdminPhoneHere = adminPhone; //
+
+                            Log.i("finalSharePreDataCheck","Login_Select_Fragment 4, before return,name: "
+                                    + nameHere+ ", phone: "+phoneHere+ ", adminName:"
+                                    +adminName+" , adminPhone: "+adminPhone);
+                        }
+
+                        //this is we setup shared prefe
+                        getFragmentManager().popBackStack();
+
+
+
+
+                    }
+
+                    if(popAdmin_2){
+                        popAdmin_2=false;
+
+                        if(nameHere!=null) {
+                            FingerPrint_LogIn_Final_Activity.timeFragmentBoolean=true;
+                            ((FingerPrint_LogIn_Final_Activity) getActivity()).nameUser = nameHere_2; //
+                            ((FingerPrint_LogIn_Final_Activity) getActivity()).phoneUser = phoneHere_2; //
+                            ((FingerPrint_LogIn_Final_Activity) getActivity()).globalAdminNameHere = adminName_2; //
+                            ((FingerPrint_LogIn_Final_Activity) getActivity()).globalAdminPhoneHere = adminPhone_2; //
+
+                            Log.i("finalSharePreDataCheck","Login_Select_Fragment 4, before return,name: "
+                                    + nameHere_2+ ", phone: "+phoneHere_2+ ", adminName:"
+                                    +adminName_2+" , adminPhone: "+adminPhone_2);
+                        }
+
+                        getFragmentManager().popBackStack();
+
+
+                    }
+
+                }
+
+                @Override
+                public void onBoomWillShow() {
+
+                }
+
+                @Override
+                public void onBoomDidShow() {
+
+
+
+                }
+            });
+        }
+
 
 
 
@@ -252,98 +438,98 @@ public class Login_Select_Action_Fragment extends Fragment implements View.OnCli
 
 
     }
-
-    @Override
-    public void onClick(View v) {
-
-        switch (v.getId()){
-
-            case R.id.select_fragment_FloatButton_backiD:
-
-                getFragmentManager().popBackStack();
-
-                break;
-
-            case R.id.select_fragment_FloatButton_admin1id:
-
-                //to disable register user, save data to shared preferences,
-                //then pull data, if data exist, dont allow for register, show toast
-                String test = nameHere;
-                if(nameHere!=null) {
-                    FingerPrint_LogIn_Final_Activity.timeFragmentBoolean=true;
-                    ((FingerPrint_LogIn_Final_Activity) getActivity()).nameUser = nameHere; //
-                    ((FingerPrint_LogIn_Final_Activity) getActivity()).phoneUser = phoneHere; //
-                    ((FingerPrint_LogIn_Final_Activity) getActivity()).globalAdminNameHere = adminName; //
-                    ((FingerPrint_LogIn_Final_Activity) getActivity()).globalAdminPhoneHere = adminPhone; //
-
-                    Log.i("finalSharePreDataCheck","Login_Select_Fragment 4, before return,name: "
-                            + nameHere+ ", phone: "+phoneHere+ ", adminName:"
-                            +adminName+" , adminPhone: "+adminPhone);
-                }
-
-                //this is we setup shared prefe
-                getFragmentManager().popBackStack();
-
-                break;
-            case R.id.select_fragment_FloatButton_admin2:
-                if(nameHere!=null) {
-                    FingerPrint_LogIn_Final_Activity.timeFragmentBoolean=true;
-                    ((FingerPrint_LogIn_Final_Activity) getActivity()).nameUser = nameHere_2; //
-                    ((FingerPrint_LogIn_Final_Activity) getActivity()).phoneUser = phoneHere_2; //
-                    ((FingerPrint_LogIn_Final_Activity) getActivity()).globalAdminNameHere = adminName_2; //
-                    ((FingerPrint_LogIn_Final_Activity) getActivity()).globalAdminPhoneHere = adminPhone_2; //
-
-                    Log.i("finalSharePreDataCheck","Login_Select_Fragment 4, before return,name: "
-                            + nameHere_2+ ", phone: "+phoneHere_2+ ", adminName:"
-                            +adminName_2+" , adminPhone: "+adminPhone_2);
-                }
-
-                getFragmentManager().popBackStack();
-
-
-
-                break;
-
-            case R.id.select_fragment_FloatButton_RegisterUseriD:
-
-                Intent intent = new Intent(getActivity(), RegAdmin_Activity.class);
-
-                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK); //creating new task for registering,
-                //but we dont want user to be able to back.
-                startActivity(intent);
-
-
-
-
-                break;
-
-            case R.id.select_fragment_FloatButton_RegisterAdminiD:
-
-            Intent intent2 = new Intent(getActivity(), RegAdmin_AsAdmin_Activity.class);
-            startActivity(intent2);
-            intent2.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK); //creating new task for registering,
-                //but we dont want user to be able to back.
-
-
-                break;
-
-            case R.id.select_fragment_FloatButton_addNoteMCiD:
-
-
-
-
-
-                break;
-
-
-
-
-
-        }
-
-
-    }
-
+//
+//    @Override
+//    public void onClick(View v) {
+//
+//        switch (v.getId()){
+//
+//            case R.id.select_fragment_FloatButton_backiD:
+//
+//                getFragmentManager().popBackStack();
+//
+//                break;
+//
+//            case R.id.select_fragment_FloatButton_admin1id:
+//
+//                //to disable register user, save data to shared preferences,
+//                //then pull data, if data exist, dont allow for register, show toast
+//                String test = nameHere;
+//                if(nameHere!=null) {
+//                    FingerPrint_LogIn_Final_Activity.timeFragmentBoolean=true;
+//                    ((FingerPrint_LogIn_Final_Activity) getActivity()).nameUser = nameHere; //
+//                    ((FingerPrint_LogIn_Final_Activity) getActivity()).phoneUser = phoneHere; //
+//                    ((FingerPrint_LogIn_Final_Activity) getActivity()).globalAdminNameHere = adminName; //
+//                    ((FingerPrint_LogIn_Final_Activity) getActivity()).globalAdminPhoneHere = adminPhone; //
+//
+//                    Log.i("finalSharePreDataCheck","Login_Select_Fragment 4, before return,name: "
+//                            + nameHere+ ", phone: "+phoneHere+ ", adminName:"
+//                            +adminName+" , adminPhone: "+adminPhone);
+//                }
+//
+//                //this is we setup shared prefe
+//                getFragmentManager().popBackStack();
+//
+//                break;
+//            case R.id.select_fragment_FloatButton_admin2:
+//                if(nameHere!=null) {
+//                    FingerPrint_LogIn_Final_Activity.timeFragmentBoolean=true;
+//                    ((FingerPrint_LogIn_Final_Activity) getActivity()).nameUser = nameHere_2; //
+//                    ((FingerPrint_LogIn_Final_Activity) getActivity()).phoneUser = phoneHere_2; //
+//                    ((FingerPrint_LogIn_Final_Activity) getActivity()).globalAdminNameHere = adminName_2; //
+//                    ((FingerPrint_LogIn_Final_Activity) getActivity()).globalAdminPhoneHere = adminPhone_2; //
+//
+//                    Log.i("finalSharePreDataCheck","Login_Select_Fragment 4, before return,name: "
+//                            + nameHere_2+ ", phone: "+phoneHere_2+ ", adminName:"
+//                            +adminName_2+" , adminPhone: "+adminPhone_2);
+//                }
+//
+//                getFragmentManager().popBackStack();
+//
+//
+//
+//                break;
+//
+//            case R.id.select_fragment_FloatButton_RegisterUseriD:
+//
+//                Intent intent = new Intent(getActivity(), RegAdmin_Activity.class);
+//
+//                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK); //creating new task for registering,
+//                //but we dont want user to be able to back.
+//                startActivity(intent);
+//
+//
+//
+//
+//                break;
+//
+//            case R.id.select_fragment_FloatButton_RegisterAdminiD:
+//
+//            Intent intent2 = new Intent(getActivity(), RegAdmin_AsAdmin_Activity.class);
+//            startActivity(intent2);
+//            intent2.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK); //creating new task for registering,
+//                //but we dont want user to be able to back.
+//
+//
+//                break;
+//
+//            case R.id.select_fragment_FloatButton_addNoteMCiD:
+//
+//
+//
+//
+//
+//                break;
+//
+//
+//
+//
+//
+//        }
+//
+//
+//    }
+//
 
 
 

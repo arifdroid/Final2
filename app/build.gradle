@@ -26,6 +26,9 @@ dependencies {
     implementation 'androidx.constraintlayout:constraintlayout:1.1.3'
     implementation 'com.google.android.material:material:1.0.0-beta01'
 
+    //boom menu
+    implementation 'com.nightonke:boommenu:2.1.1'
+
     //picasso image load
     implementation 'com.squareup.picasso:picasso:2.5.2'
 
