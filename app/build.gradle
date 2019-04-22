@@ -31,8 +31,9 @@ dependencies {
 
     //text animation
     implementation "com.hanks:htextview-base:$htextview_version"
-
     implementation "com.hanks:htextview-scale:$htextview_version"
+
+    implementation "com.hanks:htextview-evaporate:$htextview_version"
 
     //boom menu
     implementation 'com.nightonke:boommenu:2.1.1'

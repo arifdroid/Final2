@@ -8,14 +8,17 @@
     android:id = "@+id/layoutStartupID"
     tools:context=".fingerPrint_Login.startup_load.Startup_Activity">
 
-    <com.hanks.htextview.scale.ScaleTextView
+    <com.hanks.htextview.evaporate.EvaporateTextView
+        android:id = "@+id/scaletextID"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
         android:layout_marginEnd="8dp"
+        android:textSize="30sp"
+        android:text=" "
         android:layout_marginBottom="8dp"
-        android:text='"swipezy"'
+        android:textColor="@color/material_white"
         android:textAppearance="@style/TextAppearance.MaterialComponents.Headline3"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"

@@ -39,6 +39,9 @@
 
     <string name="text_outside_circle_button_text">Test</string>
 
+
+    <string name="startup_text">"LoggeddIn"</string>
+
     <string name="button_zero">Register as Admin</string>
     <string name="button_one">Register as User</string>
     <string name="button_two">MC</string>
