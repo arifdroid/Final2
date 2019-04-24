@@ -5,6 +5,10 @@
     android:id="@+id/frameID"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@drawable/gradient_2"
+    android:alpha="0.7"
+
+
     tools:context=".fingerPrint_Login.fingerprint_login.FingerPrint_LogIn_Final_Activity">
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -20,7 +24,7 @@
             android:layout_marginTop="8dp"
             android:layout_marginEnd="8dp"
             android:layout_marginBottom="8dp"
-            app:backgroundTint="@android:color/holo_red_light"
+            android:backgroundTint="@color/design_default_color_primary_dark"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.976"
@@ -37,6 +41,7 @@
             android:layout_marginEnd="8dp"
             android:layout_marginBottom="8dp"
             android:contentDescription="test fingerprint "
+            android:visibility="invisible"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -91,6 +96,32 @@
             app:layout_constraintBottom_toTopOf="@+id/textViewFinalDataID2"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent" />
+
+        <androidx.cardview.widget.CardView
+            android:layout_width="match_parent"
+            android:layout_height="150dp"
+            android:layout_marginStart="20dp"
+            android:layout_marginEnd="20dp"
+           android:outlineAmbientShadowColor="@color/material_black_grey"
+            app:cardBackgroundColor="@color/common_google_signin_btn_text_dark_default"
+            app:cardCornerRadius="20dp"
+            app:cardElevation="10dp"
+            app:cardPreventCornerOverlap="false"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.78">
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+        </androidx.cardview.widget.CardView>
 
 
     </androidx.constraintlayout.widget.ConstraintLayout>

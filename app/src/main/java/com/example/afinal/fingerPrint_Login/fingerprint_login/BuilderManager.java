@@ -1,5 +1,7 @@
 package com.example.afinal.fingerPrint_Login.fingerprint_login;
 
+import android.graphics.Rect;
+
 import com.example.afinal.R;
 import com.nightonke.boommenu.BoomButtons.BoomButtonBuilder;
 import com.nightonke.boommenu.BoomButtons.TextOutsideCircleButton;
@@ -67,10 +69,13 @@ public class BuilderManager {
         }
 
         return new TextOutsideCircleButton.Builder()
+                .rotateText(true)
+                .imagePadding(new Rect(0,0,70,50))
                 .normalImageRes(getImageResource())
-
+                .buttonRadius(100)
                 //test need to be personalized for each button
                 .normalTextRes(h);
+
 
 
     }

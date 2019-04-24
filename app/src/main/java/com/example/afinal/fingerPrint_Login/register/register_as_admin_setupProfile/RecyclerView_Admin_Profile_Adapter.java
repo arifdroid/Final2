@@ -131,6 +131,8 @@ public class RecyclerView_Admin_Profile_Adapter extends RecyclerView.Adapter<Rec
 //            Log.i("checkkLocation", "9 location " +adminDetails.get(i).getTextShow());
 //        }
         insideHolder.imageViewList.setImageResource(id);
+        //insideHolder.imageViewList.setImageResource();
+
         insideHolder.textViewList.setText(adminDetails.get(i).getTextShow());
 
 

@@ -3,10 +3,18 @@ package com.example.afinal.fingerPrint_Login.fingerprint_login;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.res.Resources;
+import android.graphics.Color;
+import android.graphics.Rect;
+import android.graphics.drawable.Drawable;
+import android.graphics.drawable.GradientDrawable;
 import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+
+import androidx.core.content.ContextCompat;
+import androidx.core.content.res.ResourcesCompat;
 import androidx.fragment.app.Fragment;
 
 import android.util.Log;
@@ -26,8 +34,10 @@ import com.nightonke.boommenu.BoomMenuButton;
 import com.nightonke.boommenu.ButtonEnum;
 import com.nightonke.boommenu.OnBoomListener;
 import com.nightonke.boommenu.Piece.PiecePlaceEnum;
+import com.nightonke.boommenu.Util;
 
 import java.io.File;
+import java.lang.reflect.Field;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -279,7 +289,56 @@ public class Login_Select_Action_Fragment extends Fragment{
             boomMenuButton.addBuilder(BuilderManager.getTextOutsideCircleButtonBuilder(j));
             final long ss = boomMenuButton.getShowDuration();
 
+            //boomMenuButton.setButtonRadius(60);
+//            int size = boomMenuButton.getButtonRadius();
+            //boomMenuButton.radius
+
+            if(j==4) {
+                boomMenuButton.getBuilder(4).normalColor(Color.YELLOW);
+
+                //boomMenuButton.getBuilder(4).rad
+                //boomMenuButton.getBuilder(4).
+
+            }
+            if(j==2) {
+
+//                GradientDrawable drawable = new GradientDrawable(GradientDrawable.Orientation.BOTTOM_TOP,
+//                        new int[] {0xFF616261,0xFF131313});
+//                drawable.setCornerRadius(0f);
+
+                //int trydraw = getResources().getDrawable(R.drawable.button_default, );
+
+               // int trydraw = getActivity().getResources().getIdentifier("drawable/button_default",null,getActivity().getPackageName());
+
+//                int trydraw = getResId("R.drawable/button_default",R.drawable.button_default);
+
+
+                int trydraw = R.drawable.button_default;
+
+                //boomMenuButton.getBuilder(2).normalColorRes(trydraw);
+                boomMenuButton.getBuilder(2).imagePadding(new Rect(200,200,200,200));
+                boomMenuButton.getBuilder(2).normalColor(trydraw);
+                //boomMenuButton.getBuilder(2).
+                //boomMenuButton.getBuilder(2).normalImageRes(trydraw);
+//
+//                Rect rect = new Rect();
+//                rect.bottom=1;
+//                rect.left=1;
+//                rect.right=1;
+//                rect.top=0;
+//
+//                boomMenuButton.getBuilder(4).imagePadding(rect);
+//
+
+            }
             boomMenuButton.setAutoBoom(true);
+            boomMenuButton.setShadowEffect(true);
+
+
+
+            //    Toast.makeText(getContext(),"size is: "+String.valueOf(size),Toast.LENGTH_SHORT).show();
+
+
 
             boomMenuButton.setOnBoomListener(new OnBoomListener() {
 
@@ -428,6 +487,26 @@ public class Login_Select_Action_Fragment extends Fragment{
 
 
         return rootView;
+    }
+
+    // HANDLE RESOURCES
+
+    public static int getResId(String variableName, Class<?> с) {
+
+        Field field = null;
+        int resId = 0;
+        try {
+            field = с.getField(variableName);
+            try {
+                resId = field.getInt(null);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return resId;
+
     }
 
 
