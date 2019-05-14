@@ -11,4 +11,9 @@
     <color name="material_blue_grey">#263238</color>
     <color name="blue_grey_soft">#ECEFF1</color>
 
+
+    <color name="pink_main">#E31F97</color>
+    <color name="orang_center">#EF7F56</color>
+    <color name="yellow_end">#FAD81A</color>
+
 </resources>

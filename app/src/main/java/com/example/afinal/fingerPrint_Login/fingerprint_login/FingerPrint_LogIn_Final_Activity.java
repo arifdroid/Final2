@@ -10,6 +10,7 @@ import androidx.constraintlayout.widget.ConstraintLayout;
 
 import com.example.afinal.fingerPrint_Login.oop.OnServerTime_Interface;
 
+import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import androidx.fragment.app.FragmentManager;
@@ -152,10 +153,22 @@ public class FingerPrint_LogIn_Final_Activity extends AppCompatActivity implemen
     public static boolean timeFragmentBoolean;
     private String lastSSIDrecorded;
 
+    //// navigation icon
+
+    private BottomNavigationView bottomNavigationView;
+
+
+
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_finger_print__log_in__final_);
+
+        bottomNavigationView = findViewById(R.id.bottomNavigationView_fingerprint);
+
+        bottomNavigationView.setItemIconTintList(null);
 
         lastSSIDrecorded = "";
         timeFragmentBoolean =false;
