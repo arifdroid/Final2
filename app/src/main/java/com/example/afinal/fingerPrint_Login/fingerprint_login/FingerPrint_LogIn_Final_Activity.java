@@ -5,6 +5,8 @@ import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
 
+import androidx.annotation.NonNull;
+import androidx.cardview.widget.CardView;
 import androidx.constraintlayout.widget.ConstraintLayout;
 
 
@@ -27,6 +29,7 @@ import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -157,7 +160,97 @@ public class FingerPrint_LogIn_Final_Activity extends AppCompatActivity implemen
 
     private BottomNavigationView bottomNavigationView;
 
+    private CardView cardViewAdminIcon, cardViewEveningIcon;
+    private ConstraintLayout constraintLayoutMorningIcon;
 
+    private ConstraintLayout barMorning, barEvening,barAdmin;
+
+    private ImageView imageViewAdminIcon, imageViewEveningIcon, imageViewMorningIcon;
+
+    //bottom navigation listener
+
+
+    private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
+            = new BottomNavigationView.OnNavigationItemSelectedListener() {
+
+        @Override
+        public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+            switch (item.getItemId()) {
+
+                case R.id.nav_wifi:
+
+
+
+
+
+                    break;
+                case R.id.nav_location:
+
+
+
+
+
+                    break;
+                case R.id.nav_morning:
+
+
+                    imageViewAdminIcon.setVisibility(View.INVISIBLE);
+                    cardViewAdminIcon.setVisibility(View.INVISIBLE);
+                    barAdmin.setVisibility(View.INVISIBLE);
+
+                    imageViewEveningIcon.setVisibility(View.INVISIBLE);
+                    cardViewEveningIcon.setVisibility(View.INVISIBLE);
+                    barEvening.setVisibility(View.INVISIBLE);
+
+                    imageViewMorningIcon.setVisibility(View.VISIBLE);
+                    constraintLayoutMorningIcon.setVisibility(View.VISIBLE);
+                    barMorning.setVisibility(View.VISIBLE);
+
+
+
+                    break;
+                case R.id.nav_evening:
+
+
+                    imageViewAdminIcon.setVisibility(View.INVISIBLE);
+                    cardViewAdminIcon.setVisibility(View.INVISIBLE);
+                    barAdmin.setVisibility(View.INVISIBLE);
+
+                    imageViewEveningIcon.setVisibility(View.VISIBLE);
+                    cardViewEveningIcon.setVisibility(View.VISIBLE);
+                    barEvening.setVisibility(View.VISIBLE);
+
+                    imageViewMorningIcon.setVisibility(View.INVISIBLE);
+                    constraintLayoutMorningIcon.setVisibility(View.INVISIBLE);
+                    barMorning.setVisibility(View.INVISIBLE);
+//
+
+
+
+                    break;
+                case R.id.nav_admin:
+
+
+                    imageViewAdminIcon.setVisibility(View.VISIBLE);
+                    cardViewAdminIcon.setVisibility(View.VISIBLE);
+                    barAdmin.setVisibility(View.VISIBLE);
+
+                    imageViewEveningIcon.setVisibility(View.INVISIBLE);
+                    cardViewEveningIcon.setVisibility(View.INVISIBLE);
+                    barEvening.setVisibility(View.INVISIBLE);
+
+                    imageViewMorningIcon.setVisibility(View.INVISIBLE);
+                    constraintLayoutMorningIcon.setVisibility(View.INVISIBLE);
+                    barMorning.setVisibility(View.INVISIBLE);
+
+
+                    break;
+
+
+            }
+            return true;
+        }
+    };
 
 
 
@@ -168,7 +261,29 @@ public class FingerPrint_LogIn_Final_Activity extends AppCompatActivity implemen
 
         bottomNavigationView = findViewById(R.id.bottomNavigationView_fingerprint);
 
+        bottomNavigationView.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
+
         bottomNavigationView.setItemIconTintList(null);
+
+
+        //setting up for bottom nav
+
+        barAdmin = findViewById(R.id.constraintLayout_bar_admin_ID);
+        barEvening = findViewById(R.id.constraintLayout_bar_evening_ID);
+        barMorning = findViewById(R.id.constraintLayout_bar_morning_ID);
+
+
+        imageViewAdminIcon = findViewById(R.id.final_admin_imageview_ID);
+        imageViewEveningIcon = findViewById(R.id.final_imageView_evening_ID);
+        imageViewMorningIcon = findViewById(R.id.final_imageView_morning_ID);
+
+        cardViewAdminIcon =  findViewById(R.id.final_cardView_admin_ID);
+        cardViewEveningIcon = findViewById(R.id.final_cardView_evening_ID);
+
+        constraintLayoutMorningIcon = findViewById(R.id.final_morning_constraint_ID);
+
+
+        //
 
         lastSSIDrecorded = "";
         timeFragmentBoolean =false;
